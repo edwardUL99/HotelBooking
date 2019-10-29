@@ -2,7 +2,7 @@
  * A class to represent a room of a hotel
  *
  */
-public class Room {
+public class Room implements Comparable<Room> {
 	private String type;
 	private int[] occupancy; //occupancy[0] = Adult min occupancy[1] = child min, occupancy[2] = adult max, occupancy[3] = child max
 	private int[] rates; //indexed 0 - 6 0 = Mon, 1 = Tues, 2 = Wed etc
@@ -117,5 +117,13 @@ public class Room {
 			return this.rates[day];
 		}
 		return -1;
+	}
+	
+	/**
+	* Provides the capability for rooms to be compared
+	* @param other the room to compare to
+	* @return the int value representing the comparison**/
+	public int compareTo(Room other) {
+		return this.type.compareTo(other.type);
 	}
 }
