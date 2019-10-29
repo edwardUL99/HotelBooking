@@ -106,4 +106,16 @@ public class Room {
 			this.rates[day] = rate;
 		}
 	}
+	
+	/**
+	* Returns the rate for the specified day
+	* @param day 0 = Monday, 1 = Tuesday, 2 = Wednesday etc
+	* @return the rate for the day specified
+	**/
+	public int getRate(int day) {
+		if (day >= 0 && day < 7) {
+			return this.rates[day];
+		}
+		return -1;
+	}
 }
