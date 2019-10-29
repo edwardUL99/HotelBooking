@@ -95,18 +95,12 @@ public class Reservation {
 	private void chooseRooms() {
 		//Implement to read available rooms from a file and then use a text interface for the user to chose the rooms they want
 		//For now, using an arbitrary list of rooms
-		int[] rates = new int[7];
-		Arrays.fill(rates, 75);
-		int[] occupancy = {1, 1, 3, 3};
-		String[] types = {"Deluxe Single", "Deluxe Executive"};
-		Room[] roomsTemp = {new Room("Deluxe Single", occupancy, rates), new Room("Deleuxe Executive", occupancy, rates)};
-		int type = 0;
-		ArrayList<Room> allRooms = new ArrayList<Room>(Arrays.asList(roomsTemp));
+		ArrayList<Room> allRooms = new ArrayList<Room>(BookingSystem.getRooms().keySet());
 		Scanner in = new Scanner(System.in);
 		while (this.rooms.size() != this.numberOfRooms) {
 			char ch = 'A';
-			for (String s : types) {
-				System.out.println(ch + ")" + s);
+			for (Room r : allRooms) {
+				System.out.println(ch + ")" + r.getType());
 				ch++;
 			} //This is not how it will be implemented, just until the other methods are developed
 			String input = in.nextLine();
@@ -114,7 +108,7 @@ public class Reservation {
 			if (n >= 0 && n < allRooms.size()) {
 				this.rooms.add(allRooms.get(n));
 			}
-			type = (type + 1) % types.length; //Wraps around
+			//type = (type + 1) % types.length; //Wraps around
 		}
 	}
 	
