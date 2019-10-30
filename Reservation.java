@@ -116,7 +116,8 @@ public class Reservation {
 			if (n >= 0 && n < allRooms.size()) {
 				this.rooms.add(allRooms.get(n));
 			}
-    }
+		}
+		in.close();
 	}
 	
 	/**
