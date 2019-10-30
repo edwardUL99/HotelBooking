@@ -2,7 +2,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Scanner;
 import java.util.Arrays;
-
+import java.util.TreeMap;
 /**
  * A class to represent the reservation for a hotel room(s)
  *
@@ -93,37 +93,30 @@ public class Reservation {
 	}
 	
 	private void chooseRooms() {
-		//Implement to read available rooms from a file and then use a text interface for the user to chose the rooms they want
-		//For now, using an arbitrary list of rooms 
-
-		int[] rates = new int[7]; 
-
-		Arrays.fill(rates, 75); 
-
-		int[] occupancy = {1, 1, 3, 3}; 
-
-		String[] types = {"Deluxe Single", "Deluxe Executive"}; 
-
-		Room[] roomsTemp = {new Room("Deluxe Single", occupancy, rates), new Room("Deleuxe Executive", occupancy, rates)}; 
-		int type = 0; 
-		ArrayList<Room> allRooms = new ArrayList<Room>(Arrays.asList(roomsTemp)); 
-		Scanner in = new Scanner(System.in); 
-		
-		while (this.rooms.size() != this.numberOfRooms) { 
-			char ch = 'A'; 
-			
-			for (String s : types) { 
-				System.out.println(ch + ")" + s); 
-				ch++; 
-			} //This is not how it will be implemented, just until the other methods are developed 
-			String input = in.nextLine(); 
-			int n = input.toUpperCase().charAt(0) - 'A'; 
-			
-			if (n >= 0 && n < allRooms.size()) { 
-				this.rooms.add(allRooms.get(n)); 
-			} 
-			type = (type + 1) % types.length; //Wraps around 
-		} 
+		Scanner in = new Scanner(System.in);
+		TreeMap<String, TreeMap<Room, Integer>> map = BookingSystem.getRooms();
+		System.out.println("Please choose your hotel: ");
+		char c = 'A';
+		ArrayList<String> hotels = new ArrayList<String>();
+		for (String s : map.keySet()) {
+			hotels.add(s);
+			System.out.println(c + ")" + s);
+			c++;
+		}
+		String choice = in.nextLine();
+		ArrayList<Room> allRooms = new ArrayList<Room>(map.get(hotels.get(choice.charAt(0) - 'A')).keySet());
+		while (this.rooms.size() != this.numberOfRooms) {
+			char ch = 'A';
+			for (Room r : allRooms) {
+				System.out.println(ch + ")" + r.getType());
+				ch++;
+			} //This is not how it will be implemented, just until the other methods are developed
+			String input = in.nextLine();
+			int n = input.toUpperCase().charAt(0) - 'A';
+			if (n >= 0 && n < allRooms.size()) {
+				this.rooms.add(allRooms.get(n));
+			}
+    }
 	}
 	
 	/**
