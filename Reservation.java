@@ -33,7 +33,7 @@ public class Reservation {
 		this.checkinDate = checkinDate;
 		this.numberOfNights = numberOfNights;
 		this.numberOfRooms = numberOfRooms;
-		this.rooms = new ArrayList<Room>(numberOfRooms);
+		this.rooms = new ArrayList<Room>(numberOfRooms); 
 		this.chooseRooms();
 	}
 
@@ -93,8 +93,6 @@ public class Reservation {
 	}
 	
 	private void chooseRooms() {
-		//Implement to read available rooms from a file and then use a text interface for the user to chose the rooms they want
-		//For now, using an arbitrary list of rooms
 		Scanner in = new Scanner(System.in);
 		TreeMap<String, TreeMap<Room, Integer>> map = BookingSystem.getRooms();
 		System.out.println("Please choose your hotel: ");
@@ -118,8 +116,7 @@ public class Reservation {
 			if (n >= 0 && n < allRooms.size()) {
 				this.rooms.add(allRooms.get(n));
 			}
-			//type = (type + 1) % types.length; //Wraps around
-		}
+    }
 	}
 	
 	/**

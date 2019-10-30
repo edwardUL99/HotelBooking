@@ -106,7 +106,7 @@ public class Room implements Comparable<Room> {
 			this.rates[day] = rate;
 		}
 	}
-	
+
 	/**
 	* Returns the rate for the specified day
 	* @param day 0 = Monday, 1 = Tuesday, 2 = Wednesday etc

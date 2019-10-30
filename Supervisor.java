@@ -1,4 +1,10 @@
 
-public class Supervisor extends User {
-
+public class Supervisor extends DeskClerk {
+	
+	public void applyDiscount() {
+		
+	}
+	
+	
+	//methods requesting data Analysis
 }
