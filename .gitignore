@@ -10,3 +10,5 @@
 /Supervisor.class
 /TextUI.class
 /User.class
+*.class
+bin/*
