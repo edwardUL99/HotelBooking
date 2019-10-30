@@ -68,5 +68,9 @@ public class Bill {
 	public void setAmountDue(double amountDue) {
 		this.amountDue = amountDue;
 	}
+	
+	public String billToString() {
+		return "Name: " + billName + "\n" + "Date: " + billedDate + "\n" + "Total amount due: "  + amountDue;
+	}
 
 }
