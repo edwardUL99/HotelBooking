@@ -12,3 +12,4 @@
 /User.class
 *.class
 bin/*
+/bin/

@@ -3,7 +3,8 @@
 */
 public class Supervisor extends DeskClerk {
 	
-	public void applyDiscount() {
+	/** allows supervisor to apply any discount to any reservation */
+	public void applyDiscount(double discount, int reservatioNumber ) {
 		
 	}
 	
