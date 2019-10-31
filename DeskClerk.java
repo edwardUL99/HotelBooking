@@ -4,6 +4,11 @@
 public class DeskClerk extends User {
 	private String hotelName;
 	
+	public DeskClerk(String hotelName, BookingSystem system) {
+		super(system);
+		this.hotelName = hotelName;
+	}
+	
 //check in check out methods
 	
 	/** checks in users */

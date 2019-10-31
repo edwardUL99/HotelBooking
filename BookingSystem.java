@@ -2,17 +2,20 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.Scanner;
 import java.util.TreeMap;
+import java.util.ArrayList;
 
 /**
 * A class with tools for managing the system
 */
 public class BookingSystem {
+	private TreeMap<String, ArrayList<Reservation>> reservations; //Stores a list of reservations peer hotel
+	private TreeMap<String, TreeMap<Room, Integer>> allRooms;
 	
 	/**
-	* Private constructor prevents instantiation of BookingSystem obejcts
+	* Constructs a BookingSystem object
 	*/
-	private BookingSystem() {
-		
+	public BookingSystem() {
+		this.reservations = new TreeMap<String, ArrayList<Reservation>>();
 	}
 	
 	/**
@@ -26,8 +29,8 @@ public class BookingSystem {
 	* It would return a TreeMap with the hotel name e.g. 5-star mapped to a treemap with eg. Deluxe Single and the Integer value 45
 	* @return the non-null TreeMap containing hotel names and the room and number of rooms that hotel has
 	*/
-	public static TreeMap<String,TreeMap<Room, Integer>> getRooms() {
-		TreeMap<String,TreeMap<Room, Integer>> allRooms = new TreeMap<String, TreeMap<Room, Integer>>();
+	public TreeMap<String,TreeMap<Room, Integer>> getRooms() {
+		this.allRooms = new TreeMap<String, TreeMap<Room, Integer>>();
 		File f = new File(System.getProperty("user.dir") + "\\l4Hotels.csv");
 		try (Scanner in = new Scanner(f)) {
 			String line;
@@ -74,6 +77,67 @@ public class BookingSystem {
 			
 		}
 		return allRooms;
+	}
+	
+	/**
+	 * Returns a TreeMap all reservations in each hotel
+	 * @return the TreeMap with hotel names and the reservations in that hotel
+	 */
+	public TreeMap<String, ArrayList<Reservation>> getReservations() {
+		return this.reservations;
+	}
+	
+	/**
+	 * Adds a new reservation to the list of reservations for the particular hotel
+	 * @param hotelName the name of the hotel owned by the chain e.g 5-star
+	 * @param reservation the reservation to be added
+	 */
+	public void addReservation(String hotelName, Reservation reservation) {
+		//Will have to have a way to check if the reservation can be made
+		if (this.reservations.containsKey(hotelName)) {
+			this.reservations.get(hotelName).add(reservation);
+		} else {
+			this.reservations.put(hotelName, new ArrayList<Reservation>());
+			this.reservations.get(hotelName).add(reservation);
+		}
+	}
+	
+	/**
+	 * Checks if the hotel that is being provided exists in the system
+	 * @param hotelName The name of the hotel of the chain
+	 * @return if the hotel is in the system
+	 */
+	private boolean containsHotel(String hotelName) {
+		return this.reservations.containsKey(hotelName);
+	}
+	
+	/**
+	 * Checks if the specific hotel has the reservation in the system
+	 * @param hotelName the name of the hotel
+	 * @param reservation the reservation being queried
+	 * @return if the system has a record of the reservation
+	 */
+	private boolean containsReservation(String hotelName, Reservation reservation) {
+		if (!containsHotel(hotelName)) {
+			return false;
+		} else {
+			ArrayList<Reservation> reservationList = this.reservations.get(hotelName);
+			return reservationList.contains(reservation);
+		}
+	}
+	
+	/**
+	 * Removes the reservation from the system for the hotel provided both the hotel name and reservation exist
+	 * @param hotelName the name of the hotel to which the reservation belongs
+	 * @param reservation the reservation to be cancelled
+	 * @return
+	 */
+	public boolean removeReservation(String hotelName, Reservation reservation) {
+		if (containsReservation(hotelName, reservation)) {
+			this.reservations.get(hotelName).remove(reservation);
+			return true;
+		}
+		return false;
 	}
 }
 	

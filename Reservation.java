@@ -94,7 +94,7 @@ public class Reservation {
 	
 	private void chooseRooms() {
 		Scanner in = new Scanner(System.in);
-		TreeMap<String, TreeMap<Room, Integer>> map = BookingSystem.getRooms();
+		TreeMap<String, TreeMap<Room, Integer>> map = new BookingSystem().getRooms(); //for now, have it an anonymous variable but may change
 		System.out.println("Please choose your hotel: ");
 		char c = 'A';
 		ArrayList<String> hotels = new ArrayList<String>();
