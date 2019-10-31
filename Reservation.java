@@ -1,7 +1,6 @@
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Scanner;
-import java.util.Arrays;
 import java.util.TreeMap;
 /**
  * A class to represent the reservation for a hotel room(s)
@@ -33,7 +32,9 @@ public class Reservation {
 		this.checkinDate = checkinDate;
 		this.numberOfNights = numberOfNights;
 		this.numberOfRooms = numberOfRooms;
-		this.rooms = new ArrayList<Room>(numberOfRooms); 
+		this.rooms = new ArrayList<Room>(numberOfRooms);
+		this.totalCost = new Bill("Total Cost", LocalDate.now());
+		this.deposit = new Bill("Deposit", LocalDate.now());
 		this.chooseRooms();
 	}
 
@@ -134,5 +135,27 @@ public class Reservation {
 	 */
 	public Bill getDeposit() {
 		return deposit;
+	}
+	
+	/**
+	 * Overwriting the equals method of Object 
+	 * @param the object to check against
+	 */
+	public boolean equals(Object obj) {
+		if (!(obj instanceof Reservation)) {
+			//if obj is not an instance of Reservation, it is definitely not equal
+			return false;
+		} else if (this == obj) {
+			//if the reference of obj is equal to this reference, they're the same object
+			return true;
+		} else if (this.hashCode() == obj.hashCode()) {
+			//if the hashCodes match, they are equal objects
+			return true;
+		} else {
+			Reservation comp = (Reservation)obj;
+			return comp.name.equals(this.name) && this.number == comp.number && this.type.equals(comp.type) 
+				 && this.checkinDate.equals(comp.checkinDate) && this.numberOfNights == comp.numberOfNights 
+				 && this.numberOfRooms == comp.numberOfRooms; //This is enough to check equality for now
+		}
 	}
 }
