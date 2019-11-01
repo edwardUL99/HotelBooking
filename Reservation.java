@@ -33,8 +33,8 @@ public class Reservation {
 		this.numberOfNights = numberOfNights;
 		this.numberOfRooms = numberOfRooms;
 		this.rooms = new ArrayList<Room>(numberOfRooms);
-		this.totalCost = new Bill("Total Cost", LocalDate.now());
-		this.deposit = new Bill("Deposit", LocalDate.now());
+		this.totalCost = new Bill("Total Cost", LocalDate.now()); //For both bills choose a more suitable date
+		this.deposit = new Bill("Deposit", LocalDate.now(), 75.00); //May change the price later 
 		this.chooseRooms();
 	}
 
@@ -122,19 +122,32 @@ public class Reservation {
 	}
 	
 	/**
-	 * 
+	 * Returns a Bill object with the amount due set to the total payable including deposit
 	 * @return a Bill object representing the total cost
 	 */
 	public Bill getTotalCost() {
-		return totalCost;
+		int dayOfWeek;
+		double total = 0.00;
+		for (int i = 0; i < this.numberOfNights; i++) {
+			dayOfWeek  = this.checkinDate.plusDays((long)i).getDayOfWeek().getValue() - 1; //Our rates array from room is indexed from 0 to 6 and getDayOfWeek().getValue() returns a number 1-7
+			for (Room r : this.rooms) {
+				total += r.getRate(dayOfWeek);
+			}
+		}
+		if (this.type.equals("AP")) {
+			total -= total * 0.05;
+		}
+		total += this.getDeposit().getAmountDue(); //Maybe after checkout, return the deposit???
+		this.totalCost.setAmountDue(total);
+		return this.totalCost;
 	}
 
 	/**
-	 * 
+	 * Returns a Bill object with the amount due set to €75
 	 * @return a Bill object representing the deposit
 	 */
 	public Bill getDeposit() {
-		return deposit;
+		return this.deposit;
 	}
 	
 	/**
