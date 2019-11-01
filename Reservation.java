@@ -25,17 +25,16 @@ public class Reservation {
 	 * @param numberOfNights the number of nights the reservation is for
 	 * @param numberOfRooms the number of rooms to book
 	 */
-	public Reservation(String name, String type, LocalDate checkinDate, int numberOfNights, int numberOfRooms) {
+	public Reservation(String name, String type, LocalDate checkinDate, int numberOfNights, int numberOfRooms, ArrayList<Room> rooms) {
 		this.number = (int)(Math.random() * 1000 + 9999);
 		this.name = name;
 		this.type = type;
 		this.checkinDate = checkinDate;
 		this.numberOfNights = numberOfNights;
 		this.numberOfRooms = numberOfRooms;
-		this.rooms = new ArrayList<Room>(numberOfRooms);
+		this.rooms = rooms;
 		this.totalCost = new Bill("Total Cost", LocalDate.now()); //For both bills choose a more suitable date
-		this.deposit = new Bill("Deposit", LocalDate.now(), 75.00); //May change the price later 
-		this.chooseRooms();
+		this.deposit = new Bill("Deposit", LocalDate.now(), 75.00); //May change the price later
 	}
 
 	/**
@@ -91,34 +90,6 @@ public class Reservation {
 	 */
 	public ArrayList<Room> getRooms() {
 		return rooms;
-	}
-	
-	private void chooseRooms() {
-		Scanner in = new Scanner(System.in);
-		TreeMap<String, TreeMap<Room, Integer>> map = new BookingSystem().getRooms(); //for now, have it an anonymous variable but may change
-		System.out.println("Please choose your hotel: ");
-		char c = 'A';
-		ArrayList<String> hotels = new ArrayList<String>();
-		for (String s : map.keySet()) {
-			hotels.add(s);
-			System.out.println(c + ")" + s);
-			c++;
-		}
-		String choice = in.nextLine();
-		ArrayList<Room> allRooms = new ArrayList<Room>(map.get(hotels.get(choice.charAt(0) - 'A')).keySet());
-		while (this.rooms.size() != this.numberOfRooms) {
-			char ch = 'A';
-			for (Room r : allRooms) {
-				System.out.println(ch + ")" + r.getType());
-				ch++;
-			} //This is not how it will be implemented, just until the other methods are developed
-			String input = in.nextLine();
-			int n = input.toUpperCase().charAt(0) - 'A';
-			if (n >= 0 && n < allRooms.size()) {
-				this.rooms.add(allRooms.get(n));
-			}
-		}
-		in.close();
 	}
 	
 	/**

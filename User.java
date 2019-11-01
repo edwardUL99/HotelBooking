@@ -1,9 +1,11 @@
 import java.time.LocalDate;
+import java.util.ArrayList;
 
 /**
 * A class representing the user of the system
 */
 public class User  {
+	protected String name;
 	protected BookingSystem system; //The system the User is on
 	
 	/**
@@ -15,8 +17,8 @@ public class User  {
 	}
 	
 	/** allows users to create reservations */
-	public void createReservation(String hotelName, String name, String type, LocalDate checkinDate, int numberOfNights, int numberOfRooms) {
-		this.system.addReservation(hotelName, new Reservation(name, type, checkinDate, numberOfNights, numberOfRooms));
+	public void createReservation(String hotelName, String name, String type, LocalDate checkinDate, int numberOfNights, int numberOfRooms, ArrayList<Room> rooms) {
+		this.system.addReservation(hotelName, new Reservation(name, type, checkinDate, numberOfNights, numberOfRooms, rooms));
 	}
 	
 	/** allows users to cancel reservations */

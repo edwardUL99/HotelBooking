@@ -1,15 +1,104 @@
+import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Scanner;
+import java.util.TreeMap;
 import java.util.TreeSet;
 
 public class TextUI {
 	private Scanner in;
+	private BookingSystem system;
+	private User user;
+	private String hotelName;
 
 	public TextUI() {
 		in = new Scanner(System.in);
 	}
 	
+	/**
+	 * Checks if the date supplied is in the form dd/mm/yyyy 
+	 * @param dateInput date the date to be checked
+	 * @return if the date is of the correct format
+	 */
+	private boolean isCorrectDateFormat(String dateInput) {
+		String[] date = dateInput.split("/");
+		if (date.length < 3 || date.length > 3 || dateInput.indexOf("/") == -1) {
+			return false;
+		} else {
+			int[] requiredLengths = {2, 2, 4};
+			for (int i = 0; i < date.length; i++) {
+				if (date[i].length() != requiredLengths[i]) {
+					return false;
+				}
+			}
+			return true;
+		}
+	}
+	
+	private LocalDate getDate() {
+		while (true) {
+			String dateInput = in.nextLine();
+			if (!isCorrectDateFormat(dateInput)) {
+				System.out.println("Date is in incorrect format");
+			} else {
+				String[] date = dateInput.split("/");
+				return LocalDate.of(Integer.parseInt(date[2]), Integer.parseInt(date[1]), Integer.parseInt(date[0]));
+			}
+		}
+	}
+	
+	private void cancelReservation() {
+		System.out.println("Please enter the checkIn date(dd/mm/yyyy)");
+		LocalDate checkIn = getDate();
+		Reservation reservation = this.system.getReservation(this.hotelName, this.user.name, checkIn);
+		if (reservation == null) {
+			System.out.println("The reservation could not be found");
+		} else {
+			this.user.cancelReservation(hotelName, reservation);
+		}
+	}
+	
+	private ArrayList<Room> chooseRooms(int numberOfRooms) {
+		TreeMap<String, TreeMap<Room, Integer>> map = new BookingSystem().getRooms(); //for now, have it an anonymous variable but may change
+		ArrayList<Room> allRooms = new ArrayList<Room>(map.get(this.hotelName).keySet());
+		ArrayList<Room> rooms = new ArrayList<Room>(numberOfRooms);
+		while (rooms.size() != numberOfRooms) {
+			char ch = 'A';
+			for (Room r : allRooms) {
+				System.out.println(ch + ")" + r.getType());
+				ch++;
+			} //This is not how it will be implemented, just until the other methods are developed
+			String input = in.nextLine();
+			int n = input.toUpperCase().charAt(0) - 'A';
+			if (n >= 0 && n < allRooms.size()) {
+				rooms.add(allRooms.get(n));
+			}
+		}
+		return rooms;
+	}
+	
+	
+	private void makeReservation() {
+		System.out.println("Do you want to make a S)tandard booking or A)dvanced Purchase?");
+		char choice = in.nextLine().toUpperCase().charAt(0);
+		String type;
+		if (choice == 'S') {
+			type = "S";
+		} else {
+			type = "AP";
+		}
+		System.out.println("Please enter your check-in date(dd/mm/yyyy): ");
+		LocalDate checkin = getDate();
+		System.out.println("Please enter the number of nights you wish to stay: ");
+		int numNights = Integer.parseInt(in.nextLine()); //Prevents line not found errors as nextInt() does not skip to nextLine
+		System.out.println("Please enter the number of rooms you wish to book: ");
+		int numRooms = Integer.parseInt(in.nextLine()); //Prevents line not found errors as nextInt() does not skip to nextLine
+		System.out.println("Please choose your room(s): ");
+		ArrayList<Room> rooms = chooseRooms(numRooms);
+		this.user.createReservation(this.hotelName, this.user.name, type, checkin, numNights, numRooms, rooms);
+	}
+	
 	public void run() {
-		BookingSystem system = new BookingSystem();
+		this.system = new BookingSystem();
 		java.util.Set<String> hotels = system.getRooms().keySet();
 		String[] hotelNames = new String[hotels.size()];
 		int i = 0;
@@ -22,18 +111,20 @@ public class TextUI {
 			String choice = (String)getChoice(users);
 			if (choice.equals("Customer")) {
 				System.out.println("Please enter your name: ");
-				User user = new Customer(in.nextLine(), system);
+				this.user = new Customer(in.nextLine(), system);
 				System.out.println("Please choose a hotel: ");
-				String hotelName = (String)getChoice(hotelNames);
+				this.hotelName = (String)getChoice(hotelNames);
 				System.out.println("Would you like to M)ake a reservation or C(ancel a reservation? ");
 				char command = in.nextLine().toUpperCase().charAt(0);
 				if (command == 'M') {
-					//Code to create a reservation, maybe write a method to do this so won't have to keep writing out for the 3 users
+					makeReservation();
 				} else if (command == 'C') {
-					//Code to cancel, as above comment, create a method to do this
+					cancelReservation();
 				}
 			}
 			//Code for other users signing on
+			System.out.println(this.system.getCurrentRooms()); //Testing only
+			
 		}
 	}
 	

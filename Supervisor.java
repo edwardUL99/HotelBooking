@@ -12,7 +12,7 @@ public class Supervisor extends DeskClerk {
 	public void applyDiscount(double discount, int reservationNumber ) {
 		
 		for(int i = 0; i < this.system.getReservations().get(hotelName).size(); i++) {
-			Reservation r = this.system.getReservations.get(hotelName).get(i);
+			Reservation r = this.system.getReservations().get(hotelName).get(i);
 			if(r.getNumber() == reservationNumber) {
 				r.getTotalCost().setAmountDue(r.getTotalCost().getAmountDue()*(1 - discount));
 			}

@@ -79,12 +79,32 @@ public class BookingSystem {
 		return allRooms;
 	}
 	
+	public TreeMap<String, TreeMap<Room, Integer>> getCurrentRooms() {
+		return this.allRooms; //Just here for testing until we save room info to csv file
+	}
+	
 	/**
 	 * Returns a TreeMap all reservations in each hotel
 	 * @return the TreeMap with hotel names and the reservations in that hotel
 	 */
 	public TreeMap<String, ArrayList<Reservation>> getReservations() {
 		return this.reservations;
+	}
+	
+	/**
+	 * Returns a single reservation specified by the name and the checkIn date
+	 * @param hotelName the name of the hotel
+	 * @param name the name of the customer who owns the reservation
+	 * @param checkIn the check in date
+	 * @return a reservation if the map of reservations contains the reservation, null if not
+	 */
+	public Reservation getReservation(String hotelName, String name, java.time.LocalDate checkIn) {
+		for (Reservation r : this.reservations.get(hotelName)) {
+			if (r.getName().equals(name) && r.getCheckinDate().equals(checkIn)) {
+				return r;
+			}
+		}
+		return null;
 	}
 	
 	/**
@@ -99,6 +119,10 @@ public class BookingSystem {
 		} else {
 			this.reservations.put(hotelName, new ArrayList<Reservation>());
 			this.reservations.get(hotelName).add(reservation);
+		}
+		TreeMap<Room, Integer> rooms = this.allRooms.get(hotelName);
+		for (Room r : reservation.getRooms()) {
+			rooms.put(r, rooms.get(r) - 1); //Decrement for each room booked. Must add a way to check if the number of rooms is not 0(maybe in choose rooms method in reservation)
 		}
 	}
 	
@@ -134,6 +158,11 @@ public class BookingSystem {
 	 */
 	public boolean removeReservation(String hotelName, Reservation reservation) {
 		if (containsReservation(hotelName, reservation)) {
+			ArrayList<Room> cancelledRooms = reservation.getRooms();
+			TreeMap<Room, Integer> rooms = this.allRooms.get(hotelName);
+			for (Room r : cancelledRooms) {
+				rooms.put(r, rooms.get(r) + 1); //Increments back the rooms available.
+			}
 			this.reservations.get(hotelName).remove(reservation);
 			return true;
 		}
