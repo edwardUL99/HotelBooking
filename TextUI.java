@@ -125,7 +125,7 @@ public class TextUI {
 			} else if(choice.equals("Desk Clerk")) {
 				System.out.println("Please choose a hotel: ");;
 				this.user = new DeskClerk(in.nextLine(), system);
-				System.out.println("Would you like to R)eservations or C)heck-in/out ? ");
+				System.out.println("Would you like to make R)eservations or C)heck-in/out ? ");
 				char command = in.nextLine().toUpperCase().charAt(0);
 				if (command == 'R') {
 					
