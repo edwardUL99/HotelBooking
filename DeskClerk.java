@@ -14,7 +14,7 @@ public class DeskClerk extends User {
 		
 	}
 	
-// check if room is available 	
+// check if room is available again
 	/** checks out users */
 	public void checkOut() {
 		

@@ -1,3 +1,5 @@
+import java.time.LocalDateTime;
+
 /**
 * A class representing the Supervisor user of the system
 */
@@ -21,6 +23,13 @@ public class Supervisor extends DeskClerk {
 	
 	
 	//methods requesting data Analysis
+	//gets data analysis of financial information between two dates
+	public void getFinancialInfo(LocalDateTime start, LocalDateTime end) {
+
+	}
 	
-	//public void 
+	//gets data analysis of what rooms are occupied between two dates
+	public void getOccupancyInfo(LocalDateTime start, LocalDateTime end) {
+		
+	}
 }

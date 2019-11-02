@@ -125,7 +125,7 @@ public class TextUI {
 			} else if(choice.equals("Desk Clerk")) {
 				System.out.println("Please choose a hotel: ");;
 				this.user = new DeskClerk(in.nextLine(), system);
-				System.out.println("Would you like to make R)eservations or C)heck-in/out ? ");
+				System.out.println("Would you like to access R)eservations or C)heck-in/out ? ");
 				char command = in.nextLine().toUpperCase().charAt(0);
 				if (command == 'R') {
 					
@@ -150,6 +150,34 @@ public class TextUI {
 			} else if(choice.equals("Superviser")) {
 				System.out.println("Please choose a hotel: ");;
 				this.user = new Supervisor(in.nextLine(), system);
+				System.out.println("Would you like to access R)eservations or C)check-in/out or A)pply discounts or D)ata analytics ");
+				char command = in.nextLine().toUpperCase().charAt(0);
+				if (command == 'R') {
+					
+					System.out.println("Would you like to M)ake a reservation or C(ancel a reservation? ");
+					char command1 = in.nextLine().toUpperCase().charAt(0);
+					if (command1 == 'M') {
+						makeReservation();
+					} else if (command1 == 'C') {
+						cancelReservation();
+					}
+				
+				} /* else if (command == 'C') {
+					
+					System.out.println("Would you like to I)check-in or O)check-out? ");
+					char command2 = in.nextLine().toUpperCase().charAt(0);
+					if (command2 == 'I') {
+						checkIn();
+					} else if (command2 == 'O') {
+						checkOut();
+					}
+				} else if (command == 'A') {
+					//enter reservation discount applies to and size of discount
+				} else if (command == 'D') {
+					//choose data analytic method
+				}
+				 	
+				 */
 			}
 			//Code for other users signing on
 			System.out.println(this.system.getCurrentRooms()); //Testing only
