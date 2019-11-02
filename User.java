@@ -6,14 +6,16 @@ import java.util.ArrayList;
 */
 public class User  {
 	protected String name;
-	protected BookingSystem system; //The system the User is on
+	protected BookingSystem system;//The system the User is on
+	protected String hotelName;
 	
 	/**
 	 * Constructs a user object
 	 * @param system the system for which this user is working on
 	 */
-	public User(BookingSystem system) {
+	public User(String hotelName ,BookingSystem system) {
 		this.system = system;
+		this.hotelName = hotelName;
 	}
 	
 	/** allows users to create reservations */

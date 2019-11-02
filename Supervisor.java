@@ -2,7 +2,6 @@
 * A class representing the Supervisor user of the system
 */
 public class Supervisor extends DeskClerk {
-	private String hotelName;
 
 	public Supervisor(String hotelName, BookingSystem system) {
 		super(hotelName, system);
@@ -15,10 +14,13 @@ public class Supervisor extends DeskClerk {
 			Reservation r = this.system.getReservations().get(hotelName).get(i);
 			if(r.getNumber() == reservationNumber) {
 				r.getTotalCost().setAmountDue(r.getTotalCost().getAmountDue()*(1 - discount));
+				break;
 			}
 		}
 	}
 	
 	
 	//methods requesting data Analysis
+	
+	//public void 
 }

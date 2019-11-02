@@ -98,6 +98,7 @@ public class TextUI {
 	}
 	
 	public void run() {
+		String tempName;
 		this.system = new BookingSystem();
 		java.util.Set<String> hotels = system.getRooms().keySet();
 		String[] hotelNames = new String[hotels.size()];
@@ -111,9 +112,9 @@ public class TextUI {
 			String choice = (String)getChoice(users);
 			if (choice.equals("Customer")) {
 				System.out.println("Please enter your name: ");
-				this.user = new Customer(in.nextLine(), system);
+				tempName = in.nextLine();
 				System.out.println("Please choose a hotel: ");
-				this.hotelName = (String)getChoice(hotelNames);
+				this.user = new Customer(tempName, in.nextLine(), system);
 				System.out.println("Would you like to M)ake a reservation or C(ancel a reservation? ");
 				char command = in.nextLine().toUpperCase().charAt(0);
 				if (command == 'M') {
@@ -121,6 +122,34 @@ public class TextUI {
 				} else if (command == 'C') {
 					cancelReservation();
 				}
+			} else if(choice.equals("Desk Clerk")) {
+				System.out.println("Please choose a hotel: ");;
+				this.user = new DeskClerk(in.nextLine(), system);
+				System.out.println("Would you like to R)eservations or C)heck-in/out ? ");
+				char command = in.nextLine().toUpperCase().charAt(0);
+				if (command == 'R') {
+					
+					System.out.println("Would you like to M)ake a reservation or C(ancel a reservation? ");
+					char command1 = in.nextLine().toUpperCase().charAt(0);
+					if (command1 == 'M') {
+						makeReservation();
+					} else if (command1 == 'C') {
+						cancelReservation();
+					}
+				
+				} /* else if (command == 'C') {
+					
+					System.out.println("Would you like to I)check-in or O)check-out? ");
+					char command2 = in.nextLine().toUpperCase().charAt(0);
+					if (command2 == 'I') {
+						checkIn();
+					} else if (command2 == 'O') {
+						checkOut();
+					}
+				} */
+			} else if(choice.equals("Superviser")) {
+				System.out.println("Please choose a hotel: ");;
+				this.user = new Supervisor(in.nextLine(), system);
 			}
 			//Code for other users signing on
 			System.out.println(this.system.getCurrentRooms()); //Testing only

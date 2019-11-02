@@ -3,9 +3,9 @@
 */
 public class Customer extends User {
 	
-	public Customer(String name, BookingSystem system) {
+	public Customer(String name, String hotelName, BookingSystem system) {
 		//The system will be provided by the text ui maybe
-		super(system);
+		super(hotelName, system);
 		super.name = name;
 	}
 }
