@@ -3,6 +3,7 @@ import java.io.FileNotFoundException;
 import java.util.Scanner;
 import java.util.TreeMap;
 import java.util.ArrayList;
+import java.util.Map;
 
 /**
 * A class with tools for managing the system
@@ -108,22 +109,74 @@ public class BookingSystem {
 	}
 	
 	/**
+	 * Returns a Tree Map with the room type and the number of rooms in the reservation for each room
+	 * @param hotelName the name of the hotel
+	 * @param reservation the reservation
+	 * @return a treemap with the room types mapped to the number of rooms booked for each type in reservation
+	 */
+	private TreeMap<String, Integer> numberOfRoomsBooked(Reservation reservation) {
+		TreeMap<String, Integer> roomNumbers = new TreeMap<String, Integer>();
+		for (Room r : reservation.getRooms()) {
+			String type = r.getType();
+			if (roomNumbers.containsKey(type)) {
+				roomNumbers.put(type, roomNumbers.get(type) + 1);
+			} else {
+				roomNumbers.put(type, 1);
+			}
+		}
+		return roomNumbers;
+	}
+	
+	/**
+	 * Checks if there is enough rooms free in the hotel chosen to add the rooms chosen in the reservation.
+	 * Take the following reservation for example:
+	 * 		Deluxe Double - 3 rooms
+	 * 		Deluxe Single - 2 rooms
+	 * And the hotel has 6 Deluxe Double rooms left and 1 Deluxe Single left
+	 * While there is enough Deluxe Double left there is not enough Deluxe Single so the method would return false
+	 * @param hotelName the name of the hotel
+	 * @param reservation thereservation
+	 * @return true if there is enough rooms in the hotel available to book in all the rooms booked in reservation
+	 */
+	private boolean hasEnoughRoomsFree(String hotelName, Reservation reservation) {
+		TreeMap<String, Integer> roomNumbers = numberOfRoomsBooked(reservation);
+		TreeMap<Room, Integer> rooms = this.allRooms.get(hotelName);
+		if (rooms != null) {
+			for (Map.Entry<Room, Integer> e : rooms.entrySet()) {
+				String type = e.getKey().getType();
+				int numRoomsBooked = roomNumbers.get(type);
+				if (numRoomsBooked > e.getValue()) {
+					return false;
+				}
+			}
+			return true;
+		} else {
+			return false;
+		}
+	}
+	
+	/**
 	 * Adds a new reservation to the list of reservations for the particular hotel
 	 * @param hotelName the name of the hotel owned by the chain e.g 5-star
 	 * @param reservation the reservation to be added
+	 * @return true if the reservation was successfully added
 	 */
-	public void addReservation(String hotelName, Reservation reservation) {
+	public boolean addReservation(String hotelName, Reservation reservation) {
 		//Will have to have a way to check if the reservation can be made
-		if (this.reservations.containsKey(hotelName)) {
-			this.reservations.get(hotelName).add(reservation);
-		} else {
-			this.reservations.put(hotelName, new ArrayList<Reservation>());
-			this.reservations.get(hotelName).add(reservation);
+		if (hasEnoughRoomsFree(hotelName, reservation)) { //May have this changed so when user is choosing a room they're only shown options that are avlable to book, i.e. if theres enough rooms of that type to book
+			if (this.reservations.containsKey(hotelName)) {
+				this.reservations.get(hotelName).add(reservation);
+			} else {
+				this.reservations.put(hotelName, new ArrayList<Reservation>());
+				this.reservations.get(hotelName).add(reservation);
+			}
+			TreeMap<Room, Integer> rooms = this.allRooms.get(hotelName);
+			for (Room r : reservation.getRooms()) {
+				rooms.put(r, rooms.get(r) - 1); //Decrement for each room booked. Must add a way to check if the number of rooms is not 0(maybe in choose rooms method in reservation)
+			}
+			return true;
 		}
-		TreeMap<Room, Integer> rooms = this.allRooms.get(hotelName);
-		for (Room r : reservation.getRooms()) {
-			rooms.put(r, rooms.get(r) - 1); //Decrement for each room booked. Must add a way to check if the number of rooms is not 0(maybe in choose rooms method in reservation)
-		}
+		return false;
 	}
 	
 	/**

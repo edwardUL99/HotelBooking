@@ -58,6 +58,7 @@ public class TextUI {
 	}
 	
 	private ArrayList<Room> chooseRooms(int numberOfRooms) {
+		//Maybe instead of checking if the rooms are available after choosing them in the BookingSystem class, have the BookingSystem getRooms only return rooms that are available for the numberOfRooms specified
 		TreeMap<String, TreeMap<Room, Integer>> map = new BookingSystem().getRooms(); //for now, have it an anonymous variable but may change
 		ArrayList<Room> allRooms = new ArrayList<Room>(map.get(this.hotelName).keySet());
 		ArrayList<Room> rooms = new ArrayList<Room>(numberOfRooms);
