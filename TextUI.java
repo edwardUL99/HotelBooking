@@ -59,13 +59,16 @@ public class TextUI {
 	
 	private ArrayList<Room> chooseRooms(int numberOfRooms) {
 		//Maybe instead of checking if the rooms are available after choosing them in the BookingSystem class, have the BookingSystem getRooms only return rooms that are available for the numberOfRooms specified
-		TreeMap<String, TreeMap<Room, Integer>> map = new BookingSystem().getRooms(); //for now, have it an anonymous variable but may change
+		TreeMap<String, TreeMap<Room, Integer>> map = this.system.getCurrentRooms(); //for now, have it an anonymous variable but may change
+		//For getCurrentRooms() method maybe supply two date parameters, indicating a time period to populate the rooms avilable map with the amount of rooms free at that period
 		ArrayList<Room> allRooms = new ArrayList<Room>(map.get(this.hotelName).keySet());
 		ArrayList<Room> rooms = new ArrayList<Room>(numberOfRooms);
+		System.out.println("Room type\tRooms Available"); //Have a way to check number of rooms available for the date chosen in reservation
 		while (rooms.size() != numberOfRooms) {
 			char ch = 'A';
-			for (Room r : allRooms) {
-				System.out.println(ch + ")" + r.getType());
+			for (int i = 0; i < allRooms.size(); i++) {
+				Room r = allRooms.get(i);
+				System.out.println(ch + ")" + r.getType() + "\t\t" + map.get(this.hotelName).get(r));
 				ch++;
 			} //This is not how it will be implemented, just until the other methods are developed
 			String input = in.nextLine();
@@ -115,7 +118,8 @@ public class TextUI {
 				System.out.println("Please enter your name: ");
 				tempName = in.nextLine();
 				System.out.println("Please choose a hotel: ");
-				this.user = new Customer(tempName, in.nextLine(), system);
+				this.hotelName = (String)getChoice(hotelNames);
+				this.user = new Customer(tempName, this.hotelName, system);
 				System.out.println("Would you like to M)ake a reservation or C(ancel a reservation? ");
 				char command = in.nextLine().toUpperCase().charAt(0);
 				if (command == 'M') {

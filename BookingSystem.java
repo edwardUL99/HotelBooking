@@ -17,6 +17,7 @@ public class BookingSystem {
 	*/
 	public BookingSystem() {
 		this.reservations = new TreeMap<String, ArrayList<Reservation>>();
+		this.getRooms();
 	}
 	
 	/**
@@ -140,12 +141,12 @@ public class BookingSystem {
 	 */
 	private boolean hasEnoughRoomsFree(String hotelName, Reservation reservation) {
 		TreeMap<String, Integer> roomNumbers = numberOfRoomsBooked(reservation);
-		TreeMap<Room, Integer> rooms = this.allRooms.get(hotelName);
+		TreeMap<Room, Integer> rooms = this.getCurrentRooms().get(hotelName);
 		if (rooms != null) {
 			for (Map.Entry<Room, Integer> e : rooms.entrySet()) {
 				String type = e.getKey().getType();
-				int numRoomsBooked = roomNumbers.get(type);
-				if (numRoomsBooked > e.getValue()) {
+				int numRoomsBooked = roomNumbers.get(type) == null ? -1:roomNumbers.get(type);
+				if (numRoomsBooked > e.getValue() && numRoomsBooked != -1) {
 					return false;
 				}
 			}
@@ -171,7 +172,7 @@ public class BookingSystem {
 				this.reservations.get(hotelName).add(reservation);
 			}
 			TreeMap<Room, Integer> rooms = this.allRooms.get(hotelName);
-			for (Room r : reservation.getRooms()) {
+			for (Room r : reservation.getRooms()) { //This should be changed to only decrement room numbers for a certain date, e.g. there might be 5 rooms booked for january, why say those 5 rooms aren't available in December if they are?
 				rooms.put(r, rooms.get(r) - 1); //Decrement for each room booked. Must add a way to check if the number of rooms is not 0(maybe in choose rooms method in reservation)
 			}
 			return true;
