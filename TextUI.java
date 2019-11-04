@@ -57,18 +57,18 @@ public class TextUI {
 		}
 	}
 	
-	private ArrayList<Room> chooseRooms(int numberOfRooms) {
+	private ArrayList<Room> chooseRooms(int numberOfRooms, LocalDate from, LocalDate to) {
 		//Maybe instead of checking if the rooms are available after choosing them in the BookingSystem class, have the BookingSystem getRooms only return rooms that are available for the numberOfRooms specified
-		TreeMap<String, TreeMap<Room, Integer>> map = this.system.getCurrentRooms(); //for now, have it an anonymous variable but may change
-		//For getCurrentRooms() method maybe supply two date parameters, indicating a time period to populate the rooms avilable map with the amount of rooms free at that period
-		ArrayList<Room> allRooms = new ArrayList<Room>(map.get(this.hotelName).keySet());
+		TreeMap<Room, Integer> map = this.system.getCurrentRooms(this.hotelName, from, to);
+		//For getCurrentRooms() method maybe supply two date parameters, indicating a time period to populate the rooms available map with the amount of rooms free at that period
+		ArrayList<Room> allRooms = new ArrayList<Room>(map.keySet());
 		ArrayList<Room> rooms = new ArrayList<Room>(numberOfRooms);
-		System.out.println("Room type\tRooms Available"); //Have a way to check number of rooms available for the date chosen in reservation
+		System.out.println("Room type(Rooms Available)"); //Have a way to check number of rooms available for the date chosen in reservation
 		while (rooms.size() != numberOfRooms) {
 			char ch = 'A';
 			for (int i = 0; i < allRooms.size(); i++) {
 				Room r = allRooms.get(i);
-				System.out.println(ch + ")" + r.getType() + "\t\t" + map.get(this.hotelName).get(r));
+				System.out.println(ch + ")" + r.getType() + "(" + map.get(r) + ")");
 				ch++;
 			} //This is not how it will be implemented, just until the other methods are developed
 			String input = in.nextLine();
@@ -97,7 +97,7 @@ public class TextUI {
 		System.out.println("Please enter the number of rooms you wish to book: ");
 		int numRooms = Integer.parseInt(in.nextLine()); //Prevents line not found errors as nextInt() does not skip to nextLine
 		System.out.println("Please choose your room(s): ");
-		ArrayList<Room> rooms = chooseRooms(numRooms);
+		ArrayList<Room> rooms = chooseRooms(numRooms, checkin, checkin.plusDays((long)numNights));
 		this.user.createReservation(this.hotelName, this.user.name, type, checkin, numNights, numRooms, rooms);
 	}
 	
@@ -128,17 +128,19 @@ public class TextUI {
 					cancelReservation();
 				}
 			} else if(choice.equals("Desk Clerk")) {
-				System.out.println("Please choose a hotel: ");;
-				this.user = new DeskClerk(in.nextLine(), system);
+				System.out.println("Please choose a hotel: ");
+				this.hotelName = (String)getChoice(hotelNames);
+				this.user = new DeskClerk(hotelName, system);
 				System.out.println("Would you like to access R)eservations or C)heck-in/out ? ");
 				char command = in.nextLine().toUpperCase().charAt(0);
 				if (command == 'R') {
-					
 					System.out.println("Would you like to M)ake a reservation or C(ancel a reservation? ");
 					char command1 = in.nextLine().toUpperCase().charAt(0);
 					if (command1 == 'M') {
 						makeReservation();
 					} else if (command1 == 'C') {
+						System.out.println("Please enter the customer name: ");
+						this.user.name = in.nextLine();
 						cancelReservation();
 					}
 				
@@ -184,9 +186,6 @@ public class TextUI {
 				 	
 				 */
 			}
-			//Code for other users signing on
-			System.out.println(this.system.getCurrentRooms()); //Testing only
-			
 		}
 	}
 	

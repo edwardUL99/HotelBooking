@@ -126,4 +126,22 @@ public class Room implements Comparable<Room> {
 	public int compareTo(Room other) {
 		return this.type.compareTo(other.type);
 	}
+	
+	/**
+	 * Overriding object equals method
+	 */
+	public boolean equals(Object obj) {
+		if (!(obj instanceof Room)) {
+			return false;
+		}
+		
+		if (this == obj) {
+			return true;
+		} else if (this.hashCode() == obj.hashCode()) {
+			return true;
+		} else {
+			Room comp = (Room)obj;
+			return comp.type.equals(this.type);
+		}
+	}
 }

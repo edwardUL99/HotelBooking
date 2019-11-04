@@ -1,5 +1,6 @@
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.time.LocalDate;
 import java.util.Scanner;
 import java.util.TreeMap;
 import java.util.ArrayList;
@@ -9,7 +10,7 @@ import java.util.Map;
 * A class with tools for managing the system
 */
 public class BookingSystem {
-	private TreeMap<String, ArrayList<Reservation>> reservations; //Stores a list of reservations peer hotel
+	private TreeMap<String, ArrayList<Reservation>> reservations; //Stores a list of reservations per hotel
 	private TreeMap<String, TreeMap<Room, Integer>> allRooms;
 	
 	/**
@@ -83,6 +84,88 @@ public class BookingSystem {
 	
 	public TreeMap<String, TreeMap<Room, Integer>> getCurrentRooms() {
 		return this.allRooms; //Just here for testing until we save room info to csv file
+	}
+	
+	/**
+	 * Finds out if a room in the given hotel is booked at the specified date
+	 * @param hotelName the name of the hotel to check
+	 * @param room the room to check booking status
+	 * @param date the date at which to check if this room is booked
+	 * @return if the room is booking at this date
+	 */
+	private boolean isRoomBookedAtThisDate(String hotelName, Room room, LocalDate date) {
+		for (Reservation r : this.reservations.get(hotelName)) {
+			for (Room bookedRoom : r.getRooms()) {
+				ArrayList<LocalDate> bookedDates = new ArrayList<LocalDate>();
+				for (int i = 0; i < r.getNumberOfNights(); i++) {
+					bookedDates.add(r.getCheckinDate().plusDays((long)i));
+				}
+				if (bookedRoom.equals(room) && bookedDates.contains(date)) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+	
+	/** 
+	 * Returns a list of reservations that are booked in the period between the date period specified
+	 * @param hotelName the name of the hotel
+	 * @param from the date the period starts at
+	 * @param to the date the period ends at
+	 * @return the list of matching reservations
+	 */
+	private ArrayList<Reservation> bookingsInTimePeriod(String hotelName, LocalDate from, LocalDate to) {
+		ArrayList<Reservation> allBookings = this.reservations.get(hotelName);
+		if (allBookings != null) {
+			ArrayList<Reservation> bookings = new ArrayList<Reservation>();
+			for (Reservation r : allBookings) {
+				if ((r.getCheckinDate().isAfter(from) || r.getCheckinDate().equals(from)) && (r.getCheckinDate().isBefore(to) || r.getCheckinDate().plusDays((long)r.getNumberOfNights()).isBefore(to) || r.getCheckinDate().plusDays((long)r.getNumberOfNights()).equals(to))) {
+					bookings.add(r);
+				}
+			}
+			return bookings;
+		}
+		return null;
+	}
+	
+	private int numberOfTimesRoomIsBookedAtDate(String hotelName, Room room, LocalDate from, LocalDate to) {
+		ArrayList<Reservation> bookings = bookingsInTimePeriod(hotelName, from, to);
+		if (bookings != null) {
+			int count = 0;
+			for (Reservation r : bookings) {
+				for (Room roomBooked : r.getRooms()) {
+					if (roomBooked.equals(room)) {
+						count++;
+					}
+				}
+			}
+			return count;
+		}
+		return -1;
+	}
+	
+	/**
+	 * Returns a tree map of the rooms and their available number for the time period specified by the from and to parameters
+	 * @param hotelName the name of the hotel in question
+	 * @param from the date at the start of the time period
+	 * @param to the date at the end of the time period
+	 * @return a TreeMap with a rooms and their corresponding number of rooms available in the hotel during this period
+	 */
+	public TreeMap<Room, Integer> getCurrentRooms(String hotelName, LocalDate from, LocalDate to) {
+		TreeMap<Room, Integer> hotelRooms = this.getRooms().get(hotelName);
+		if (hotelRooms != null) {
+			TreeMap<Room, Integer> availableRooms = new TreeMap<Room, Integer>(hotelRooms); //Initialise it with allRooms i.e the total number of rooms in the hotel regardless of if booked or not
+			for (Room r : hotelRooms.keySet()) {
+				int numberTimesBooked = this.numberOfTimesRoomIsBookedAtDate(hotelName, r, from, to);
+				if (numberTimesBooked != -1) {
+					availableRooms.put(r, availableRooms.get(r) - numberTimesBooked);
+				};
+			}
+			return availableRooms;
+		}
+		//N.B. At the moment this code doesn't take into account rooms booked during the date period that overflow as such the period with the number of nights staying. will have to fix this in the methods used by this method
+		return null;
 	}
 	
 	/**
