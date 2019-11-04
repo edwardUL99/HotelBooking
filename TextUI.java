@@ -38,10 +38,15 @@ public class TextUI {
 		while (true) {
 			String dateInput = in.nextLine();
 			if (!isCorrectDateFormat(dateInput)) {
-				System.out.println("Date is in incorrect format");
+				System.out.println("Date is in incorrect format, please try again: ");
 			} else {
 				String[] date = dateInput.split("/");
-				return LocalDate.of(Integer.parseInt(date[2]), Integer.parseInt(date[1]), Integer.parseInt(date[0]));
+				LocalDate dateChosen = LocalDate.of(Integer.parseInt(date[2]), Integer.parseInt(date[1]), Integer.parseInt(date[0]));
+				if (!dateChosen.isAfter(LocalDate.now())) {
+					System.out.println("Please choose a date that is in the future: ");
+				} else {
+					return dateChosen;
+				}
 			}
 		}
 	}

@@ -120,7 +120,7 @@ public class BookingSystem {
 		if (allBookings != null) {
 			ArrayList<Reservation> bookings = new ArrayList<Reservation>();
 			for (Reservation r : allBookings) {
-				if ((r.getCheckinDate().isAfter(from) || r.getCheckinDate().equals(from)) && (r.getCheckinDate().isBefore(to) || r.getCheckinDate().plusDays((long)r.getNumberOfNights()).isBefore(to) || r.getCheckinDate().plusDays((long)r.getNumberOfNights()).equals(to))) {
+				if ((r.getCheckinDate().isAfter(from) || r.getCheckinDate().plusDays((long)r.getNumberOfNights()).isAfter(from)) || (r.getCheckinDate().equals(from)) && (r.getCheckinDate().isBefore(to) || r.getCheckinDate().plusDays((long)r.getNumberOfNights()).isBefore(to) || r.getCheckinDate().plusDays((long)r.getNumberOfNights()).equals(to))) {
 					bookings.add(r);
 				}
 			}
