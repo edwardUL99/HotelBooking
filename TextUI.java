@@ -51,16 +51,7 @@ public class TextUI {
 		}
 	}
 	
-	private void cancelReservation() {
-		System.out.println("Please enter the checkIn date(dd/mm/yyyy)");
-		LocalDate checkIn = getDate();
-		Reservation reservation = this.system.getReservation(this.hotelName, this.user.name, checkIn);
-		if (reservation == null) {
-			System.out.println("The reservation could not be found");
-		} else {
-			this.user.cancelReservation(hotelName, reservation);
-		}
-	}
+	
 	
 	private ArrayList<Room> chooseRooms(int numberOfRooms, LocalDate from, LocalDate to) {
 		//Maybe instead of checking if the rooms are available after choosing them in the BookingSystem class, have the BookingSystem getRooms only return rooms that are available for the numberOfRooms specified
@@ -104,6 +95,29 @@ public class TextUI {
 		System.out.println("Please choose your room(s): ");
 		ArrayList<Room> rooms = chooseRooms(numRooms, checkin, checkin.plusDays((long)numNights));
 		this.user.createReservation(this.hotelName, this.user.name, type, checkin, numNights, numRooms, rooms);
+	}
+
+	private void cancelReservation() {
+		System.out.println("Please enter the checkIn date(dd/mm/yyyy)");
+		LocalDate checkIn = getDate();
+		Reservation reservation = this.system.getReservation(this.hotelName, this.user.name, checkIn);
+		if (reservation == null) {
+			System.out.println("The reservation could not be found");
+		} else {
+			this.user.cancelReservation(hotelName, reservation);
+		}
+	}
+
+	public void checkInUser() {
+		
+	}
+	
+	public void checkOutUser() {
+		
+	}
+	
+	public void applyDiscountToReservation() {
+		
 	}
 	
 	public void run() {
@@ -159,7 +173,7 @@ public class TextUI {
 						checkOut();
 					}
 				} */
-			} else if(choice.equals("Superviser")) {
+			} else if(choice.equals("Supervisor")) {
 				System.out.println("Please choose a hotel: ");;
 				this.user = new Supervisor(in.nextLine(), system);
 				System.out.println("Would you like to access R)eservations or C)check-in/out or A)pply discounts or D)ata analytics ");
