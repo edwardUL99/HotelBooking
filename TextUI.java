@@ -107,6 +107,17 @@ public class TextUI {
 			this.user.cancelReservation(hotelName, reservation);
 		}
 	}
+	
+	private void viewReservation() {
+		System.out.println("Please enter the checkIn date(dd/mm/yyy)");
+		LocalDate checkIn = getDate();
+		Reservation reservation = this.system.getReservation(this.hotelName, this.user.name, checkIn);
+		if (reservation != null) {
+			System.out.println(reservation);
+		} else {
+			System.out.println("The reservation could not be found");
+		}
+	}
 
 	public void checkInUser() {
 		
@@ -139,12 +150,14 @@ public class TextUI {
 				System.out.println("Please choose a hotel: ");
 				this.hotelName = (String)getChoice(hotelNames);
 				this.user = new Customer(tempName, this.hotelName, system);
-				System.out.println("Would you like to M)ake a reservation or C(ancel a reservation? ");
+				System.out.println("Would you like to M)ake a reservation, C(ancel a reservation or V)iew a reservation?");
 				char command = in.nextLine().toUpperCase().charAt(0);
 				if (command == 'M') {
 					makeReservation();
 				} else if (command == 'C') {
 					cancelReservation();
+				} else if (command == 'V') {
+					viewReservation();
 				}
 			} else if(choice.equals("Desk Clerk")) {
 				System.out.println("Please choose a hotel: ");

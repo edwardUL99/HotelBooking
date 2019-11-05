@@ -127,6 +127,10 @@ public class Room implements Comparable<Room> {
 		return this.type.compareTo(other.type);
 	}
 	
+	public String toString() {
+		return this.type;
+	}
+	
 	/**
 	 * Overriding object equals method
 	 */

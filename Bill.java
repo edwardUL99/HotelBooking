@@ -69,7 +69,7 @@ public class Bill {
 		this.amountDue = amountDue;
 	}
 	
-	public String billToString() {
+	public String toString() {
 		return "Name: " + billName + "\n" + "Date: " + billedDate + "\n" + "Total amount due: "  + amountDue;
 	}
 

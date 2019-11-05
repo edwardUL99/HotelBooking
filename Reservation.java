@@ -142,4 +142,16 @@ public class Reservation {
 				 && this.numberOfRooms == comp.numberOfRooms; //This is enough to check equality for now
 		}
 	}
+	
+	private String roomsBookedAsString() {
+		String returned = "";
+		for (Room r : this.rooms) {
+			returned += r + "\n";
+		}
+		return returned;
+	}
+	
+	public String toString() {
+		return String.format("Reservation name: %s\nReservation type: %s\nResrvation number: %d\nCheck-in Date: %s\nNumber of nights: %d\nNumber of rooms: %d\nRooms Booked:\n%s\nTotal Cost (incl. deposit): €%.02f\nDeposit: €%.02f", this.name, this.type, this.number, this.checkinDate.toString(), this.numberOfNights, this.numberOfRooms, roomsBookedAsString(), this.getTotalCost().getAmountDue(), this.deposit.getAmountDue());
+	}
 }
