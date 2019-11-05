@@ -1,5 +1,7 @@
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.time.LocalDate;
 import java.util.Scanner;
 import java.util.TreeMap;
@@ -9,7 +11,7 @@ import java.util.Map;
 /**
 * A class with tools for managing the system
 */
-public class BookingSystem {
+public class BookingSystem implements CsvTools {
 	private TreeMap<String, ArrayList<Reservation>> reservations; //Stores a list of reservations per hotel
 	private TreeMap<String, TreeMap<Room, Integer>> allRooms;
 	
@@ -258,9 +260,41 @@ public class BookingSystem {
 			for (Room r : reservation.getRooms()) { //This should be changed to only decrement room numbers for a certain date, e.g. there might be 5 rooms booked for january, why say those 5 rooms aren't available in December if they are?
 				rooms.put(r, rooms.get(r) - 1); //Decrement for each room booked. Must add a way to check if the number of rooms is not 0(maybe in choose rooms method in reservation)
 			}
+			writeReservationToFile(reservation);
 			return true;
 		}
 		return false;
+	}
+	
+	private void writeReservationToFile(Reservation reservation) {
+		int columns = 8 + reservation.getNumberOfRooms();
+		Object[][] data = new String[2][columns];
+		String[] attributes = {"Number", "Name", "Type", "Check-in Date", "Number of Nights", "Number Of Rooms", "Total Cost", "Deposit"};
+		int index = 0;
+		for (int col = 0; col < columns; col++) {
+			if (col == 6) {
+				data[0][col] = "Rooms";
+			} else if (col > 6 && col < 6 + reservation.getNumberOfRooms()) {
+				data[0][col] = "";
+			} else {
+				data[0][col] = attributes[index++];
+			}
+		}
+		
+		data[1][0] = Integer.valueOf(reservation.getNumber()).toString();
+		data[1][1] = reservation.getName();
+		data[1][2] = reservation.getType();
+		data[1][3] = reservation.getCheckinDate().toString();
+		data[1][4] = Integer.valueOf(reservation.getNumberOfNights()).toString();
+		data[1][5] = Integer.valueOf(reservation.getNumberOfRooms()).toString();
+		int lastIndex = 6;
+		for (Room r : reservation.getRooms()) {
+			data[1][lastIndex++] = r.getType();
+		}
+		data[1][lastIndex++] = String.format("€%.02f", reservation.getTotalCost().getAmountDue());
+		data[1][lastIndex] = String.format("€%.02f", reservation.getDeposit().getAmountDue());
+		String path = System.getProperty("user.dir") + "/reservation.csv";
+		this.writeDataToFile(path, data);
 	}
 	
 	/**
@@ -304,6 +338,74 @@ public class BookingSystem {
 			return true;
 		}
 		return false;
+	}
+
+	@Override
+	public void writeDataToFile(String filePath, Object[][] data) {
+		File file = new File(filePath);
+		try (PrintWriter writer = new PrintWriter(file)) {
+			if (!file.exists()) {
+				file.createNewFile();
+			}
+			for (int row = 0; row < data.length; row++) {
+				String line = "";
+				for (int col = 0; col < data[row].length; col++) {
+					line += data[row][col] + ",";
+				}
+				line = line.substring(0, line.length() - 1); //removes the last ","
+				writer.println(line);
+			}
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	private int getRows(String filePath) {
+		int count = 0;
+		try (Scanner in = new Scanner(new File(filePath))) {
+			while (in.hasNextLine()) {
+				count++;
+				in.nextLine();
+			}
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
+		return count;
+	}
+	
+	private Object[][] initialiseMatrix(String filePath) {
+		Object[][] matrix = new Object[getRows(filePath)][];
+		try (Scanner in = new Scanner(new File(filePath))) {
+			int i = 0;
+			while (in.hasNextLine()) {
+				String[] values = in.nextLine().split(",");
+				matrix[i++] = new Object[values.length];
+				in.nextLine();
+			}
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
+		return matrix;
+	}
+
+	@Override
+	public Object[][] readDataFromFile(String filePath) {
+		Object[][] data = initialiseMatrix(filePath);
+		int row = 0;
+		try (Scanner in = new Scanner(new File(filePath))) {
+			while (in.hasNextLine()) {
+				String[] values = in.nextLine().split(",");
+				for (int col = 0; col < values.length; col++) {
+					data[row][col] = values[col];
+				}
+				row++;
+			}
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
+		return data;
 	}
 }
 	
