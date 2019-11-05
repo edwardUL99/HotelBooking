@@ -23,6 +23,8 @@ public class TextUI {
 		String[] date = dateInput.split("/");
 		if (date.length < 3 || date.length > 3 || dateInput.indexOf("/") == -1) {
 			return false;
+		} else if (Integer.parseInt(date[1]) > 12) { //If the mm value is greater than twelve, it may have been confused to be the dd value
+			return false;
 		} else {
 			int[] requiredLengths = {2, 2, 4};
 			for (int i = 0; i < date.length; i++) {
