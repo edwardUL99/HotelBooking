@@ -92,6 +92,10 @@ public class Reservation {
 		return rooms;
 	}
 	
+	public LocalDate getCheckoutDate() {
+		return this.checkinDate.plusDays((long)this.numberOfNights);
+	}
+	
 	/**
 	 * Returns a Bill object with the amount due set to the total payable including deposit
 	 * @return a Bill object representing the total cost

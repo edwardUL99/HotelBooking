@@ -1,3 +1,2 @@
-Hotel,Number,Name,Type,Check-in Date,Number of Nights,Number Of Rooms,Rooms,Total Cost,Deposit
-5-star,10118,Eddy Lynch,S,2020-08-20,5,1,Deluxe Double,€485.00,€75.00
-,10039,Oliver Lynch,S,2019-12-20,3,1,Deluxe Twin,€330.00,€75.00
+Hotel,Number,Name,Type,Check-in Date,Number of Nights,Number Of Rooms,Rooms,,Total Cost,Deposit
+5-star,10385,Eddy ,S,2020-08-20,5,2,Deluxe Double,Deluxe Double,€895.00,€75.00

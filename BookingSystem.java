@@ -100,7 +100,7 @@ public class BookingSystem implements CsvTools {
 		if (allBookings != null) {
 			ArrayList<Reservation> bookings = new ArrayList<Reservation>();
 			for (Reservation r : allBookings) {
-				if ((r.getCheckinDate().isAfter(from) || r.getCheckinDate().plusDays((long)r.getNumberOfNights()).isAfter(from)) || (r.getCheckinDate().equals(from)) && (r.getCheckinDate().isBefore(to) || r.getCheckinDate().plusDays((long)r.getNumberOfNights()).isBefore(to) || r.getCheckinDate().plusDays((long)r.getNumberOfNights()).equals(to))) {
+				if ((r.getCheckinDate().isBefore(from) && r.getCheckoutDate().isAfter(from)) || (r.getCheckoutDate().equals(to))) {
 					bookings.add(r);
 				}
 			}
@@ -265,7 +265,7 @@ public class BookingSystem implements CsvTools {
 	 * @return the number of rows required
 	 */
 	private int getNumberOfRows() {
-		int rows = this.reservations.keySet().size();
+		int rows = 0;
 		for (Map.Entry<String, ArrayList<Reservation>> e : this.reservations.entrySet()) {
 			rows += e.getValue().size();
 		}
@@ -274,7 +274,7 @@ public class BookingSystem implements CsvTools {
 	
 	private void writeReservationsToFile() {
 		int largestRoomCount = largestRoomCountBooked();
-		int rows = getNumberOfRows();
+		int rows = getNumberOfRows() + 1;
 		int columns = 9 + largestRoomCount;
 		Object[][] data = new String[rows][columns];
 		String[] attributes = {"Hotel", "Number", "Name", "Type", "Check-in Date", "Number of Nights", "Number Of Rooms", "Total Cost", "Deposit"};
@@ -307,9 +307,16 @@ public class BookingSystem implements CsvTools {
 				data[row][5] = Integer.valueOf(reservation.getNumberOfNights()).toString();
 				data[row][6] = Integer.valueOf(reservation.getNumberOfRooms()).toString();
 				int lastIndex = 7;
+				int roomsPrinted = 0;
 				for (Room r : reservation.getRooms()) {
 					data[row][lastIndex++] = r.getType();
-				}	
+					roomsPrinted++;
+				}
+				if (roomsPrinted < largestRoomCount) {
+					for (int i = roomsPrinted; i < largestRoomCount; i++) {
+						data[row][lastIndex++] = "";
+					}
+				}
 				data[row][lastIndex++] = String.format("€%.02f", reservation.getTotalCost().getAmountDue());
 				data[row][lastIndex] = String.format("€%.02f", reservation.getDeposit().getAmountDue());
 				lastIndex = 7;
