@@ -29,7 +29,7 @@ public class Supervisor extends DeskClerk {
 	}
 	
 	//gets data analysis of what rooms are occupied between two dates
-	public void getOccupancyInfo(LocalDateTime start, LocalDateTime end) {
+	public void getOccupancyInfo(LocalDate start, LocalDate end) {
 		
 	}
 }

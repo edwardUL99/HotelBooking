@@ -88,28 +88,6 @@ public class BookingSystem implements CsvTools {
 		return this.allRooms; //Just here for testing until we save room info to csv file
 	}
 	
-	/**
-	 * Finds out if a room in the given hotel is booked at the specified date
-	 * @param hotelName the name of the hotel to check
-	 * @param room the room to check booking status
-	 * @param date the date at which to check if this room is booked
-	 * @return if the room is booking at this date
-	 */
-	private boolean isRoomBookedAtThisDate(String hotelName, Room room, LocalDate date) {
-		for (Reservation r : this.reservations.get(hotelName)) {
-			for (Room bookedRoom : r.getRooms()) {
-				ArrayList<LocalDate> bookedDates = new ArrayList<LocalDate>();
-				for (int i = 0; i < r.getNumberOfNights(); i++) {
-					bookedDates.add(r.getCheckinDate().plusDays((long)i));
-				}
-				if (bookedRoom.equals(room) && bookedDates.contains(date)) {
-					return true;
-				}
-			}
-		}
-		return false;
-	}
-	
 	/** 
 	 * Returns a list of reservations that are booked in the period between the date period specified
 	 * @param hotelName the name of the hotel
@@ -260,42 +238,87 @@ public class BookingSystem implements CsvTools {
 			for (Room r : reservation.getRooms()) { //This should be changed to only decrement room numbers for a certain date, e.g. there might be 5 rooms booked for january, why say those 5 rooms aren't available in December if they are?
 				rooms.put(r, rooms.get(r) - 1); //Decrement for each room booked. Must add a way to check if the number of rooms is not 0(maybe in choose rooms method in reservation)
 			}
-			writeReservationToFile(reservation);
+			writeReservationsToFile();
 			return true;
 		}
 		return false;
 	}
 	
-	private void writeReservationToFile(Reservation reservation) {
-		int columns = 8 + reservation.getNumberOfRooms();
-		Object[][] data = new String[2][columns];
-		String[] attributes = {"Number", "Name", "Type", "Check-in Date", "Number of Nights", "Number Of Rooms", "Total Cost", "Deposit"};
-		int index = 0;
-		for (int col = 0; col < columns; col++) {
-			if (col == 6) {
-				data[0][col] = "Rooms";
-			} else if (col > 6 && col < 6 + reservation.getNumberOfRooms()) {
-				data[0][col] = "";
-			} else {
-				data[0][col] = attributes[index++];
+	/**
+	 * Searches through all reservations and for the reservation with the most rooms booked, returns the room count
+	 * @return the room count of the reservation with the most rooms booked
+	 */
+	private int largestRoomCountBooked() {
+		int largestRoomCount = 0;
+		for (Map.Entry<String, ArrayList<Reservation>> e : this.reservations.entrySet()) {
+			for (Reservation r : e.getValue()) {
+				if (r.getNumberOfRooms() > largestRoomCount) {
+					largestRoomCount = r.getNumberOfRooms();
+				}
 			}
 		}
-		
-		data[1][0] = Integer.valueOf(reservation.getNumber()).toString();
-		data[1][1] = reservation.getName();
-		data[1][2] = reservation.getType();
-		data[1][3] = reservation.getCheckinDate().toString();
-		data[1][4] = Integer.valueOf(reservation.getNumberOfNights()).toString();
-		data[1][5] = Integer.valueOf(reservation.getNumberOfRooms()).toString();
-		int lastIndex = 6;
-		for (Room r : reservation.getRooms()) {
-			data[1][lastIndex++] = r.getType();
-		}
-		data[1][lastIndex++] = String.format("€%.02f", reservation.getTotalCost().getAmountDue());
-		data[1][lastIndex] = String.format("€%.02f", reservation.getDeposit().getAmountDue());
-		String path = System.getProperty("user.dir") + "/reservation.csv";
-		this.writeDataToFile(path, data);
+		return largestRoomCount;
 	}
+	
+	/**
+	 * Gets the number of rows for a reservation data matrix
+	 * @return the number of rows required
+	 */
+	private int getNumberOfRows() {
+		int rows = this.reservations.keySet().size();
+		for (Map.Entry<String, ArrayList<Reservation>> e : this.reservations.entrySet()) {
+			rows += e.getValue().size();
+		}
+		return rows;
+	}
+	
+	private void writeReservationsToFile() {
+		int largestRoomCount = largestRoomCountBooked();
+		int rows = getNumberOfRows();
+		int columns = 9 + largestRoomCount;
+		Object[][] data = new String[rows][columns];
+		String[] attributes = {"Hotel", "Number", "Name", "Type", "Check-in Date", "Number of Nights", "Number Of Rooms", "Total Cost", "Deposit"};
+		int row = 1;
+		int index = 0;
+		for (int col = 0; col < columns; col++) {
+			if (col == 7) {
+				data[0][col] = "Rooms";
+			} else if (col > 7 && col < 7 + largestRoomCount) {
+				data[0][col] = "";
+			} else {
+				if (index < attributes.length) { 
+					data[0][col] = attributes[index++];
+				}
+			}
+		}
+		for (Map.Entry<String, ArrayList<Reservation>> e : this.reservations.entrySet()) {
+			data[row][0] = e.getKey();
+			boolean hotelNamed = true;
+			for (Reservation reservation : e.getValue()) {
+				if (hotelNamed) {
+					hotelNamed = false;
+				} else {
+					data[row][0] = "";
+				}
+				data[row][1] = Integer.valueOf(reservation.getNumber()).toString();
+				data[row][2] = reservation.getName();
+				data[row][3] = reservation.getType();
+				data[row][4] = reservation.getCheckinDate().toString();
+				data[row][5] = Integer.valueOf(reservation.getNumberOfNights()).toString();
+				data[row][6] = Integer.valueOf(reservation.getNumberOfRooms()).toString();
+				int lastIndex = 7;
+				for (Room r : reservation.getRooms()) {
+					data[row][lastIndex++] = r.getType();
+				}	
+				data[row][lastIndex++] = String.format("€%.02f", reservation.getTotalCost().getAmountDue());
+				data[row][lastIndex] = String.format("€%.02f", reservation.getDeposit().getAmountDue());
+				lastIndex = 7;
+				row++;
+			}
+		}
+	String path = System.getProperty("user.dir") + "/reservation.csv";
+	this.writeDataToFile(path, data);
+}
 	
 	/**
 	 * Checks if the hotel that is being provided exists in the system
