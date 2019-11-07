@@ -24,7 +24,7 @@ public class Supervisor extends DeskClerk {
 	
 	//methods requesting data Analysis
 	//gets data analysis of financial information between two dates
-	public void getFinancialInfo(LocalDate start, LocalDate end) {
+	public void getFinancialDataAnalysis(LocalDate start, LocalDate end) {
 
 	}
 	
