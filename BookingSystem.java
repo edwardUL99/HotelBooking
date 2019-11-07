@@ -21,6 +21,7 @@ public class BookingSystem implements CsvTools {
 	public BookingSystem() {
 		this.reservations = new TreeMap<String, ArrayList<Reservation>>();
 		this.getRooms();
+		this.reinitialise();
 	}
 	
 	/**
@@ -84,8 +85,55 @@ public class BookingSystem implements CsvTools {
 		return allRooms;
 	}
 	
+	public Room getRoom(String hotelName, String roomName) {
+		for (Room r : this.allRooms.get(hotelName).keySet()) {
+			if (r.getType().equals(roomName)) {
+				return r;
+			}
+		}
+		return null;
+	}
+	
 	public TreeMap<String, TreeMap<Room, Integer>> getCurrentRooms() {
 		return this.allRooms; //Just here for testing until we save room info to csv file
+	}
+	
+	/**
+	 * Equivalent to for example y <= x in maths but for dates
+	 * @param d1 the variable to check thats greater than or equals to
+	 * @param compare the variable to compare d1 against
+	 * @return whether the date d1 is greater than or equals to compare
+	 */
+	private boolean dateGreaterThanEquals(LocalDate d1, LocalDate compare) {
+		return d1.isEqual(compare) || d1.isAfter(compare);
+	}
+	
+	/**
+	 * Equivalent to for example x <= y in maths but for dates
+	 * @param d1 the variable to check thats greater than or equals to
+	 * @param compare the variable to compare d1 against
+	 * @return whether the date d1 is greater than or equals to compare
+	 */
+	private boolean dateLessThanEquals(LocalDate d1, LocalDate compare) {
+		return d1.isEqual(compare) || d1.isBefore(compare);
+	}
+	
+	/**
+	 * Checks if the specified reservation is between the given time period, i.e if the reservation checkIn date + number of nights infringes on the time period
+	 * @param from the starting date of the time period
+	 * @param to the ending date of the time period
+ 	 * @param reservation the reservation to check
+	 * @return if the reservation is in the time period
+	 */ 
+	private boolean isInTimePeriod(LocalDate from, LocalDate to, Reservation reservation) {
+		LocalDate checkIn = reservation.getCheckinDate();
+		LocalDate checkOut = reservation.getCheckoutDate();
+		for (LocalDate date = checkIn; !date.isEqual(checkOut); date = date.plusDays((long)1)) {
+			if (dateGreaterThanEquals(date, from) && dateLessThanEquals(date, to)) {
+				return true;
+			}
+		}
+		return false;
 	}
 	
 	/** 
@@ -100,7 +148,7 @@ public class BookingSystem implements CsvTools {
 		if (allBookings != null) {
 			ArrayList<Reservation> bookings = new ArrayList<Reservation>();
 			for (Reservation r : allBookings) {
-				if ((r.getCheckinDate().isBefore(from) && r.getCheckoutDate().isAfter(from)) || (r.getCheckoutDate().equals(to))) {
+				if (isInTimePeriod(from, to, r)) {
 					bookings.add(r);
 				}
 			}
@@ -228,12 +276,10 @@ public class BookingSystem implements CsvTools {
 	public boolean addReservation(String hotelName, Reservation reservation) {
 		//Will have to have a way to check if the reservation can be made
 		if (hasEnoughRoomsFree(hotelName, reservation)) { //May have this changed so when user is choosing a room they're only shown options that are avlable to book, i.e. if theres enough rooms of that type to book
-			if (this.reservations.containsKey(hotelName)) {
-				this.reservations.get(hotelName).add(reservation);
-			} else {
+			if (!this.reservations.containsKey(hotelName)) {
 				this.reservations.put(hotelName, new ArrayList<Reservation>());
-				this.reservations.get(hotelName).add(reservation);
 			}
+			this.reservations.get(hotelName).add(reservation);
 			TreeMap<Room, Integer> rooms = this.allRooms.get(hotelName);
 			for (Room r : reservation.getRooms()) { //This should be changed to only decrement room numbers for a certain date, e.g. there might be 5 rooms booked for january, why say those 5 rooms aren't available in December if they are?
 				rooms.put(r, rooms.get(r) - 1); //Decrement for each room booked. Must add a way to check if the number of rooms is not 0(maybe in choose rooms method in reservation)
@@ -323,7 +369,7 @@ public class BookingSystem implements CsvTools {
 				row++;
 			}
 		}
-	String path = System.getProperty("user.dir") + "/reservation.csv";
+	String path = System.getProperty("user.dir") + "/reservations.csv";
 	this.writeDataToFile(path, data);
 }
 	
@@ -400,42 +446,86 @@ public class BookingSystem implements CsvTools {
 				in.nextLine();
 			}
 		} catch (FileNotFoundException e) {
-			e.printStackTrace();
 		}
 		return count;
 	}
 	
-	private Object[][] initialiseMatrix(String filePath) {
-		Object[][] matrix = new Object[getRows(filePath)][];
+	private int getCols(String filePath) {
+		int count = 0;
 		try (Scanner in = new Scanner(new File(filePath))) {
-			int i = 0;
-			while (in.hasNextLine()) {
-				String[] values = in.nextLine().split(",");
-				matrix[i++] = new Object[values.length];
-				in.nextLine();
+			if (in.hasNextLine()) {
+				count = in.nextLine().split(",").length;
 			}
 		} catch (FileNotFoundException e) {
-			e.printStackTrace();
 		}
-		return matrix;
+		return count;
 	}
 
 	@Override
-	public Object[][] readDataFromFile(String filePath) {
-		Object[][] data = initialiseMatrix(filePath);
-		int row = 0;
-		try (Scanner in = new Scanner(new File(filePath))) {
-			while (in.hasNextLine()) {
-				String[] values = in.nextLine().split(",");
-				for (int col = 0; col < values.length; col++) {
-					data[row][col] = values[col];
+	/**
+	 * Reads in data from the specified filePath and reads it into an Object matrix
+	 * @param filePath the path to the file
+	 */
+	public String[][] readDataFromFile(String filePath) {
+		if (new File(filePath).exists()) {
+			String[][] data = new String[getRows(filePath)][getCols(filePath)];
+			int row = 0;
+			try (Scanner in = new Scanner(new File(filePath))) {
+				while (in.hasNextLine()) {
+					String[] values = in.nextLine().split(",");
+					for (int col = 0; col < values.length; col++) {
+						data[row][col] = values[col];
+					}
+					row++;
 				}
-				row++;
+			} catch (FileNotFoundException e) {
+				e.printStackTrace();
 			}
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
+			return data;
+		} else {
+			return null;
 		}
-		return data;
+	}
+	
+	private void reinitialise() {
+		String[][] data = readDataFromFile(System.getProperty("user.dir") + "/reservations.csv");
+		if (data != null) {
+			int row;
+			String hotelName = "", name, type;
+			int number, numOfNights, numOfRooms;
+			Reservation r;
+			ArrayList<Room> rooms;
+			for (row = 1; row < data.length; row++) {
+				String[] dataRow = data[row];
+				if (!dataRow[0].equals("")) {
+					hotelName = dataRow[0];
+				}
+				number = Integer.parseInt(dataRow[1]);
+				name = dataRow[2];
+				type = dataRow[3];
+				String[] date = dataRow[4].split("-");
+				LocalDate checkin = LocalDate.of(Integer.parseInt(date[0]),  Integer.parseInt(date[1]), Integer.parseInt(date[2]));
+				numOfNights = Integer.parseInt(dataRow[5]);
+				numOfRooms = Integer.parseInt(dataRow[6]);
+				rooms = new ArrayList<Room>(numOfRooms);
+				int lastCol = 7;
+				while (lastCol < numOfRooms + 7) {
+					String roomName = dataRow[lastCol++];
+					if (!roomName.equals("")) {
+						Room room = this.getRoom(hotelName, roomName);
+						if (room != null) {
+							rooms.add(room);
+						}	
+					}
+				}
+				r = new Reservation(name, type, checkin, numOfNights, numOfRooms, rooms);
+				r.setNumber(number);
+				if (!this.reservations.containsKey(hotelName)) {
+					this.reservations.put(hotelName, new ArrayList<Reservation>());
+				}
+				this.reservations.get(hotelName).add(r);
+			}
+		}
 	}
 }
 	

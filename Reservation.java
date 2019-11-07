@@ -26,7 +26,7 @@ public class Reservation {
 	 * @param numberOfRooms the number of rooms to book
 	 */
 	public Reservation(String name, String type, LocalDate checkinDate, int numberOfNights, int numberOfRooms, ArrayList<Room> rooms) {
-		this.number = (int)(Math.random() * 1000 + 9999);
+		this.number = (int)(Math.random() * 8999 + 1000);
 		this.name = name;
 		this.type = type;
 		this.checkinDate = checkinDate;
@@ -43,6 +43,14 @@ public class Reservation {
 	 */
 	public int getNumber() {
 		return number;
+	}
+	
+	/**
+	 * Sets the new reservation number, particularly useful for when reading in a new reservation from data in a file
+	 * @param number the reservation number
+	 */
+	public void setNumber(int number) {
+		this.number = number;
 	}
 	
 	/**
