@@ -4,7 +4,8 @@ import java.time.LocalDate;
 * A class representing the Supervisor user of the system
 */
 public class Supervisor extends DeskClerk {
-
+	
+	DataAnalysis A = new DataAnalysis();
 	public Supervisor(String hotelName, BookingSystem system) {
 		super(hotelName, system);
 	}
@@ -24,8 +25,17 @@ public class Supervisor extends DeskClerk {
 	
 	//methods requesting data Analysis
 	//gets data analysis of financial information between two dates
-	public void getFinancialDataAnalysis(LocalDate start, LocalDate end) {
-
+	public void getFinancialDataAnalysis(LocalDate start, LocalDate end, String filePath) {
+		
+		A.getFinancialInfo(start, end, this.system.readDataFromFile(filePath));
+	}
+	
+	public double getAverageRoomCost(LocalDate start, LocalDate end, Object[][] data ) {
+		return A.getAverageCostPerRoom(start, end, data);
+	}
+	
+	public double getTotalEarnedAmount(LocalDate start, LocalDate end, Object[][] data) {
+		return A.getTotalEarned(start, end, data);
 	}
 	
 	//gets data analysis of what rooms are occupied between two dates

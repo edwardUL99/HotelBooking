@@ -181,19 +181,19 @@ public class TextUI {
 				} /* else if (command == 'C') {
 					
 					System.out.println("Would you like to I)check-in or O)check-out? ");
-					char command2 = in.nextLine().toUpperCase().charAt(0);
-					if (command2 == 'I') {
+					char command1 = in.nextLine().toUpperCase().charAt(0);
+					if (command1 == 'I') {
 						checkIn();
-					} else if (command2 == 'O') {
+					} else if (command1 == 'O') {
 						checkOut();
 					}
 				} */
 			} else if(choice.equals("Supervisor")) {
 				System.out.println("Please choose a hotel: ");;
 				this.user = new Supervisor(in.nextLine(), system);
-				System.out.println("Would you like to access R)eservations or C)check-in/out or A)pply discounts or D)ata analytics ");
+				System.out.println("Would you like to access \n1)reservations \n2)check-in/out \n3)apply discounts \n4)data analytics ");
 				char command = in.nextLine().toUpperCase().charAt(0);
-				if (command == 'R') {
+				if (command == '1') {
 					
 					System.out.println("Would you like to M)ake a reservation or C(ancel a reservation? ");
 					char command1 = in.nextLine().toUpperCase().charAt(0);
@@ -203,19 +203,29 @@ public class TextUI {
 						cancelReservation();
 					}
 				
-				} /* else if (command == 'C') {
+				} /* else if (command == '2') 
 					
 					System.out.println("Would you like to I)check-in or O)check-out? ");
-					char command2 = in.nextLine().toUpperCase().charAt(0);
-					if (command2 == 'I') {
+					char command1 = in.nextLine().toUpperCase().charAt(0);
+					if (command1 == 'I') {
 						checkIn();
-					} else if (command2 == 'O') {
+					} else if (command1 == 'O') {
 						checkOut();
 					}
-				} else if (command == 'A') {
+				} else if (command == '3') {
 					//enter reservation discount applies to and size of discount
-				} else if (command == 'D') {
+				} else if (command == '4') {
 					//choose data analytic method
+					System,out.println("would you like to \n1)get all room purchases between dates. \n2)get average earnings across all rooms over chosen period \n3)get Total earnings over chosen period");
+					char command1 = in.nextLine().toUpperCase().charAt(0);
+					if (command1 == '1') {
+					
+					} else if (command1 == '2') {
+					
+					} else if (command1 == '3') {
+					
+					}
+					
 				}
 				 	
 				 */

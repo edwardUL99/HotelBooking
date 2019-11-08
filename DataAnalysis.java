@@ -19,12 +19,22 @@ public class DataAnalysis  {
 		return dateTotalCost;
 	}
 	
-	public void getAverageCostPerRoom(LocalDate start, LocalDate end, Object[][] data) {
+	public double getAverageCostPerRoom(LocalDate start, LocalDate end, Object[][] data) {
 		TreeMap<LocalDate, Double> dateTotalCost = getFinancialInfo(start, end, data);
 		int average = 0;
 		for(double totalCost :dateTotalCost.values()) {
 			average += totalCost;
 		}
 		average = average/dateTotalCost.size();
+		return average;
+	}
+	
+	public double getTotalEarned(LocalDate start, LocalDate end, Object[][] data) {
+		TreeMap<LocalDate, Double> dateTotalCost = getFinancialInfo(start, end, data);
+		int total = 0;
+		for(double totalCost :dateTotalCost.values()) {
+			total += totalCost;
+		}
+		return total;
 	}
 }
