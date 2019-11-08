@@ -411,6 +411,7 @@ public class BookingSystem implements CsvTools {
 				rooms.put(r, rooms.get(r) + 1); //Increments back the rooms available.
 			}
 			this.reservations.get(hotelName).remove(reservation);
+			this.writeReservationsToFile();
 			return true;
 		}
 		return false;
@@ -453,8 +454,11 @@ public class BookingSystem implements CsvTools {
 	private int getCols(String filePath) {
 		int count = 0;
 		try (Scanner in = new Scanner(new File(filePath))) {
-			if (in.hasNextLine()) {
-				count = in.nextLine().split(",").length;
+			while (in.hasNextLine()) {
+				int nextCount = in.nextLine().split(",").length;
+				if (nextCount > count) {
+					count = in.nextLine().split(",").length;
+				}
 			}
 		} catch (FileNotFoundException e) {
 		}
