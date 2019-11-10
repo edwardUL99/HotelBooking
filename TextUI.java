@@ -61,18 +61,29 @@ public class TextUI {
 		//For getCurrentRooms() method maybe supply two date parameters, indicating a time period to populate the rooms available map with the amount of rooms free at that period
 		ArrayList<Room> allRooms = new ArrayList<Room>(map.keySet());
 		ArrayList<Room> rooms = new ArrayList<Room>(numberOfRooms);
-		System.out.println("Room type(Rooms Available)"); //Have a way to check number of rooms available for the date chosen in reservation
+		System.out.println("Room type(Rooms Available)(Maximum Adult occupancy)(Maximum Child occupancy)"); //Have a way to check number of rooms available for the date chosen in reservation
 		while (rooms.size() != numberOfRooms) {
 			char ch = 'A';
 			for (int i = 0; i < allRooms.size(); i++) {
 				Room r = allRooms.get(i);
-				System.out.println(ch + ")" + r.getType() + "(" + map.get(r) + ")");
-				ch++;
+				if (map.get(r) > 0) {
+					System.out.println(ch + ")" + r.getType() + "(" + map.get(r) + ")" + "(" + r.occupancy(true, false) + ")" + "(" + r.occupancy(false, false) + ")");
+					ch++;
+				}
 			} //This is not how it will be implemented, just until the other methods are developed
 			String input = in.nextLine();
 			int n = input.toUpperCase().charAt(0) - 'A';
+			System.out.println("Please enter how many adults and children are staying per room (number of Adults,number of Children): ");
+			String[] occupancy = in.nextLine().split(",");
+			int adults = Integer.parseInt(occupancy[0]);
+			int children = Integer.parseInt(occupancy[1]);
 			if (n >= 0 && n < allRooms.size()) {
-				rooms.add(allRooms.get(n));
+				Room choice = allRooms.get(n);
+				if ((adults >= choice.occupancy(true, true) && adults <= choice.occupancy(true, false)) && (children >= choice.occupancy(false, true) && children <= choice.occupancy(false,  false))) {
+					rooms.add(choice);
+				} else {
+					System.out.println("The room chosen is not suitable for the number of adults or children you entered, please try again");
+				}
 			}
 		}
 		return rooms;
@@ -94,7 +105,6 @@ public class TextUI {
 		int numNights = Integer.parseInt(in.nextLine()); //Prevents line not found errors as nextInt() does not skip to nextLine
 		System.out.println("Please enter the number of rooms you wish to book: ");
 		int numRooms = Integer.parseInt(in.nextLine()); //Prevents line not found errors as nextInt() does not skip to nextLine
-		System.out.println("Please choose your room(s): ");
 		ArrayList<Room> rooms = chooseRooms(numRooms, checkin, checkin.plusDays((long)numNights));
 		this.user.createReservation(this.hotelName, this.user.name, type, checkin, numNights, numRooms, rooms);
 	}
@@ -134,101 +144,110 @@ public class TextUI {
 	}
 	
 	public void run() {
-		String tempName;
+		boolean run = true;
+		String tempName, choice;
 		this.system = new BookingSystem();
 		java.util.Set<String> hotels = system.getRooms().keySet();
 		String[] hotelNames = new String[hotels.size()];
 		int i = 0;
 		for (String name : hotels) {
 			hotelNames[i++] = name;
-		}
-		while (true) {
-			System.out.println("Please choose which user to login as: ");
-			String[] users = {"Customer", "Desk Clerk", "Supervisor"};
-			String choice = (String)getChoice(users);
-			if (choice.equals("Customer")) {
-				System.out.println("Please enter your name: ");
-				tempName = in.nextLine();
-				System.out.println("Please choose a hotel: ");
-				this.hotelName = (String)getChoice(hotelNames);
-				this.user = new Customer(tempName, this.hotelName, system);
-				System.out.println("Would you like to M)ake a reservation, C(ancel a reservation or V)iew a reservation?");
-				char command = in.nextLine().toUpperCase().charAt(0);
-				if (command == 'M') {
-					makeReservation();
-				} else if (command == 'C') {
-					cancelReservation();
-				} else if (command == 'V') {
-					viewReservation();
-				}
-			} else if(choice.equals("Desk Clerk")) {
-				System.out.println("Please choose a hotel: ");
-				this.hotelName = (String)getChoice(hotelNames);
-				this.user = new DeskClerk(hotelName, system);
-				System.out.println("Would you like to access R)eservations or C)heck-in/out ? ");
-				char command = in.nextLine().toUpperCase().charAt(0);
-				if (command == 'R') {
-					System.out.println("Would you like to M)ake a reservation or C(ancel a reservation? ");
-					char command1 = in.nextLine().toUpperCase().charAt(0);
-					if (command1 == 'M') {
-						makeReservation();
-					} else if (command1 == 'C') {
-						System.out.println("Please enter the customer name: ");
-						this.user.name = in.nextLine();
-						cancelReservation();
-					}
+		}	
+		System.out.println("Please choose a hotel: ");
+		this.hotelName = (String)getChoice(hotelNames);
+		while (run) {
+			System.out.println("Would you like to L)ogin, C(hange hotel, or Q)uit?");
+			char option = in.nextLine().toUpperCase().charAt(0);
+			if (option == 'L') {
+				System.out.println("Please choose which user to login as: ");
+				String[] users = {"Customer", "Desk Clerk", "Supervisor"};
+				choice = (String)getChoice(users);
+				if (choice.equals("Customer")) {
+					System.out.println("Please enter your name: ");
+					tempName = in.nextLine();
 				
-				} /* else if (command == 'C') {
-					
-					System.out.println("Would you like to I)check-in or O)check-out? ");
-					char command1 = in.nextLine().toUpperCase().charAt(0);
-					if (command1 == 'I') {
-						checkIn();
-					} else if (command1 == 'O') {
-						checkOut();
-					}
-				} */
-			} else if(choice.equals("Supervisor")) {
-				System.out.println("Please choose a hotel: ");;
-				this.user = new Supervisor(in.nextLine(), system);
-				System.out.println("Would you like to access \n1)reservations \n2)check-in/out \n3)apply discounts \n4)data analytics ");
-				char command = in.nextLine().toUpperCase().charAt(0);
-				if (command == '1') {
-					
-					System.out.println("Would you like to M)ake a reservation or C(ancel a reservation? ");
-					char command1 = in.nextLine().toUpperCase().charAt(0);
-					if (command1 == 'M') {
+					this.user = new Customer(tempName, this.hotelName, system);
+					System.out.println("Would you like to M)ake a reservation, C(ancel a reservation, V)iew a reservation?");
+					char command = in.nextLine().toUpperCase().charAt(0);
+					if (command == 'M') {
 						makeReservation();
-					} else if (command1 == 'C') {
+					} else if (command == 'C') {
 						cancelReservation();
+					} else if (command == 'V') {
+						viewReservation();
 					}
+				} else if(choice.equals("Desk Clerk")) {
+					this.user = new DeskClerk(hotelName, system);
+					System.out.println("Would you like to access R)eservations or C)heck-in/out ? ");
+					char command = in.nextLine().toUpperCase().charAt(0);
+					if (command == 'R') {
+						System.out.println("Would you like to M)ake a reservation or C(ancel a reservation? ");
+						char command1 = in.nextLine().toUpperCase().charAt(0);
+						if (command1 == 'M') {
+							makeReservation();
+						} else if (command1 == 'C') {
+							System.out.println("Please enter the customer name: ");
+							this.user.name = in.nextLine();
+							cancelReservation();
+						}
 				
-				} /* else if (command == '2') 
+					} /* else if (command == 'C') {
 					
-					System.out.println("Would you like to I)check-in or O)check-out? ");
-					char command1 = in.nextLine().toUpperCase().charAt(0);
-					if (command1 == 'I') {
-						checkIn();
-					} else if (command1 == 'O') {
-						checkOut();
+						System.out.println("Would you like to I)check-in or O)check-out? ");
+						char command1 = in.nextLine().toUpperCase().charAt(0);
+						if (command1 == 'I') {
+							checkIn();
+						} else if (command1 == 'O') {
+							checkOut();
+						}
+					} */
+				} else if(choice.equals("Supervisor")) {
+					this.user = new Supervisor(in.nextLine(), system);
+					System.out.println("Would you like to access \n1)reservations \n2)check-in/out \n3)apply discounts \n4)data analytics ");
+					char command = in.nextLine().toUpperCase().charAt(0);
+					if (command == '1') {
+						
+						System.out.println("Would you like to M)ake a reservation or C(ancel a reservation? ");
+						command = in.nextLine().toUpperCase().charAt(0);
+						if (command == 'M') {
+							makeReservation();
+						} else if (command == 'C') {
+						cancelReservation();
+						}
+				
+					} /* else if (command == '2') 
+					
+						System.out.println("Would you like to I)check-in or O)check-out? ");
+						command = in.nextLine().toUpperCase().charAt(0);
+						if (command == 'I') {
+							checkIn();
+						} else if (command == 'O') {
+							checkOut();
+						}
+					} else if (command == '3') {
+						//enter reservation discount applies to and size of discount
+					} else if (command == '4') {
+						//choose data analytic method
+						System.out.println("would you like to \n1)get all room purchases between dates. \n2)get average earnings across all rooms over chosen period \n3)get Total earnings over chosen period");
+						command = in.nextLine().toUpperCase().charAt(0);
+						if (command == '1') {
+					
+						} else if (command1 == '2') {
+					
+						} else if (command1 == '3') {
+					
+						}
+					
 					}
-				} else if (command == '3') {
-					//enter reservation discount applies to and size of discount
-				} else if (command == '4') {
-					//choose data analytic method
-					System,out.println("would you like to \n1)get all room purchases between dates. \n2)get average earnings across all rooms over chosen period \n3)get Total earnings over chosen period");
-					char command1 = in.nextLine().toUpperCase().charAt(0);
-					if (command1 == '1') {
-					
-					} else if (command1 == '2') {
-					
-					} else if (command1 == '3') {
-					
-					}
-					
-				}
 				 	
-				 */
+					 */
+				}
+			} else if (option == 'C') {
+				System.out.println("The current hotel is: " + this.hotelName);
+				System.out.println("Please choose a hotel: ");
+				this.hotelName = (String)getChoice(hotelNames);
+			} else if (option == 'Q') {
+				run = false;
 			}
 		}
 	}

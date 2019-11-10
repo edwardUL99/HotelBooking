@@ -14,12 +14,14 @@ import java.util.Map;
 public class BookingSystem implements CsvTools {
 	private TreeMap<String, ArrayList<Reservation>> reservations; //Stores a list of reservations per hotel
 	private TreeMap<String, TreeMap<Room, Integer>> allRooms;
+	private TreeMap<String, ArrayList<Reservation>> cancellations; //Stores a list of cancellations from the system per hotel
 	
 	/**
 	* Constructs a BookingSystem object
 	*/
 	public BookingSystem() {
 		this.reservations = new TreeMap<String, ArrayList<Reservation>>();
+		this.cancellations = new TreeMap<String, ArrayList<Reservation>>(); //also reinitialise this
 		this.getRooms();
 		this.reinitialise();
 	}
@@ -178,6 +180,8 @@ public class BookingSystem implements CsvTools {
 	 * @param hotelName the name of the hotel in question
 	 * @param from the date at the start of the time period
 	 * @param to the date at the end of the time period
+	 * @param adultOcc the number of adults staying per room
+	 * @param childOcc the number of children staying per room
 	 * @return a TreeMap with a rooms and their corresponding number of rooms available in the hotel during this period
 	 */
 	public TreeMap<Room, Integer> getCurrentRooms(String hotelName, LocalDate from, LocalDate to) {
@@ -280,10 +284,6 @@ public class BookingSystem implements CsvTools {
 				this.reservations.put(hotelName, new ArrayList<Reservation>());
 			}
 			this.reservations.get(hotelName).add(reservation);
-			TreeMap<Room, Integer> rooms = this.allRooms.get(hotelName);
-			for (Room r : reservation.getRooms()) { //This should be changed to only decrement room numbers for a certain date, e.g. there might be 5 rooms booked for january, why say those 5 rooms aren't available in December if they are?
-				rooms.put(r, rooms.get(r) - 1); //Decrement for each room booked. Must add a way to check if the number of rooms is not 0(maybe in choose rooms method in reservation)
-			}
 			writeReservationsToFile();
 			return true;
 		}
@@ -316,6 +316,10 @@ public class BookingSystem implements CsvTools {
 			rows += e.getValue().size();
 		}
 		return rows;
+	}
+	
+	private void writeCancellationsToFile() {
+		
 	}
 	
 	private void writeReservationsToFile() {
@@ -405,13 +409,13 @@ public class BookingSystem implements CsvTools {
 	 */
 	public boolean removeReservation(String hotelName, Reservation reservation) {
 		if (containsReservation(hotelName, reservation)) {
-			ArrayList<Room> cancelledRooms = reservation.getRooms();
-			TreeMap<Room, Integer> rooms = this.allRooms.get(hotelName);
-			for (Room r : cancelledRooms) {
-				rooms.put(r, rooms.get(r) + 1); //Increments back the rooms available.
+			if (!this.cancellations.containsKey(hotelName)) {
+				this.cancellations.put(hotelName, new ArrayList<Reservation>());
 			}
+			this.cancellations.get(hotelName).add(reservation);
 			this.reservations.get(hotelName).remove(reservation);
 			this.writeReservationsToFile();
+			this.writeCancellationsToFile(); //doesn't do anything yet
 			return true;
 		}
 		return false;

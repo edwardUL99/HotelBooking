@@ -6,6 +6,7 @@ public class Room implements Comparable<Room> {
 	private String type;
 	private int[] occupancy; //occupancy[0] = Adult min occupancy[1] = child min, occupancy[2] = adult max, occupancy[3] = child max
 	private int[] rates; //indexed 0 - 6 0 = Mon, 1 = Tues, 2 = Wed etc
+	private boolean breakfastIncluded;
 	
 	/**
 	 * No-arg constructor which creates a default room object
@@ -147,5 +148,13 @@ public class Room implements Comparable<Room> {
 			Room comp = (Room)obj;
 			return comp.type.equals(this.type);
 		}
+	}
+
+	public boolean isBreakfastIncluded() {
+		return breakfastIncluded;
+	}
+
+	public void setBreakfastIncluded(boolean breakfastIncluded) {
+		this.breakfastIncluded = breakfastIncluded;
 	}
 }

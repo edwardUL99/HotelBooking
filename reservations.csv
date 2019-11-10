@@ -1,6 +1,10 @@
-Hotel,Number,Name,Type,Check-in Date,Number of Nights,Number Of Rooms,Rooms,,,Total Cost,Deposit
-3-star,6482,John Doe,S,2020-04-04,7,1,Classic Double,,,€565.00,€75.00
-4-star,8697,Jane Doe,S,2020-12-12,5,1,Executie Double,,,€455.00,€75.00
-,4554,Mary,S,2020-10-10,7,3,Executie Double,Executive Single,Executive Twin,€1620.00,€75.00
-5-star,4482,Eddy Lynch,S,2020-08-20,5,1,Deluxe Double,,,€485.00,€75.00
-,7719,Eddy Lynch,S,2019-12-20,3,1,Deluxe Single,,,€300.00,€75.00
+Hotel,Number,Name,Type,Check-in Date,Number of Nights,Number Of Rooms,Rooms,,,,Total Cost,Deposit
+3-star,6482,John Doe,S,2020-04-04,7,1,Classic Double,,,,€565.00,€75.00
+,4449,Mary O'Sullivan,S,2020-01-20,5,4,Classic Double,Classic Double,Classic Double,Classic Double,€1455.00,€75.00
+4-star,8697,Jane Doe,S,2020-12-12,5,1,Executie Double,,,,€455.00,€75.00
+,4554,Mary,S,2020-10-10,7,3,Executie Double,Executive Single,Executive Twin,,€1620.00,€75.00
+,9460,Eddy,S,2019-12-20,3,1,Executie Double,,,,€325.00,€75.00
+5-star,4482,Eddy Lynch,S,2020-08-20,5,1,Deluxe Double,,,,€485.00,€75.00
+,7719,Eddy Lynch,S,2019-12-20,3,1,Deluxe Single,,,,€300.00,€75.00
+,8713,Eddy Lynch,S,2019-12-10,7,3,Deluxe Family,Deluxe Twin,Deluxe Single,,€1745.00,€75.00
+,6316,Mary Collins,S,2020-08-16,7,1,Deluxe Single,,,,€585.00,€75.00
