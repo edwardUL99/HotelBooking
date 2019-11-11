@@ -21,9 +21,10 @@ public class BookingSystem implements CsvTools {
 	*/
 	public BookingSystem() {
 		this.reservations = new TreeMap<String, ArrayList<Reservation>>();
-		this.cancellations = new TreeMap<String, ArrayList<Reservation>>(); //also reinitialise this
+		this.cancellations = new TreeMap<String, ArrayList<Reservation>>();
 		this.getRooms();
-		this.reinitialise();
+		this.reinitialise(true); //reinitialises reservations
+		this.reinitialise(false); //reinitialises cancellations
 	}
 	
 	/**
@@ -251,7 +252,7 @@ public class BookingSystem implements CsvTools {
 	 * And the hotel has 6 Deluxe Double rooms left and 1 Deluxe Single left
 	 * While there is enough Deluxe Double left there is not enough Deluxe Single so the method would return false
 	 * @param hotelName the name of the hotel
-	 * @param reservation thereservation
+	 * @param reservation the reservation
 	 * @return true if there is enough rooms in the hotel available to book in all the rooms booked in reservation
 	 */
 	private boolean hasEnoughRoomsFree(String hotelName, Reservation reservation) {
@@ -272,6 +273,60 @@ public class BookingSystem implements CsvTools {
 	}
 	
 	/**
+	 * Checks if the hotel that is being provided exists in the system
+	 * @param hotelName The name of the hotel of the chain
+	 * @return if the hotel is in the system
+	 */
+	private boolean containsHotel(String hotelName) {
+		return this.reservations.containsKey(hotelName);
+	}
+	
+	/**
+	 * Checks if the specific hotel has the reservation in the system
+	 * @param hotelName the name of the hotel
+	 * @param reservation the reservation being queried
+	 * @return if the system has a record of the reservation
+	 */
+	private boolean containsReservation(String hotelName, Reservation reservation) {
+		if (!containsHotel(hotelName)) {
+			return false;
+		} else {
+			ArrayList<Reservation> reservationList = this.reservations.get(hotelName);
+			return reservationList.contains(reservation);
+		}
+	}
+	
+	/**
+	 * Removes the reservation from the system for the hotel provided both the hotel name and reservation exist
+	 * @param hotelName the name of the hotel to which the reservation belongs
+	 * @param reservation the reservation to be cancelled
+	 * @param cancellation true if it's a cancellation, false if its being removed from the system
+	 * @return
+	 */
+	public boolean removeReservation(String hotelName, Reservation reservation, boolean cancellation) {
+		if (containsReservation(hotelName, reservation)) {
+			if (cancellation) {
+				if (!this.cancellations.containsKey(hotelName)) {
+					this.cancellations.put(hotelName, new ArrayList<Reservation>());
+				}
+				this.cancellations.get(hotelName).add(reservation);
+				this.writeReservationsToFile(false); //writes the reservation to the cancellation file
+				this.reservations.get(hotelName).remove(reservation);
+				this.writeReservationsToFile(true); //updates the reservations file
+			} else {
+				if (LocalDate.now().isAfter(reservation.getCheckoutDate().plusDays((long)30))) {
+					this.reservations.get(hotelName).remove(reservation);
+					this.writeReservationsToFile(true); //updates the reservations file
+				} else {
+					return false;
+				}
+			}
+			return true;
+		}
+		return false;
+	}
+	
+	/**
 	 * Adds a new reservation to the list of reservations for the particular hotel
 	 * @param hotelName the name of the hotel owned by the chain e.g 5-star
 	 * @param reservation the reservation to be added
@@ -284,7 +339,7 @@ public class BookingSystem implements CsvTools {
 				this.reservations.put(hotelName, new ArrayList<Reservation>());
 			}
 			this.reservations.get(hotelName).add(reservation);
-			writeReservationsToFile();
+			writeReservationsToFile(true);
 			return true;
 		}
 		return false;
@@ -292,11 +347,13 @@ public class BookingSystem implements CsvTools {
 	
 	/**
 	 * Searches through all reservations and for the reservation with the most rooms booked, returns the room count
+	 * @param reservationOrCancelled returns highest number of rooms booked in one reservation from reservations if true, cancellations if false
 	 * @return the room count of the reservation with the most rooms booked
 	 */
-	private int largestRoomCountBooked() {
+	private int largestRoomCountBooked(boolean reservationOrCancellation) {
 		int largestRoomCount = 0;
-		for (Map.Entry<String, ArrayList<Reservation>> e : this.reservations.entrySet()) {
+		TreeMap<String, ArrayList<Reservation>> reservations = reservationOrCancellation ? this.reservations:this.cancellations;
+		for (Map.Entry<String, ArrayList<Reservation>> e : reservations.entrySet()) {
 			for (Reservation r : e.getValue()) {
 				if (r.getNumberOfRooms() > largestRoomCount) {
 					largestRoomCount = r.getNumberOfRooms();
@@ -308,23 +365,26 @@ public class BookingSystem implements CsvTools {
 	
 	/**
 	 * Gets the number of rows for a reservation data matrix
+	 * @param reservationOrCancellation returns number of rows for reservations if true, cancellations if false
 	 * @return the number of rows required
 	 */
-	private int getNumberOfRows() {
+	private int getNumberOfRows(boolean reservationOrCancellation) {
+		TreeMap<String, ArrayList<Reservation>> reservations = reservationOrCancellation ? this.reservations:this.cancellations;
 		int rows = 0;
-		for (Map.Entry<String, ArrayList<Reservation>> e : this.reservations.entrySet()) {
+		for (Map.Entry<String, ArrayList<Reservation>> e : reservations.entrySet()) {
 			rows += e.getValue().size();
 		}
 		return rows;
 	}
 	
-	private void writeCancellationsToFile() {
-		
-	}
-	
-	private void writeReservationsToFile() {
-		int largestRoomCount = largestRoomCountBooked();
-		int rows = getNumberOfRows() + 1;
+	/**
+	 * Writes reservations or cancellations to a file
+	 * @param reservationsOrCancellations if true, reservations will be written to the file, if false, cancellations
+	 */
+	private void writeReservationsToFile(boolean reservationOrCancellation) {
+		TreeMap<String, ArrayList<Reservation>> reservations = reservationOrCancellation ? this.reservations : this.cancellations;
+		int largestRoomCount = largestRoomCountBooked(reservationOrCancellation);
+		int rows = getNumberOfRows(reservationOrCancellation) + 1;
 		int columns = 9 + largestRoomCount;
 		Object[][] data = new String[rows][columns];
 		String[] attributes = {"Hotel", "Number", "Name", "Type", "Check-in Date", "Number of Nights", "Number Of Rooms", "Total Cost", "Deposit"};
@@ -341,7 +401,7 @@ public class BookingSystem implements CsvTools {
 				}
 			}
 		}
-		for (Map.Entry<String, ArrayList<Reservation>> e : this.reservations.entrySet()) {
+		for (Map.Entry<String, ArrayList<Reservation>> e : reservations.entrySet()) {
 			data[row][0] = e.getKey();
 			boolean hotelNamed = true;
 			for (Reservation reservation : e.getValue()) {
@@ -373,53 +433,12 @@ public class BookingSystem implements CsvTools {
 				row++;
 			}
 		}
-	String path = System.getProperty("user.dir") + "/reservations.csv";
+	String fileName = reservationOrCancellation ? "/reservations.csv": "/cancellations.csv";
+	String path = System.getProperty("user.dir") + fileName;
 	this.writeDataToFile(path, data);
 }
 	
-	/**
-	 * Checks if the hotel that is being provided exists in the system
-	 * @param hotelName The name of the hotel of the chain
-	 * @return if the hotel is in the system
-	 */
-	private boolean containsHotel(String hotelName) {
-		return this.reservations.containsKey(hotelName);
-	}
 	
-	/**
-	 * Checks if the specific hotel has the reservation in the system
-	 * @param hotelName the name of the hotel
-	 * @param reservation the reservation being queried
-	 * @return if the system has a record of the reservation
-	 */
-	private boolean containsReservation(String hotelName, Reservation reservation) {
-		if (!containsHotel(hotelName)) {
-			return false;
-		} else {
-			ArrayList<Reservation> reservationList = this.reservations.get(hotelName);
-			return reservationList.contains(reservation);
-		}
-	}
-	
-	/**
-	 * Removes the reservation from the system for the hotel provided both the hotel name and reservation exist
-	 * @param hotelName the name of the hotel to which the reservation belongs
-	 * @param reservation the reservation to be cancelled
-	 * @return
-	 */
-	public boolean removeReservation(String hotelName, Reservation reservation) {
-		if (containsReservation(hotelName, reservation)) {
-			if (!this.cancellations.containsKey(hotelName)) {
-				this.cancellations.put(hotelName, new ArrayList<Reservation>());
-			}
-			this.cancellations.get(hotelName).add(reservation);
-			this.reservations.get(hotelName).remove(reservation);
-			this.writeReservationsToFile();
-			this.writeCancellationsToFile(); //doesn't do anything yet
-			return true;
-		}
-		return false;
-	}
 
 	@Override
 	public void writeDataToFile(String filePath, Object[][] data) {
@@ -495,8 +514,9 @@ public class BookingSystem implements CsvTools {
 		}
 	}
 	
-	private void reinitialise() {
-		String[][] data = readDataFromFile(System.getProperty("user.dir") + "/reservations.csv");
+	private void reinitialise(boolean reservationOrCancellation) {
+		String fileName = reservationOrCancellation ? "/reservations.csv":"/cancellations.csv";
+		String[][] data = readDataFromFile(System.getProperty("user.dir") + fileName);
 		if (data != null) {
 			int row;
 			String hotelName = "", name, type;
@@ -528,10 +548,11 @@ public class BookingSystem implements CsvTools {
 				}
 				r = new Reservation(name, type, checkin, numOfNights, numOfRooms, rooms);
 				r.setNumber(number);
-				if (!this.reservations.containsKey(hotelName)) {
-					this.reservations.put(hotelName, new ArrayList<Reservation>());
+				TreeMap<String, ArrayList<Reservation>> reservations = reservationOrCancellation ? this.reservations:this.cancellations;
+				if (!reservations.containsKey(hotelName)) {
+					reservations.put(hotelName, new ArrayList<Reservation>());
 				}
-				this.reservations.get(hotelName).add(r);
+				reservations.get(hotelName).add(r);
 			}
 		}
 	}

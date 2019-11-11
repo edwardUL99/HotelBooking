@@ -26,7 +26,7 @@ public class User  {
 	
 	/** allows users to cancel reservations */
 	public void cancelReservation(String hotelName, Reservation reservation) {
-		this.system.removeReservation(hotelName, reservation);
+		this.system.removeReservation(hotelName, reservation, true);
 	}
 		
 }

@@ -25,6 +25,13 @@ public class DeskClerk extends User {
 		//this.system.getReservation(name, name, checkIn).getTotalCost().setAmountDue(0);
 	}
 	
-	
+	/**
+	 * Removing a reservation is different from a cancellation, removing is for after checkout and they need to save space for example
+	 * @param hotelName the name of the hotel
+	 * @param reservation the reservation
+	 */
+	public void removeReservation(String hotelName, Reservation reservation) {
+		this.system.removeReservation(hotelName, reservation, false); 
+	}
 	
 }

@@ -156,6 +156,7 @@ public class TextUI {
 		System.out.println("Please choose a hotel: ");
 		this.hotelName = (String)getChoice(hotelNames);
 		while (run) {
+			//Maybe make here to be logged in until they choose to logout?
 			System.out.println("Would you like to L)ogin, C(hange hotel, or Q)uit?");
 			char option = in.nextLine().toUpperCase().charAt(0);
 			if (option == 'L') {
