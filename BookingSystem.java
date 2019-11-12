@@ -548,6 +548,11 @@ public class BookingSystem implements CsvTools {
 				}
 				r = new Reservation(name, type, checkin, numOfNights, numOfRooms, rooms);
 				r.setNumber(number);
+				while (dataRow[lastCol].equals("")) {
+					lastCol++;
+				}
+				r.setTotalCost(Double.parseDouble(dataRow[lastCol++].substring(1)));
+				r.setDeposit(Double.parseDouble(dataRow[lastCol].substring(1)));
 				TreeMap<String, ArrayList<Reservation>> reservations = reservationOrCancellation ? this.reservations:this.cancellations;
 				if (!reservations.containsKey(hotelName)) {
 					reservations.put(hotelName, new ArrayList<Reservation>());

@@ -132,7 +132,7 @@ public class TextUI {
 	}
 
 	public void checkInUser() {
-		
+		//call getTotalCostCalculated() for a reservation either here or at checkout
 	}
 	
 	public void checkOutUser() {

@@ -104,11 +104,23 @@ public class Reservation {
 		return this.checkinDate.plusDays((long)this.numberOfNights);
 	}
 	
+	public void setTotalCost(double amount) {
+		this.totalCost.setAmountDue(amount);
+	}
+	
+	public void setDeposit(double amount) {
+		this.deposit.setAmountDue(amount);
+	}
+	
+	public Bill getTotalCost() {
+		return this.totalCost;
+	}
+	
 	/**
-	 * Returns a Bill object with the amount due set to the total payable including deposit
+	 * Returns a Bill object with the amount due set to the total payable calculated using rates including deposit
 	 * @return a Bill object representing the total cost
 	 */
-	public Bill getTotalCost() {
+	public Bill getTotalCostCalculated() {
 		int dayOfWeek;
 		double total = 0.00;
 		for (int i = 0; i < this.numberOfNights; i++) {
