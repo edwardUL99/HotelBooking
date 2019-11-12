@@ -143,114 +143,136 @@ public class TextUI {
 		
 	}
 	
+	private void runAsCustomer() {
+		boolean loggedIn = true;
+		System.out.println("Please enter your name: ");
+		this.user = new Customer(in.nextLine(), this.hotelName, system);
+		while (loggedIn) {
+			System.out.println("Would you like to M)ake a reservation, C(ancel a reservation, V)iew a reservation or L)ogout?");
+			char command = in.nextLine().toUpperCase().charAt(0);
+			if (command == 'M') {
+				makeReservation();
+			} else if (command == 'C') {
+				cancelReservation();
+			} else if (command == 'V') {
+				viewReservation();
+			} else if (command == 'L') {
+				loggedIn = false;
+			}
+		}
+	}
+	
+	private void runAsDeskClerk() {
+		boolean loggedIn = true;
+		while (loggedIn) {
+			this.user = new DeskClerk(hotelName, system);
+			System.out.println("Would you like to access R)eservations, C)heck-in/out or L)ogout?");
+			char command = in.nextLine().toUpperCase().charAt(0);
+			if (command == 'R') {
+				System.out.println("Would you like to M)ake a reservation, C(ancel a reservation or V)iew a reservation?");
+				command = in.nextLine().toUpperCase().charAt(0);
+				if (command == 'M') {
+					System.out.println("Please enter the customer name: ");
+					this.user.name = in.nextLine();
+					makeReservation();
+				} else if (command == 'C') {
+					System.out.println("Please enter the customer name: ");
+					this.user.name = in.nextLine();
+					cancelReservation();
+				} else if (command == 'V') {
+					System.out.println("Please enter the customer name: ");
+					this.user.name = in.nextLine();
+					viewReservation();
+				}
+			} else if (command == 'C') {
+				
+			} else if (command == 'L') {
+				loggedIn = false;
+			}
+		}
+	}
+	
+	private void runAsSupervisor() {
+		boolean loggedIn = true;
+		while (loggedIn) {
+			this.user = new Supervisor(this.hotelName, system);
+			System.out.println("Would you like to access \n1)reservations \n2)check-in/out \n3)apply discounts \n4)data analytics or \n5)Logout");
+			char command = in.nextLine().toUpperCase().charAt(0);
+			if (command == '1') {
+				
+				System.out.println("Would you like to M)ake a reservation or C(ancel a reservation? ");
+				command = in.nextLine().toUpperCase().charAt(0);
+				if (command == 'M') {
+					makeReservation();
+				} else if (command == 'C') {
+				cancelReservation();
+				}
+		
+			} else if (command == '5') {
+				loggedIn = false;
+			}/* else if (command == '2') 
+			
+				System.out.println("Would you like to I)check-in or O)check-out? ");
+				command = in.nextLine().toUpperCase().charAt(0);
+				if (command == 'I') {
+					checkIn();
+				} else if (command == 'O') {
+					checkOut();
+				}
+			} else if (command == '3') {
+				//enter reservation discount applies to and size of discount
+			} else if (command == '4') {
+				//choose data analytic method
+				System.out.println("would you like to \n1)get all room purchases between dates. \n2)get average earnings across all rooms over chosen period \n3)get Total earnings over chosen period");
+				command = in.nextLine().toUpperCase().charAt(0);
+				if (command == '1') {
+			
+				} else if (command1 == '2') {
+			
+				} else if (command1 == '3') {
+			
+				}
+			
+			}
+		 	
+			 */
+		}
+	}
+	
 	public void run() {
 		boolean run = true;
-		String tempName, choice;
+		String choice;
 		this.system = new BookingSystem();
 		java.util.Set<String> hotels = system.getRooms().keySet();
 		String[] hotelNames = new String[hotels.size()];
 		int i = 0;
-		for (String name : hotels) {
-			hotelNames[i++] = name;
+		for (String n : hotels) {
+			hotelNames[i++] = n;
 		}	
 		System.out.println("Please choose a hotel: ");
 		this.hotelName = (String)getChoice(hotelNames);
 		while (run) {
-			//Maybe make here to be logged in until they choose to logout?
-			System.out.println("Would you like to L)ogin, C(hange hotel, or Q)uit?");
-			char option = in.nextLine().toUpperCase().charAt(0);
-			if (option == 'L') {
+			System.out.println("Would you like to L)ogin or C)hange hotel or Q)uit?");
+			char ch = in.nextLine().toUpperCase().charAt(0);
+			if (ch == 'L') {
 				System.out.println("Please choose which user to login as: ");
 				String[] users = {"Customer", "Desk Clerk", "Supervisor"};
-				choice = (String)getChoice(users);
+				choice = (String)getChoice(users);	
 				if (choice.equals("Customer")) {
-					System.out.println("Please enter your name: ");
-					tempName = in.nextLine();
-				
-					this.user = new Customer(tempName, this.hotelName, system);
-					System.out.println("Would you like to M)ake a reservation, C(ancel a reservation, V)iew a reservation?");
-					char command = in.nextLine().toUpperCase().charAt(0);
-					if (command == 'M') {
-						makeReservation();
-					} else if (command == 'C') {
-						cancelReservation();
-					} else if (command == 'V') {
-						viewReservation();
-					}
-				} else if(choice.equals("Desk Clerk")) {
-					this.user = new DeskClerk(hotelName, system);
-					System.out.println("Would you like to access R)eservations or C)heck-in/out ? ");
-					char command = in.nextLine().toUpperCase().charAt(0);
-					if (command == 'R') {
-						System.out.println("Would you like to M)ake a reservation or C(ancel a reservation? ");
-						char command1 = in.nextLine().toUpperCase().charAt(0);
-						if (command1 == 'M') {
-							makeReservation();
-						} else if (command1 == 'C') {
-							System.out.println("Please enter the customer name: ");
-							this.user.name = in.nextLine();
-							cancelReservation();
-						}
-				
-					} /* else if (command == 'C') {
-					
-						System.out.println("Would you like to I)check-in or O)check-out? ");
-						char command1 = in.nextLine().toUpperCase().charAt(0);
-						if (command1 == 'I') {
-							checkIn();
-						} else if (command1 == 'O') {
-							checkOut();
-						}
-					} */
-				} else if(choice.equals("Supervisor")) {
-					this.user = new Supervisor(in.nextLine(), system);
-					System.out.println("Would you like to access \n1)reservations \n2)check-in/out \n3)apply discounts \n4)data analytics ");
-					char command = in.nextLine().toUpperCase().charAt(0);
-					if (command == '1') {
-						
-						System.out.println("Would you like to M)ake a reservation or C(ancel a reservation? ");
-						command = in.nextLine().toUpperCase().charAt(0);
-						if (command == 'M') {
-							makeReservation();
-						} else if (command == 'C') {
-						cancelReservation();
-						}
-				
-					} /* else if (command == '2') 
-					
-						System.out.println("Would you like to I)check-in or O)check-out? ");
-						command = in.nextLine().toUpperCase().charAt(0);
-						if (command == 'I') {
-							checkIn();
-						} else if (command == 'O') {
-							checkOut();
-						}
-					} else if (command == '3') {
-						//enter reservation discount applies to and size of discount
-					} else if (command == '4') {
-						//choose data analytic method
-						System.out.println("would you like to \n1)get all room purchases between dates. \n2)get average earnings across all rooms over chosen period \n3)get Total earnings over chosen period");
-						command = in.nextLine().toUpperCase().charAt(0);
-						if (command == '1') {
-					
-						} else if (command1 == '2') {
-					
-						} else if (command1 == '3') {
-					
-						}
-					
-					}
-				 	
-					 */
+					runAsCustomer();
+				} else if (choice.equals("DeskClerk")) {
+					runAsDeskClerk();
+				} else if (choice.equals("Supervisor")) {
+					runAsSupervisor();
 				}
-			} else if (option == 'C') {
+			} else if (ch == 'C') {
 				System.out.println("The current hotel is: " + this.hotelName);
 				System.out.println("Please choose a hotel: ");
 				this.hotelName = (String)getChoice(hotelNames);
-			} else if (option == 'Q') {
+			} else if (ch == 'Q') {
 				run = false;
 			}
-		}
+		} 
 	}
 	
 	private Object getChoice(Object[] objs) {
