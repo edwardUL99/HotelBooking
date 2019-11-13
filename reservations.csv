@@ -3,5 +3,6 @@ Hotel,Number,Name,Type,Check-in Date,Number of Nights,Number Of Rooms,Rooms,,,,T
 ,4449,Mary O'Sullivan,S,2020-01-20,5,4,Classic Double,Classic Double,Classic Double,Classic Double,€1455.00,€75.00
 4-star,8697,Jane Doe,S,2020-12-12,5,1,Executie Double,,,,€455.00,€75.00
 ,9460,Eddy,S,2019-12-20,3,1,Executie Double,,,,€325.00,€75.00
-5-star,7719,Eddy Lynch,S,2019-12-20,3,1,Deluxe Single,,,,€300.00,€75.00
-,5070,Mary Jones,S,2019-12-29,5,1,Deluxe Single,,,,€0.00,€75.00
+5-star,5070,Mary Jones,S,2019-12-29,5,1,Deluxe Single,,,,€425.00,€75.00
+,1316,Eddy Lynch,S,2019-12-20,3,1,Deluxe Single,,,,€300.00,€75.00
+,1989,Eddy Lynch,S,2019-12-20,5,1,Deluxe Family,,,,€0.00,€75.00

@@ -1,7 +1,5 @@
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Scanner;
-import java.util.TreeMap;
 /**
  * A class to represent the reservation for a hotel room(s)
  *
@@ -175,7 +173,15 @@ public class Reservation {
 		return returned;
 	}
 	
+	/**
+	 * Formats the reservation into a readable line by line 
+	 * @return formatted reservation 
+	 */
+	public String format() {
+		return String.format("Reservation name: %s\nReservation type: %s\nResrvation number: %d\nCheck-in Date: %s\nNumber of nights: %d\nNumber of rooms: %d\nRooms Booked:\n%sTotal Cost (incl. deposit): €%.02f\nDeposit: €%.02f", this.name, this.type, this.number, this.checkinDate.toString(), this.numberOfNights, this.numberOfRooms, roomsBookedAsString(), this.getTotalCost().getAmountDue(), this.deposit.getAmountDue());
+	}
+	
 	public String toString() {
-		return String.format("Reservation name: %s\nReservation type: %s\nResrvation number: %d\nCheck-in Date: %s\nNumber of nights: %d\nNumber of rooms: %d\nRooms Booked:\n%s\nTotal Cost (incl. deposit): €%.02f\nDeposit: €%.02f", this.name, this.type, this.number, this.checkinDate.toString(), this.numberOfNights, this.numberOfRooms, roomsBookedAsString(), this.getTotalCost().getAmountDue(), this.deposit.getAmountDue());
+		return String.format("Reservation name: %s, Type: %s, Number: %d, Checkin Date: %s, Number of nights: %d, Number of rooms: %d", this.name, this.type, this.number, this.checkinDate.toString(), this.numberOfNights, this.numberOfRooms);
 	}
 }

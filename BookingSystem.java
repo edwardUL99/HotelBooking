@@ -214,6 +214,27 @@ public class BookingSystem implements CsvTools {
 	 * @param hotelName the name of the hotel
 	 * @param name the name of the customer who owns the reservation
 	 * @param checkIn the check in date
+	 * @return a list of reservations matching the name and checkout date, null if the hotel doesn't exist
+	 */
+	public ArrayList<Reservation> getReservations(String hotelName, String name, java.time.LocalDate checkIn) {
+		ArrayList<Reservation> reservations = this.reservations.get(hotelName);
+		if (reservations != null) {
+			ArrayList<Reservation> matches = new ArrayList<Reservation>();
+			for (Reservation r : reservations) {
+				if (r.getName().equals(name) && r.getCheckinDate().isEqual(checkIn)) {
+					matches.add(r);
+				}
+			}
+			return matches;
+		}
+		return null;
+	}
+	
+	/**
+	 * Returns a single reservation specified by the name and the checkIn date
+	 * @param hotelName the name of the hotel
+	 * @param name the name of the customer who owns the reservation
+	 * @param checkIn the check in date
 	 * @return a reservation if the map of reservations contains the reservation, null if not
 	 */
 	public Reservation getReservation(String hotelName, String name, java.time.LocalDate checkIn) {
@@ -427,7 +448,7 @@ public class BookingSystem implements CsvTools {
 						data[row][lastIndex++] = "";
 					}
 				}
-				data[row][lastIndex++] = String.format("€%.02f", reservation.getTotalCost().getAmountDue());
+				data[row][lastIndex++] = String.format("€%.02f", reservation.getTotalCostCalculated().getAmountDue()); //look at this after figuring out check in and checkout
 				data[row][lastIndex] = String.format("€%.02f", reservation.getDeposit().getAmountDue());
 				lastIndex = 7;
 				row++;

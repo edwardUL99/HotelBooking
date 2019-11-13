@@ -1,5 +1,3 @@
-import java.time.LocalDate;
-
 /**
 * A class representing the Desk Clerk user of the system
 */

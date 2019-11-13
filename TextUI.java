@@ -2,7 +2,6 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Scanner;
 import java.util.TreeMap;
-import java.util.TreeSet;
 
 public class TextUI {
 	private Scanner in;
@@ -112,7 +111,7 @@ public class TextUI {
 	private void cancelReservation() {
 		System.out.println("Please enter the checkIn date(dd/mm/yyyy)");
 		LocalDate checkIn = getDate();
-		Reservation reservation = this.system.getReservation(this.hotelName, this.user.name, checkIn);
+		Reservation reservation = (Reservation)getChoice(this.system.getReservations(this.hotelName, this.user.name, checkIn)); //if more than 1 reservation same date allow to choose which one
 		if (reservation == null) {
 			System.out.println("The reservation could not be found");
 		} else {
@@ -123,11 +122,11 @@ public class TextUI {
 	private void viewReservation() {
 		System.out.println("Please enter the checkIn date(dd/mm/yyy)");
 		LocalDate checkIn = getDate();
-		Reservation reservation = this.system.getReservation(this.hotelName, this.user.name, checkIn);
-		if (reservation != null) {
-			System.out.println(reservation);
-		} else {
+		Reservation reservation = (Reservation)getChoice(this.system.getReservations(this.hotelName, this.user.name, checkIn)); //if more than 1 reservation same date allow to choose which one
+		if (reservation == null) {
 			System.out.println("The reservation could not be found");
+		} else {
+			System.out.println(reservation.format());
 		}
 	}
 
@@ -148,7 +147,7 @@ public class TextUI {
 		System.out.println("Please enter your name: ");
 		this.user = new Customer(in.nextLine(), this.hotelName, system);
 		while (loggedIn) {
-			System.out.println("Would you like to M)ake a reservation, C(ancel a reservation, V)iew a reservation or L)ogout?");
+			System.out.println("\nWould you like to M)ake a reservation, C(ancel a reservation, V)iew a reservation or L)ogout?");
 			char command = in.nextLine().toUpperCase().charAt(0);
 			if (command == 'M') {
 				makeReservation();
@@ -166,7 +165,7 @@ public class TextUI {
 		boolean loggedIn = true;
 		while (loggedIn) {
 			this.user = new DeskClerk(hotelName, system);
-			System.out.println("Would you like to access R)eservations, C)heck-in/out or L)ogout?");
+			System.out.println("\nWould you like to access R)eservations, C)heck-in/out or L)ogout?");
 			char command = in.nextLine().toUpperCase().charAt(0);
 			if (command == 'R') {
 				System.out.println("Would you like to M)ake a reservation, C(ancel a reservation or V)iew a reservation?");
@@ -196,7 +195,7 @@ public class TextUI {
 		boolean loggedIn = true;
 		while (loggedIn) {
 			this.user = new Supervisor(this.hotelName, system);
-			System.out.println("Would you like to access \n1)reservations \n2)check-in/out \n3)apply discounts \n4)data analytics or \n5)Logout");
+			System.out.println("\nWould you like to access \n1)reservations \n2)check-in/out \n3)apply discounts \n4)data analytics or \n5)Logout");
 			char command = in.nextLine().toUpperCase().charAt(0);
 			if (command == '1') {
 				
@@ -252,7 +251,7 @@ public class TextUI {
 		System.out.println("Please choose a hotel: ");
 		this.hotelName = (String)getChoice(hotelNames);
 		while (run) {
-			System.out.println("Would you like to L)ogin or C)hange hotel or Q)uit?");
+			System.out.println("\nWould you like to L)ogin or C)hange hotel or Q)uit?");
 			char ch = in.nextLine().toUpperCase().charAt(0);
 			if (ch == 'L') {
 				System.out.println("Please choose which user to login as: ");
@@ -289,5 +288,16 @@ public class TextUI {
 				return objs[index];
 			}
 		}
+	}
+	
+	private Object getChoice(ArrayList<Reservation> reservations) {
+		if (reservations.size() == 0) {
+			return null;
+		}
+		Object[] choices = new Object[reservations.size()];
+		for (int i = 0; i < reservations.size(); i++) {
+			choices[i] = reservations.get(i);
+		}
+		return getChoice(choices);
 	}
 }
