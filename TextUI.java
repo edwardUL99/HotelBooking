@@ -100,6 +100,10 @@ public class TextUI {
 		}
 		System.out.println("Please enter your check-in date(dd/mm/yyyy): ");
 		LocalDate checkin = getDate();
+		if (!this.system.onlyBookingOnCheckInDate(this.hotelName, this.user.name, checkin)) {
+			System.out.println("You already have a reservation on this date, please try again");
+			makeReservation();
+		}
 		System.out.println("Please enter the number of nights you wish to stay: ");
 		int numNights = Integer.parseInt(in.nextLine()); //Prevents line not found errors as nextInt() does not skip to nextLine
 		System.out.println("Please enter the number of rooms you wish to book: ");
