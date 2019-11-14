@@ -13,7 +13,7 @@ public class DataAnalysis  {
 		while(count < data.length) {
 			
 			if(((LocalDate)data[count][4]).compareTo(end) >= 0 || ((LocalDate)data[count][4]).compareTo(start) <= 0) {
-				dateTotalCost.put((LocalDate)data[count][4],  (double)data[count][9]);
+				dateTotalCost.put((LocalDate)data[count][4],  (Double)data[count][9]);
 			}
 		}
 		return dateTotalCost;
