@@ -117,8 +117,8 @@ public class BookingSystem implements CsvTools {
 	 * @param compare the variable to compare d1 against
 	 * @return whether the date d1 is greater than or equals to compare
 	 */
-	private boolean dateLessThanEquals(LocalDate d1, LocalDate compare) {
-		return d1.isEqual(compare) || d1.isBefore(compare);
+	private boolean dateLessThan(LocalDate d1, LocalDate compare) {
+		return d1.isBefore(compare);
 	}
 	
 	/**
@@ -132,7 +132,7 @@ public class BookingSystem implements CsvTools {
 		LocalDate checkIn = reservation.getCheckinDate();
 		LocalDate checkOut = reservation.getCheckoutDate();
 		for (LocalDate date = checkIn; !date.isEqual(checkOut); date = date.plusDays((long)1)) {
-			if (dateGreaterThanEquals(date, from) && dateLessThanEquals(date, to)) {
+			if (dateGreaterThanEquals(date, from) && dateLessThan(date, to)) {
 				return true;
 			}
 		}
@@ -317,11 +317,7 @@ public class BookingSystem implements CsvTools {
 				}
 			}
 		}
-		if (this.reservations.size() == 0) {
-			return true;
-		} else {
-			return false;
-		}
+		return true;
 	}
 	
 	/**
