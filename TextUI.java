@@ -98,11 +98,16 @@ public class TextUI {
 		} else {
 			type = "AP";
 		}
-		System.out.println("Please enter your check-in date(dd/mm/yyyy): ");
-		LocalDate checkin = getDate();
-		if (!this.system.onlyBookingOnCheckInDate(this.hotelName, this.user.name, checkin)) {
-			System.out.println("You already have a reservation on this date, please try again");
-			makeReservation();
+		boolean run = true;
+		LocalDate checkin = null;
+		while (run) {
+			System.out.println("Please enter your check-in date(dd/mm/yyyy): ");
+			checkin = getDate();
+			if (!this.system.onlyBookingOnCheckInDate(this.hotelName, this.user.name, checkin)) {
+				System.out.println("You already have a reservation on this date, please try again");
+			} else {
+				run = false;
+			}
 		}
 		System.out.println("Please enter the number of nights you wish to stay: ");
 		int numNights = Integer.parseInt(in.nextLine()); //Prevents line not found errors as nextInt() does not skip to nextLine
@@ -115,7 +120,7 @@ public class TextUI {
 	private void cancelReservation() {
 		System.out.println("Please enter the checkIn date(dd/mm/yyyy)");
 		LocalDate checkIn = getDate();
-		Reservation reservation = (Reservation)getChoice(this.system.getReservations(this.hotelName, this.user.name, checkIn)); //if more than 1 reservation same date allow to choose which one
+		Reservation reservation = this.system.getReservation(this.hotelName, this.user.name, checkIn); //if more than 1 reservation same date allow to choose which one
 		if (reservation == null) {
 			System.out.println("The reservation could not be found");
 		} else {
@@ -126,7 +131,7 @@ public class TextUI {
 	private void viewReservation() {
 		System.out.println("Please enter the checkIn date(dd/mm/yyy)");
 		LocalDate checkIn = getDate();
-		Reservation reservation = (Reservation)getChoice(this.system.getReservations(this.hotelName, this.user.name, checkIn)); //if more than 1 reservation same date allow to choose which one
+		Reservation reservation = this.system.getReservation(this.hotelName, this.user.name, checkIn); //if more than 1 reservation same date allow to choose which one
 		if (reservation == null) {
 			System.out.println("The reservation could not be found");
 		} else {

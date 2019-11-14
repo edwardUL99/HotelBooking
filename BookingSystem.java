@@ -316,9 +316,12 @@ public class BookingSystem implements CsvTools {
 					return false;
 				}
 			}
-			return true;
 		}
-		return false;
+		if (this.reservations.size() == 0) {
+			return true;
+		} else {
+			return false;
+		}
 	}
 	
 	/**
