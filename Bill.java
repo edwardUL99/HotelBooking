@@ -69,6 +69,7 @@ public class Bill {
 		this.amountDue = amountDue;
 	}
 	
+	@Override
 	public String toString() {
 		return "Name: " + billName + "\n" + "Date: " + billedDate + "\n" + "Total amount due: "  + amountDue;
 	}

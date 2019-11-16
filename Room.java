@@ -124,10 +124,12 @@ public class Room implements Comparable<Room> {
 	* Provides the capability for rooms to be compared
 	* @param other the room to compare to
 	* @return the int value representing the comparison**/
+	@Override
 	public int compareTo(Room other) {
 		return this.type.compareTo(other.type);
 	}
 	
+	@Override
 	public String toString() {
 		return this.type;
 	}
@@ -135,6 +137,7 @@ public class Room implements Comparable<Room> {
 	/**
 	 * Overriding object equals method
 	 */
+	@Override
 	public boolean equals(Object obj) {
 		if (!(obj instanceof Room)) {
 			return false;

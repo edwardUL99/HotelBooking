@@ -91,31 +91,49 @@ public class Reservation {
 	}
 	
 	/**
-	 * 
+	 * Returns the list of all the rooms booked
 	 * @return a list of all rooms booked for this reservation
 	 */
 	public ArrayList<Room> getRooms() {
 		return rooms;
 	}
 	
+	/**
+	 * Calculates the checkout date by adding on the number of nights staying to the check in date
+	 * @return the check out date for this reservation
+	 */
 	public LocalDate getCheckoutDate() {
 		return this.checkinDate.plusDays((long)this.numberOfNights);
 	}
 	
+	/**
+	 * Sets the total cost bill amount due to the amount specified
+	 * @param amount the amount to be paid
+	 */
 	public void setTotalCost(double amount) {
 		this.totalCost.setAmountDue(amount);
 	}
 	
+	/**
+	 * Sets the deposit in the deposit bill associated with this object to the amount specified
+	 * @param amount the amount to set the deposit to
+	 */
 	public void setDeposit(double amount) {
 		this.deposit.setAmountDue(amount);
 	}
 	
+	/**
+	 * Returns the current Bill TotalCost without calculating the amount to pay for each room for each night
+	 * @return the total cost bill
+	 */
 	public Bill getTotalCost() {
 		return this.totalCost;
 	}
 	
 	/**
 	 * Returns a Bill object with the amount due set to the total payable calculated using rates including deposit
+	 * Also sets the amount due of the bill total cost associated with this object to this calculated cost, so if you want to get the current total cost, either not calculated yet or discounted yet,
+	 * see getTotalCost()
 	 * @return a Bill object representing the total cost
 	 */
 	public Bill getTotalCostCalculated() {
@@ -144,9 +162,10 @@ public class Reservation {
 	}
 	
 	/**
-	 * Overwriting the equals method of Object 
+	 * Overriding the equals method of Object 
 	 * @param the object to check against
 	 */
+	@Override
 	public boolean equals(Object obj) {
 		if (!(obj instanceof Reservation)) {
 			//if obj is not an instance of Reservation, it is definitely not equal
@@ -181,6 +200,7 @@ public class Reservation {
 		return String.format("Reservation name: %s\nReservation type: %s\nResrvation number: %d\nCheck-in Date: %s\nNumber of nights: %d\nNumber of rooms: %d\nRooms Booked:\n%sTotal Cost (incl. deposit): €%.02f\nDeposit: €%.02f", this.name, this.type, this.number, this.checkinDate.toString(), this.numberOfNights, this.numberOfRooms, roomsBookedAsString(), this.getTotalCost().getAmountDue(), this.deposit.getAmountDue());
 	}
 	
+	@Override
 	public String toString() {
 		return String.format("Reservation name: %s, Type: %s, Number: %d, Checkin Date: %s, Number of nights: %d, Number of rooms: %d", this.name, this.type, this.number, this.checkinDate.toString(), this.numberOfNights, this.numberOfRooms);
 	}

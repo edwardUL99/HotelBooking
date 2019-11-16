@@ -15,6 +15,7 @@ public class BookingSystem implements CsvTools {
 	private TreeMap<String, ArrayList<Reservation>> reservations; //Stores a list of reservations per hotel
 	private TreeMap<String, TreeMap<Room, Integer>> allRooms;
 	private TreeMap<String, ArrayList<Reservation>> cancellations; //Stores a list of cancellations from the system per hotel
+	private TreeMap<String, ArrayList<HotelStay>> stays; //Stores a list of hotel stays per hotel
 	
 	/**
 	* Constructs a BookingSystem object
@@ -22,6 +23,7 @@ public class BookingSystem implements CsvTools {
 	public BookingSystem() {
 		this.reservations = new TreeMap<String, ArrayList<Reservation>>();
 		this.cancellations = new TreeMap<String, ArrayList<Reservation>>();
+		this.stays = new TreeMap<String, ArrayList<HotelStay>>(); //will have to save and restore too?
 		this.getRooms();
 		this.reinitialise(true); //reinitialises reservations
 		this.reinitialise(false); //reinitialises cancellations
@@ -299,7 +301,7 @@ public class BookingSystem implements CsvTools {
 	 * @return if the hotel is in the system
 	 */
 	private boolean containsHotel(String hotelName) {
-		return this.reservations.containsKey(hotelName);
+		return this.allRooms.containsKey(hotelName);
 	}
 	
 	/**
@@ -353,7 +355,9 @@ public class BookingSystem implements CsvTools {
 				this.reservations.get(hotelName).remove(reservation);
 				this.writeReservationsToFile(true); //updates the reservations file
 			} else {
-				if (LocalDate.now().isAfter(reservation.getCheckoutDate().plusDays((long)30))) {
+				if (LocalDate.now().isAfter(reservation.getCheckoutDate().plusDays((long)30))
+						&& (this.cancellations.get(hotelName).contains(reservation) ||  //if cancelled or is a hotel stay, it has been processed
+							this.stays.get(hotelName).contains(new HotelStay(reservation)))) {
 					this.reservations.get(hotelName).remove(reservation);
 					this.writeReservationsToFile(true); //updates the reservations file
 				} else {
@@ -380,6 +384,56 @@ public class BookingSystem implements CsvTools {
 			this.reservations.get(hotelName).add(reservation);
 			writeReservationsToFile(true);
 			return true;
+		}
+		return false;
+	}
+	
+	/**
+	 * Adds a hotel stay to the system
+	 * @param hotelName the name of the hotel
+	 * @param stay the hotel stay to add
+	 * @return if the system does not have the hotel, you cannot possibly have a hotel stay for a new hotel, if no reservation was made first, so will return false
+	 */
+	public boolean addHotelStay(String hotelName, HotelStay stay) {
+		if (this.containsHotel(hotelName)) {
+			if (this.stays.get(hotelName).contains(stay)) {
+				return false; //already checkedin
+			}
+			if (!this.stays.containsKey(hotelName)) {
+				this.stays.put(hotelName, new ArrayList<HotelStay>());
+			}
+			this.stays.get(hotelName).add(stay);
+		}
+		return false;
+	}
+	
+	/**
+	 * Gets a particular hotel stay 
+	 * @param hotelName the name of the hotel
+	 * @param r the reservation concerned with a hotel stay 
+ 	 * @return the hotel stay if present, null otherwise
+	 */
+	public HotelStay getHotelStay(String hotelName, Reservation r) {
+		for (HotelStay stay : this.stays.get(hotelName)) {
+			if (stay.getReservation().equals(r)) {
+				return stay;
+			}
+		}
+		return null;
+	}
+	
+	/**
+	 * Removes a hotelStay from the system
+	 * @param hotelName the name of the hotel to remove the stay from
+	 * @param stay the stay to remove
+	 * @return true if the stay exists and it was successfully removed
+	 */
+	public boolean removeHotelStay(String hotelName, HotelStay stay) {
+		if (this.containsHotel(hotelName)) {
+			if (this.stays.get(hotelName).contains(stay) && LocalDate.now().isAfter(stay.getReservation().getCheckinDate().plusYears((long)7))) {
+				this.stays.get(hotelName).remove(stay);
+				return true;
+			}
 		}
 		return false;
 	}
