@@ -149,7 +149,7 @@ public class TextUI {
 			LocalDate checkin = getDate();
 			if (this.user instanceof DeskClerk) {
 				DeskClerk clerk = (DeskClerk)this.user;
-				clerk.checkIn(name, checkin); //may replace with LocalDate.now() as checkin and check is it the right date for the ckeckin to occur
+				clerk.checkIn(name, checkin); //may replace with LocalDate.now() as checkin and check is it the right date for the ckeckin to occur, i.e if the reservation for this checkin date is null, it doesnt exist or is the wrong day to check in
 			}
 			run = false;
 		}
