@@ -37,9 +37,10 @@ public class DeskClerk extends User {
 	 * Checks users out of the hotel
 	 * @param customerName the name of the customer who made the reservation
 	 * @param checkIn the check in date
+	 * @param checkOut the checkout date
 	 * @return whether the check out was successful, false if the reservation doesn't exist or it's not even checked in
 	 */
-	public boolean checkOut(String customerName, LocalDate checkIn) {
+	public boolean checkOut(String customerName, LocalDate checkIn, LocalDate checkOut) {
 		//LocalDate checkIn = null;
 		//this.system.getReservation(name, name, checkIn).getTotalCost().setAmountDue(0);
 		//may have to check if there's any stays gone past checkout and should be removed
@@ -49,7 +50,10 @@ public class DeskClerk extends User {
 			return false;
 		} else {
 			stay.setCheckedIn(false);
-			return false;
+			stay.setStayStart(checkIn); //possibly check here if these are valid dates
+			stay.setStayEnd(checkOut);
+			this.system.writeReservationsToFile(true, true);
+			return true;
 		}
 		//possibly trigger write to file in system here to update the checkIn status
 	}

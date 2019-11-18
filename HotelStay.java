@@ -53,6 +53,14 @@ public class HotelStay {
 		return this.stayEnd;
 	}
 	
+	public void setStayStart(LocalDate stayStart) {
+		this.stayStart = stayStart;
+	}
+	
+	public void setStayEnd(LocalDate stayEnd) {
+		this.stayEnd = stayEnd;
+	}
+	
 	@Override
 	public String toString() {
 		return String.format("%s Checked In: %b, Total Income: €%.02f, Stay from %s to %s", this.reservation.toString(), this.checkedIn, this.totalIncome.getAmountDue(), this.stayStart.toString(), this.stayEnd.toString());
@@ -68,7 +76,7 @@ public class HotelStay {
 			return true;
 		} else {
 			HotelStay comp = (HotelStay)obj;
-			return this.reservation.equals(comp) && this.checkedIn == comp.checkedIn; //If reservations are the same no need to check stayStart or endStart as these would be set witht he same dates
+			return this.reservation.equals(comp.reservation) && this.checkedIn == comp.checkedIn; //If reservations are the same no need to check stayStart or endStart as these would be set witht he same dates
 		}
 	}
 }
