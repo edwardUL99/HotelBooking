@@ -1,2 +1,2 @@
 Hotel,Number,Name,Type,Check-in Date,Number of Nights,Number Of Rooms,Rooms,,,Total Cost,Deposit,Checked In,Stay Start,Stay End
-5-star,8132,Eddy Lynch,S,2019-12-20,5,3,Deluxe Double,Deluxe Family,Deluxe Single,€1285.00,€75.00,true,2019-12-20,2019-12-25
+5-star,8132,Eddy Lynch,S,2019-12-20,5,3,Deluxe Double,Deluxe Family,Deluxe Single,€1285.00,€75.00,false,2019-12-20,2019-12-25

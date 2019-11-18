@@ -173,7 +173,7 @@ public class TextUI {
 	private void checkinServices() {
 		boolean run = true;
 		while (run) {
-			System.out.println("Would you like to A)Check In or B) Check Out?");
+			System.out.println("Would you like to A)Check In or B)Check Out?");
 			char choice = in.nextLine().toUpperCase().charAt(0);
 			if (choice == 'A') {
 				checkInUser();
