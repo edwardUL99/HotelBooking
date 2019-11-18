@@ -129,7 +129,7 @@ public class TextUI {
 	}
 	
 	private void viewReservation() {
-		System.out.println("Please enter the checkIn date(dd/mm/yyy)");
+		System.out.println("Please enter the checkIn date(dd/mm/yyyy): ");
 		LocalDate checkIn = getDate();
 		Reservation reservation = this.system.getReservation(this.hotelName, this.user.name, checkIn); //if more than 1 reservation same date allow to choose which one
 		if (reservation == null) {
@@ -140,11 +140,49 @@ public class TextUI {
 	}
 
 	public void checkInUser() {
-		//call getTotalCostCalculated() for a reservation either here or at checkout
+		boolean run = true;
+		while (run) {
+			//call getTotalCostCalculated() for a reservation either here or at checkout
+			System.out.println("Please enter the customer name: ");
+			String name = in.nextLine();
+			System.out.println("Please enter the check-in date(dd/mm/yyyy): ");
+			LocalDate checkin = getDate();
+			if (this.user instanceof DeskClerk) {
+				DeskClerk clerk = (DeskClerk)this.user;
+				clerk.checkIn(name, checkin);
+			}
+			run = false;
+		}
 	}
 	
 	public void checkOutUser() {
-		
+		boolean run = true;
+		while (run) {
+			System.out.println("Please enter the customer name: ");
+			String name = in.nextLine();
+			System.out.println("Please enter the check-in date(dd/mm/yyyy): ");
+			LocalDate checkin = getDate();
+			if (this.user instanceof DeskClerk) {
+				DeskClerk clerk = (DeskClerk)this.user;
+				clerk.checkOut(name, checkin);
+			}
+			run = false;
+		}
+	}
+	
+	private void checkinServices() {
+		boolean run = true;
+		while (run) {
+			System.out.println("Would you like to A)Check In or B) Check Out?");
+			char choice = in.nextLine().toUpperCase().charAt(0);
+			if (choice == 'A') {
+				checkInUser();
+				run = false;
+			} else if (choice == 'B') {
+				checkOutUser();
+				run = false;
+			}
+		}
 	}
 	
 	public void applyDiscountToReservation() {
@@ -193,7 +231,7 @@ public class TextUI {
 					viewReservation();
 				}
 			} else if (command == 'C') {
-				
+				this.checkinServices();
 			} else if (command == 'L') {
 				loggedIn = false;
 			}
@@ -268,7 +306,7 @@ public class TextUI {
 				choice = (String)getChoice(users);	
 				if (choice.equals("Customer")) {
 					runAsCustomer();
-				} else if (choice.equals("DeskClerk")) {
+				} else if (choice.equals("Desk Clerk")) {
 					runAsDeskClerk();
 				} else if (choice.equals("Supervisor")) {
 					runAsSupervisor();

@@ -68,7 +68,7 @@ public class HotelStay {
 			return true;
 		} else {
 			HotelStay comp = (HotelStay)obj;
-			return this.reservation.equals(comp) && this.checkedIn == comp.checkedIn; //If reservations are the same no need to check stayStart or endStart as these would be set witht he same dates
+			return this.reservation.equals(comp.reservation) && this.checkedIn == comp.checkedIn; //If reservations are the same no need to check stayStart or endStart as these would be set witht he same dates
 		}
 	}
 }

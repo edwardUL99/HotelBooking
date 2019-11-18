@@ -49,7 +49,8 @@ public class DeskClerk extends User {
 			return false;
 		} else {
 			stay.setCheckedIn(false);
-			return false;
+			this.system.writeReservationsToFile(true, true);
+			return true;
 		}
 		//possibly trigger write to file in system here to update the checkIn status
 	}

@@ -218,7 +218,7 @@ public class BookingSystem implements CsvTools {
 	 * @param checkIn the check in date
 	 * @return a list of reservations matching the name and checkout date, null if the hotel doesn't exist
 	 */
-	public ArrayList<Reservation> getReservations(String hotelName, String name, java.time.LocalDate checkIn) {
+	public ArrayList<Reservation> getReservations(String hotelName, String name, LocalDate checkIn) {
 		ArrayList<Reservation> reservations = this.reservations.get(hotelName);
 		if (reservations != null) {
 			ArrayList<Reservation> matches = new ArrayList<Reservation>();
@@ -239,7 +239,7 @@ public class BookingSystem implements CsvTools {
 	 * @param checkIn the check in date
 	 * @return a reservation if the map of reservations contains the reservation, null if not
 	 */
-	public Reservation getReservation(String hotelName, String name, java.time.LocalDate checkIn) {
+	public Reservation getReservation(String hotelName, String name, LocalDate checkIn) {
 		for (Reservation r : this.reservations.get(hotelName)) {
 			if (r.getName().equals(name) && r.getCheckinDate().equals(checkIn)) {
 				return r;
@@ -351,15 +351,15 @@ public class BookingSystem implements CsvTools {
 					this.cancellations.put(hotelName, new ArrayList<Reservation>());
 				}
 				this.cancellations.get(hotelName).add(reservation);
-				this.writeReservationsToFile(false); //writes the reservation to the cancellation file
+				this.writeReservationsToFile(false, false); //writes the reservation to the cancellation file
 				this.reservations.get(hotelName).remove(reservation);
-				this.writeReservationsToFile(true); //updates the reservations file
+				this.writeReservationsToFile(true, false); //updates the reservations file
 			} else {
 				if (LocalDate.now().isAfter(reservation.getCheckoutDate().plusDays((long)30))
 						&& (this.cancellations.get(hotelName).contains(reservation) ||  //if cancelled or is a hotel stay, it has been processed
 							this.stays.get(hotelName).contains(new HotelStay(reservation)))) {
 					this.reservations.get(hotelName).remove(reservation);
-					this.writeReservationsToFile(true); //updates the reservations file
+					this.writeReservationsToFile(true, false); //updates the reservations file
 				} else {
 					return false;
 				}
@@ -382,7 +382,7 @@ public class BookingSystem implements CsvTools {
 				this.reservations.put(hotelName, new ArrayList<Reservation>());
 			}
 			this.reservations.get(hotelName).add(reservation);
-			writeReservationsToFile(true);
+			writeReservationsToFile(true, false);
 			return true;
 		}
 		return false;
@@ -396,13 +396,15 @@ public class BookingSystem implements CsvTools {
 	 */
 	public boolean addHotelStay(String hotelName, HotelStay stay) {
 		if (this.containsHotel(hotelName)) {
-			if (this.stays.get(hotelName).contains(stay)) {
-				return false; //already checkedin
-			}
 			if (!this.stays.containsKey(hotelName)) {
 				this.stays.put(hotelName, new ArrayList<HotelStay>());
 			}
+			
+			if (this.stays.get(hotelName).contains(stay)) {
+				return false; //already checkedin
+			}
 			this.stays.get(hotelName).add(stay);
+			this.writeReservationsToFile(true, true);
 		}
 		return false;
 	}
@@ -459,28 +461,48 @@ public class BookingSystem implements CsvTools {
 	/**
 	 * Gets the number of rows for a reservation data matrix
 	 * @param reservationOrCancellation returns number of rows for reservations if true, cancellations if false
+	 * @param hotelStay true if you want to find number of rows for hotel stays
 	 * @return the number of rows required
 	 */
-	private int getNumberOfRows(boolean reservationOrCancellation) {
-		TreeMap<String, ArrayList<Reservation>> reservations = reservationOrCancellation ? this.reservations:this.cancellations;
+	private int getNumberOfRows(boolean reservationOrCancellation, boolean hotelStay) {
 		int rows = 0;
-		for (Map.Entry<String, ArrayList<Reservation>> e : reservations.entrySet()) {
-			rows += e.getValue().size();
+		if (!hotelStay) {
+			TreeMap<String, ArrayList<Reservation>> reservations = reservationOrCancellation ? this.reservations:this.cancellations;
+			for (Map.Entry<String, ArrayList<Reservation>> e : reservations.entrySet()) {
+				rows += e.getValue().size();
+			}
+		} else if (reservationOrCancellation && hotelStay) {
+			for (Map.Entry<String, ArrayList<HotelStay>> e : stays.entrySet()) {
+				rows += e.getValue().size();
+			}
 		}
+		
 		return rows;
+	} 
+	
+	/**
+	 * Checks if the reservation has been processed to a hotel stay 
+	 * @param hotelName the name of the hotel
+	 * @param r the reservation
+	 * @return if the reservation has been processed to a stay
+	 */
+	private boolean isReservationStayed(String hotelName, Reservation r) {
+		return this.getHotelStay(hotelName, r) != null;
 	}
 	
 	/**
 	 * Writes reservations or cancellations to a file
 	 * @param reservationsOrCancellations if true, reservations will be written to the file, if false, cancellations
+	 * @param hotelStay true if writing a hotel stay to file, false if not. Note reservationOrCancellation must be true also
 	 */
-	private void writeReservationsToFile(boolean reservationOrCancellation) {
+	public void writeReservationsToFile(boolean reservationOrCancellation, boolean hotelStay) {
 		TreeMap<String, ArrayList<Reservation>> reservations = reservationOrCancellation ? this.reservations : this.cancellations;
 		int largestRoomCount = largestRoomCountBooked(reservationOrCancellation);
-		int rows = getNumberOfRows(reservationOrCancellation) + 1;
+		int rows = getNumberOfRows(reservationOrCancellation, hotelStay) + 1;
 		int columns = 9 + largestRoomCount;
-		Object[][] data = new String[rows][columns];
-		String[] attributes = {"Hotel", "Number", "Name", "Type", "Check-in Date", "Number of Nights", "Number Of Rooms", "Total Cost", "Deposit"};
+		columns = hotelStay ? columns + 3:columns;
+		Object[][] data = new Object[rows][columns];
+		String[] attributes = {"Hotel", "Number", "Name", "Type", "Check-in Date", "Number of Nights", "Number Of Rooms", "Total Cost", "Deposit", "Checked In", "Stay Start", "Stay End"};
 		int row = 1;
 		int index = 0;
 		for (int col = 0; col < columns; col++) {
@@ -498,38 +520,59 @@ public class BookingSystem implements CsvTools {
 			data[row][0] = e.getKey();
 			boolean hotelNamed = true;
 			for (Reservation reservation : e.getValue()) {
-				if (hotelNamed) {
-					hotelNamed = false;
-				} else {
-					data[row][0] = "";
+				boolean canAddReservation = true;
+				if (hotelStay) {
+					canAddReservation = this.isReservationStayed(e.getKey(), reservation);
 				}
-				data[row][1] = Integer.valueOf(reservation.getNumber()).toString();
-				data[row][2] = reservation.getName();
-				data[row][3] = reservation.getType();
-				data[row][4] = reservation.getCheckinDate().toString();
-				data[row][5] = Integer.valueOf(reservation.getNumberOfNights()).toString();
-				data[row][6] = Integer.valueOf(reservation.getNumberOfRooms()).toString();
-				int lastIndex = 7;
-				int roomsPrinted = 0;
-				for (Room r : reservation.getRooms()) {
-					data[row][lastIndex++] = r.getType();
-					roomsPrinted++;
-				}
-				if (roomsPrinted < largestRoomCount) {
-					for (int i = roomsPrinted; i < largestRoomCount; i++) {
-						data[row][lastIndex++] = "";
+				if (canAddReservation) { //if reservation has not been procesed to a stay and hotel stay is true, don't bother writing it
+					if (hotelNamed) {
+						hotelNamed = false;
+						} else {
+							data[row][0] = "";
+						}
+						data[row][1] = Integer.valueOf(reservation.getNumber()).toString();
+						data[row][2] = reservation.getName();
+						data[row][3] = reservation.getType();
+						data[row][4] = reservation.getCheckinDate().toString();
+						data[row][5] = Integer.valueOf(reservation.getNumberOfNights()).toString();
+						data[row][6] = Integer.valueOf(reservation.getNumberOfRooms()).toString();
+						int lastIndex = 7;
+						int roomsPrinted = 0;
+						for (Room r : reservation.getRooms()) {
+							data[row][lastIndex++] = r.getType();
+							roomsPrinted++;
+						}
+						if (roomsPrinted < largestRoomCount) {
+							for (int i = roomsPrinted; i < largestRoomCount; i++) {
+								data[row][lastIndex++] = "";
+							}
+						}
+						data[row][lastIndex++] = String.format("€%.02f", reservation.getTotalCostCalculated().getAmountDue()); //look at this after figuring out check in and checkout
+						data[row][lastIndex++] = String.format("€%.02f", reservation.getDeposit().getAmountDue());
+						if (hotelStay) {
+							HotelStay stay = getHotelStay(e.getKey(), reservation);
+							if (stay != null) {
+								data[row][lastIndex++] = Boolean.valueOf(stay.isCheckedIn());
+								data[row][lastIndex++] = stay.getStayStart().toString();
+								data[row][lastIndex] = stay.getStayEnd().toString();
+							}
+						}
+						lastIndex = 7;
+						row++;
 					}
 				}
-				data[row][lastIndex++] = String.format("€%.02f", reservation.getTotalCostCalculated().getAmountDue()); //look at this after figuring out check in and checkout
-				data[row][lastIndex] = String.format("€%.02f", reservation.getDeposit().getAmountDue());
-				lastIndex = 7;
-				row++;
 			}
+		String fileName;
+		if (reservationOrCancellation && !hotelStay) {
+			fileName = "/reservations.csv";
+		} else if (!reservationOrCancellation && !hotelStay) {
+			fileName = "/cancellations.csv";
+		} else {
+			fileName = "/stays.csv";
 		}
-	String fileName = reservationOrCancellation ? "/reservations.csv": "/cancellations.csv";
-	String path = System.getProperty("user.dir") + fileName;
-	this.writeDataToFile(path, data);
-}
+		String path = System.getProperty("user.dir") + fileName;
+		this.writeDataToFile(path, data);
+	}
 	
 	
 
