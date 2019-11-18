@@ -149,7 +149,7 @@ public class TextUI {
 			LocalDate checkin = getDate();
 			if (this.user instanceof DeskClerk) {
 				DeskClerk clerk = (DeskClerk)this.user;
-				clerk.checkIn(name, checkin);
+				clerk.checkIn(name, checkin); //may replace with LocalDate.now() as checkin and check is it the right date for the ckeckin to occur
 			}
 			run = false;
 		}
@@ -162,9 +162,11 @@ public class TextUI {
 			String name = in.nextLine();
 			System.out.println("Please enter the check-in date(dd/mm/yyyy): ");
 			LocalDate checkin = getDate();
+			System.out.println("Please enter the check-out date(dd/mm/yyyy): "); //may replace with LocalDate.now() as if this was a checkout it would be current time. Same with checkin and check is it the right date for the checkin to occur
+			LocalDate checkout = getDate();
 			if (this.user instanceof DeskClerk) {
 				DeskClerk clerk = (DeskClerk)this.user;
-				clerk.checkOut(name, checkin);
+				clerk.checkOut(name, checkin, checkout);
 			}
 			run = false;
 		}
