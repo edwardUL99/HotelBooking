@@ -25,8 +25,9 @@ public class BookingSystem implements CsvTools {
 		this.cancellations = new TreeMap<String, ArrayList<Reservation>>();
 		this.stays = new TreeMap<String, ArrayList<HotelStay>>(); //will have to save and restore too?
 		this.getRooms();
-		this.reinitialise(true); //reinitialises reservations
-		this.reinitialise(false); //reinitialises cancellations
+		this.reinitialise(true, false); //reinitialises reservations
+		this.reinitialise(false, false); //reinitialises cancellations
+		this.reinitialise(true,  true); //reinitialises hotelStays
 	}
 	
 	/**
@@ -416,9 +417,11 @@ public class BookingSystem implements CsvTools {
  	 * @return the hotel stay if present, null otherwise
 	 */
 	public HotelStay getHotelStay(String hotelName, Reservation r) {
-		for (HotelStay stay : this.stays.get(hotelName)) {
-			if (stay.getReservation().equals(r)) {
-				return stay;
+		if (this.stays.get(hotelName) != null) {
+			for (HotelStay stay : this.stays.get(hotelName)) {
+				if (stay.getReservation().equals(r)) {
+					return stay;
+				}
 			}
 		}
 		return null;
@@ -487,7 +490,10 @@ public class BookingSystem implements CsvTools {
 	 * @return if the reservation has been processed to a stay
 	 */
 	private boolean isReservationStayed(String hotelName, Reservation r) {
-		return this.getHotelStay(hotelName, r) != null;
+		if (this.stays.get(hotelName) != null) {
+			return this.stays.get(hotelName).contains(new HotelStay(r));
+		}
+		return false;
 	}
 	
 	/**
@@ -650,8 +656,15 @@ public class BookingSystem implements CsvTools {
 		}
 	}
 	
-	private void reinitialise(boolean reservationOrCancellation) {
-		String fileName = reservationOrCancellation ? "/reservations.csv":"/cancellations.csv";
+	private void reinitialise(boolean reservationOrCancellation, boolean hotelStay) {
+		String fileName;
+		if (reservationOrCancellation && !hotelStay) {
+			fileName = "/reservations.csv";
+		} else if (!reservationOrCancellation && !hotelStay) {
+			fileName = "/cancellations.csv";
+		} else {
+			fileName = "/stays.csv";
+		}
 		String[][] data = readDataFromFile(System.getProperty("user.dir") + fileName);
 		if (data != null) {
 			int row;
@@ -693,7 +706,25 @@ public class BookingSystem implements CsvTools {
 				if (!reservations.containsKey(hotelName)) {
 					reservations.put(hotelName, new ArrayList<Reservation>());
 				}
-				reservations.get(hotelName).add(r);
+				if (!reservations.get(hotelName).contains(r)) {
+					reservations.get(hotelName).add(r);
+				}
+				if (reservationOrCancellation && hotelStay) {
+					lastCol++;
+					boolean checkedIn = Boolean.parseBoolean(dataRow[lastCol++]);
+					String[] start = dataRow[lastCol++].split("-");
+					LocalDate startDate = LocalDate.of(Integer.parseInt(start[0]), Integer.parseInt(start[1]), Integer.parseInt(start[2]));
+					String[] end = dataRow[lastCol].split("-");
+					LocalDate endDate = LocalDate.of(Integer.parseInt(end[0]), Integer.parseInt(end[1]), Integer.parseInt(end[2]));
+					HotelStay stay = new HotelStay(r);
+					stay.setCheckedIn(checkedIn);
+					stay.setStayStart(startDate);
+					stay.setStayEnd(endDate);
+					if (!stays.containsKey(hotelName)) {
+						stays.put(hotelName, new ArrayList<HotelStay>());
+					}
+					stays.get(hotelName).add(stay);
+				}
 			}
 		}
 	}

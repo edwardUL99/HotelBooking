@@ -1,3 +1,4 @@
 Hotel,Number,Name,Type,Check-in Date,Number of Nights,Number Of Rooms,Rooms,,,Total Cost,Deposit,Checked In,Stay Start,Stay End
-5-star,8132,Eddy Lynch,S,2019-12-20,5,3,Deluxe Double,Deluxe Family,Deluxe Single,€1285.00,€75.00,true,2019-12-20,2019-12-25
-,7153,Eddy Lynch,S,2020-08-20,5,1,Penthouse,,,€615.00,€75.00,true,2020-08-20,2020-08-25
+4-star,2492,Oliver Lynch,S,2020-04-15,3,1,Executie Double,,,€295.00,€75.00,true,2020-04-15,2020-04-18
+5-star,7153,Eddy Lynch,S,2020-08-20,5,1,Penthouse,,,€615.00,€75.00,true,2020-08-20,2020-08-25
+,5609,Eddy Lynch,S,2019-12-15,6,2,Deluxe Family,Penthouse,,€1205.00,€75.00,true,2019-12-15,2019-12-21
