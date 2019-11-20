@@ -166,7 +166,7 @@ public class TextUI {
 			LocalDate checkout = getDate();
 			if (this.user instanceof DeskClerk) {
 				DeskClerk clerk = (DeskClerk)this.user;
-				clerk.checkOut(name, checkin, checkout);
+				clerk.checkOut(name, checkin, checkout); //check if it was successful, if not print out an error message
 			}
 			run = false;
 		}
@@ -337,16 +337,5 @@ public class TextUI {
 				return objs[index];
 			}
 		}
-	}
-	
-	private Object getChoice(ArrayList<Reservation> reservations) {
-		if (reservations.size() == 0) {
-			return null;
-		}
-		Object[] choices = new Object[reservations.size()];
-		for (int i = 0; i < reservations.size(); i++) {
-			choices[i] = reservations.get(i);
-		}
-		return getChoice(choices);
 	}
 }

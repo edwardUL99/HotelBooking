@@ -76,7 +76,7 @@ public class HotelStay {
 			return true;
 		} else {
 			HotelStay comp = (HotelStay)obj;
-			return this.reservation.equals(comp.reservation) && this.checkedIn == comp.checkedIn; //If reservations are the same no need to check stayStart or endStart as these would be set witht he same dates
+			return this.reservation.equals(comp.reservation);//If reservations are the same no need to check stayStart or endStart as these would be set with the same dates. Don't check if checkIn are equals because this can change from true to false if they checkin or checkout and still be the same hotel stay
 		}
 	}
 }
