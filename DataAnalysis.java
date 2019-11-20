@@ -48,18 +48,13 @@ public class DataAnalysis  {
 					
 			for (Entry<LocalDate, ArrayList<Double>> e : financialInfo.entrySet()) {
 				data[1][0] = e.getKey();
-				boolean hotelNamed = true;
 				for (Double amount : e.getValue()) {
-					if (hotelNamed) {
-						hotelNamed = false;
-					} else {
-						data[row][0] = "";
-					}
 					data[row][1] = e.getKey();  
 					data[row][2] = amount;
 					row++;
 				}
 			}
+
 		String fileName = "/FinanacialInfo.csv";
 		String path = System.getProperty("user.dir") + fileName;
 		this.writeDataToFile(path, data);
