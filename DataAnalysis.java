@@ -9,7 +9,7 @@ import java.util.Map.Entry;
 import java.util.TreeMap;
 
 
-public class DataAnalysis  {
+public class DataAnalysis implements CsvTools {
 	
 		public void writeDataToFile(String filePath, Object[][] data) {
 			File file = new File(filePath);
@@ -61,7 +61,7 @@ public class DataAnalysis  {
 					row++;
 				}
 			}
-		String fileName = "/FinanacialInfo.csv";
+		String fileName = "/data/dataAnalysis/FinanacialInfo.csv";
 		String path = System.getProperty("user.dir") + fileName;
 		this.writeDataToFile(path, data);
 	}
@@ -104,6 +104,12 @@ public class DataAnalysis  {
 	
 	public TreeMap<String,ArrayList<Integer>> getOccupancyInfo(LocalDate start, LocalDate end, Object[][] data) {
 		
+		return null;
+	}
+
+	@Override
+	public String[][] readDataFromFile(String filePath) {
+		// TODO Auto-generated method stub
 		return null;
 	}
 			
