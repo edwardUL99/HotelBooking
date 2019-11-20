@@ -530,7 +530,7 @@ public class BookingSystem implements CsvTools {
 				if (hotelStay) {
 					canAddReservation = this.isReservationStayed(e.getKey(), reservation);
 				}
-				if (canAddReservation) { //if reservation has not been procesed to a stay and hotel stay is true, don't bother writing it
+				if (canAddReservation) { //if reservation has not been processed to a stay and hotel stay is true, don't bother writing it
 					if (hotelNamed) {
 						hotelNamed = false;
 						} else {

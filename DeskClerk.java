@@ -51,6 +51,7 @@ public class DeskClerk extends User {
 		} else {
 			stay.setCheckedIn(false);
 			stay.setStayStart(checkIn); //possibly check here if these are valid dates
+			//May just check the reservation checkin date against the LocalDate.now() and if they're not equal they're not allowed checkin? 
 			stay.setStayEnd(checkOut);
 			this.system.writeReservationsToFile(true, true);
 			return true;
