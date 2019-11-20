@@ -25,7 +25,7 @@ public class DeskClerk extends User {
 		if (r == null) {
 			return false;
 		} else {
-			HotelStay stay = new HotelStay(r); //will be added to an arraylist in BookingSystem
+			HotelStay stay = new HotelStay(r); //will be added to an arraylist in BookingSystem 
 			this.system.addHotelStay(this.hotelName, stay);
 			return true;
 			//possibly write to file here
