@@ -27,7 +27,7 @@ public class BookingSystem implements CsvTools {
 		this.getRooms();
 		this.reinitialise(true, false); //reinitialises reservations
 		this.reinitialise(false, false); //reinitialises cancellations
-		this.reinitialise(true,  true); //reinitialises hotelStays
+		this.reinitialise(true, true); //reinitialises stays
 	}
 	
 	/**
@@ -43,7 +43,7 @@ public class BookingSystem implements CsvTools {
 	*/
 	public TreeMap<String,TreeMap<Room, Integer>> getRooms() {
 		this.allRooms = new TreeMap<String, TreeMap<Room, Integer>>();
-		File f = new File(System.getProperty("user.dir") + "\\l4Hotels.csv");
+		File f = new File(System.getProperty("user.dir") + "/data/hotels/l4Hotels.csv");
 		try (Scanner in = new Scanner(f)) {
 			String line;
 			String[] values;
@@ -570,11 +570,11 @@ public class BookingSystem implements CsvTools {
 			}
 		String fileName;
 		if (reservationOrCancellation && !hotelStay) {
-			fileName = "/reservations.csv";
+			fileName = "/data/bookingInfo/reservations.csv";
 		} else if (!reservationOrCancellation && !hotelStay) {
-			fileName = "/cancellations.csv";
+			fileName = "/data/bookingInfo/cancellations.csv";
 		} else {
-			fileName = "/stays.csv";
+			fileName = "/data/bookingInfo/stays.csv";
 		}
 		String path = System.getProperty("user.dir") + fileName;
 		this.writeDataToFile(path, data);
@@ -659,11 +659,11 @@ public class BookingSystem implements CsvTools {
 	private void reinitialise(boolean reservationOrCancellation, boolean hotelStay) {
 		String fileName;
 		if (reservationOrCancellation && !hotelStay) {
-			fileName = "/reservations.csv";
+			fileName = "/data/bookingInfo/reservations.csv";
 		} else if (!reservationOrCancellation && !hotelStay) {
-			fileName = "/cancellations.csv";
+			fileName = "/data/bookingInfo/cancellations.csv";
 		} else {
-			fileName = "/stays.csv";
+			fileName = "/data/bookingInfo/stays.csv";
 		}
 		String[][] data = readDataFromFile(System.getProperty("user.dir") + fileName);
 		if (data != null) {
