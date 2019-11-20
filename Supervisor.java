@@ -6,6 +6,7 @@ import java.time.LocalDate;
 public class Supervisor extends DeskClerk {
 	
 	DataAnalysis A = new DataAnalysis();
+	
 	public Supervisor(String hotelName, BookingSystem system) {
 		super(hotelName, system);
 	}
