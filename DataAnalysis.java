@@ -1,4 +1,4 @@
-	import java.io.File;
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -55,7 +55,7 @@ public class DataAnalysis  {
 				}
 			}
 
-		String fileName = "/FinanacialInfo.csv";
+		String fileName = "/data/dataAnalysis/FinanacialInfo.csv";
 		String path = System.getProperty("user.dir") + fileName;
 		this.writeDataToFile(path, data);
 	}
