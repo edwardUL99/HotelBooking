@@ -29,7 +29,7 @@ public class User  {
 	 * @param rooms the list of rooms booked
 	 */
 	//Here maybe have it boolean to return if booking was successful or not
-	public void createReservation(String hotelName, String name, String type, LocalDate checkinDate, int numberOfNights, int numberOfPeople, int numberOfRooms, ArrayList<Room> rooms) {
+	public void createReservation(String hotelName, String name, String type, LocalDate checkinDate, int numberOfNights, int numberOfPeople, int numberOfRooms, ArrayList<RoomBooking> rooms) {
 		this.system.addReservation(hotelName, new Reservation(name, type, checkinDate, numberOfNights, numberOfPeople, numberOfRooms, rooms));
 	}
 	

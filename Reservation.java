@@ -1,6 +1,6 @@
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.HashMap;
+
 /**
  * A class to represent the reservation for a hotel room(s)
  *
@@ -15,8 +15,7 @@ public class Reservation {
 	private int numberOfNights;
 	private int numberOfPeople;
 	private int numberOfRooms;
-	
-	private ArrayList<Room> rooms;
+	private ArrayList<RoomBooking> rooms;
 	private Bill totalCost;
 	private Bill deposit;
 	
@@ -28,7 +27,7 @@ public class Reservation {
 	 * @param numberOfNights the number of nights the reservation is for
 	 * @param numberOfRooms the number of rooms to book
 	 */
-	public Reservation(String name, String type, LocalDate checkinDate, int numberOfNights, int numberOfPeople, int numberOfRooms, ArrayList<Room> rooms) {
+	public Reservation(String name, String type, LocalDate checkinDate, int numberOfNights, int numberOfPeople, int numberOfRooms, ArrayList<RoomBooking> rooms) {
 		this.number = ++lastBookingNumber;
 		this.name = name;
 		this.type = type;
@@ -51,7 +50,7 @@ public class Reservation {
 	 * @param numberOfRooms the number of rooms
 	 * @param rooms the list of rooms booked
 	 */
-	public Reservation(int number, String name, String type, LocalDate checkinDate, int numberOfNights, int numberOfPeople, int numberOfRooms, ArrayList<Room> rooms) {
+	public Reservation(int number, String name, String type, LocalDate checkinDate, int numberOfNights, int numberOfPeople, int numberOfRooms, ArrayList<RoomBooking> rooms) {
 		this.setNumber(number);
 		this.name = name;
 		this.type = type;
@@ -140,7 +139,7 @@ public class Reservation {
 	 * Returns the list of all the rooms booked
 	 * @return a list of all rooms booked for this reservation
 	 */
-	public ArrayList<Room> getRooms() {
+	public ArrayList<RoomBooking> getRooms() {
 		return rooms;
 	}
 	
@@ -185,8 +184,8 @@ public class Reservation {
 		double calculated = 0.00;
 		
 		for (int i = 0; i < this.numberOfNights; i++) {
-			for (Room r : this.rooms) {
-				if (r.isBreakfastIncluded()) {
+			for (RoomBooking rb : this.rooms) {
+				if (rb.isBreakfastIncluded()) {
 					calculated += breakfastCost * this.numberOfPeople;
 				}
 			}
@@ -206,7 +205,8 @@ public class Reservation {
 		double total = 0.00;
 		for (int i = 0; i < this.numberOfNights; i++) {
 			dayOfWeek = this.checkinDate.plusDays((long)i).getDayOfWeek().getValue() - 1; //Our rates array from room is indexed from 0 to 6 and getDayOfWeek().getValue() returns a number 1-7
-			for (Room r : this.rooms) {
+			for (RoomBooking rb : this.rooms) {
+				Room r = rb.getRoom();
 				total += r.getRate(dayOfWeek);
 			}
 		}
@@ -252,8 +252,9 @@ public class Reservation {
 	
 	private String roomsBookedAsString() {
 		String returned = "";
-		for (Room r : this.rooms) {
-			returned += r + " Breakfast Included: " + r.isBreakfastIncluded() + "\n";
+		for (RoomBooking rb : this.rooms) {
+			Room r = rb.getRoom();
+			returned += r + " Breakfast Included: " + rb.isBreakfastIncluded() + "\n";
 		}
 		return returned;
 	}

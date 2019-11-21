@@ -54,12 +54,12 @@ public class TextUI {
 	
 	
 	
-	private ArrayList<Room> chooseRooms(int numberOfRooms, LocalDate from, LocalDate to) {
+	private ArrayList<RoomBooking> chooseRooms(int numberOfRooms, LocalDate from, LocalDate to) {
 		//Maybe instead of checking if the rooms are available after choosing them in the BookingSystem class, have the BookingSystem getRooms only return rooms that are available for the numberOfRooms specified
 		TreeMap<Room, Integer> map = this.system.getCurrentRooms(this.hotelName, from, to);
 		//For getCurrentRooms() method maybe supply two date parameters, indicating a time period to populate the rooms available map with the amount of rooms free at that period
 		ArrayList<Room> allRooms = new ArrayList<Room>(map.keySet());
-		ArrayList<Room> rooms = new ArrayList<Room>(numberOfRooms);
+		ArrayList<RoomBooking> rooms = new ArrayList<RoomBooking>(numberOfRooms);
 		System.out.println("Room type(Rooms Available)(Maximum Adult occupancy)(Maximum Child occupancy)"); //Have a way to check number of rooms available for the date chosen in reservation
 		while (rooms.size() != numberOfRooms) {
 			char ch = 'A';
@@ -91,13 +91,14 @@ public class TextUI {
 							System.out.println("Would you like breakfast included with the room? (Yes/No)");
 							String option = in.nextLine();
 							option = option.substring(0, 1).toUpperCase() + option.substring(1).toLowerCase();
+							RoomBooking booking = new RoomBooking(choice, adults, children);
 							if (option.equals("Yes")) {
-								choice.setBreakfastIncluded(true);
-								rooms.add(choice);
+								booking.setBreakfastIncluded(true);
+								rooms.add(booking);
 								run = false;
 							} else if (option.equals("No")) {
-								choice.setBreakfastIncluded(false);
-								rooms.add(choice);
+								booking.setBreakfastIncluded(false);
+								rooms.add(booking);
 								run = false;
 							} else {
 								System.out.println("Please choose yes/no");
@@ -139,7 +140,7 @@ public class TextUI {
 		int numPeople = Integer.parseInt(in.nextLine());
 		System.out.println("Please enter the number of rooms you wish to book: ");
 		int numRooms = Integer.parseInt(in.nextLine()); //Prevents line not found errors as nextInt() does not skip to nextLine
-		ArrayList<Room> rooms = chooseRooms(numRooms, checkin, checkin.plusDays((long)numNights));
+		ArrayList<RoomBooking> rooms = chooseRooms(numRooms, checkin, checkin.plusDays((long)numNights));
 		this.user.createReservation(this.hotelName, this.user.name, type, checkin, numNights, numPeople, numRooms, rooms);
 	}
 
@@ -222,6 +223,7 @@ public class TextUI {
 		System.out.println("Please enter your name: ");
 		this.user = new Customer(in.nextLine(), this.hotelName, system);
 		while (loggedIn) {
+			System.out.println("\nHotel: " + this.hotelName);
 			System.out.println("\nWould you like to M)ake a reservation, C(ancel a reservation, V)iew a reservation or L)ogout?");
 			char command = in.nextLine().toUpperCase().charAt(0);
 			if (command == 'M') {
@@ -238,8 +240,9 @@ public class TextUI {
 	
 	private void runAsDeskClerk() {
 		boolean loggedIn = true;
+		this.user = new DeskClerk(hotelName, system);
 		while (loggedIn) {
-			this.user = new DeskClerk(hotelName, system);
+			System.out.println("\nHotel: " + this.hotelName);
 			System.out.println("\nWould you like to access R)eservations, C)heck-in/out or L)ogout?");
 			char command = in.nextLine().toUpperCase().charAt(0);
 			if (command == 'R') {
@@ -268,8 +271,10 @@ public class TextUI {
 	
 	private void runAsSupervisor() {
 		boolean loggedIn = true;
+		this.user = new Supervisor(this.hotelName, system);
 		while (loggedIn) {
-			this.user = new Supervisor(this.hotelName, system);
+			System.out.println("\nHotel: " + this.hotelName);
+			
 			System.out.println("\nWould you like to access \n1)reservations \n2)check-in/out \n3)apply discounts \n4)data analytics or \n5)Logout");
 			char command = in.nextLine().toUpperCase().charAt(0);
 			if (command == '1') {
@@ -340,7 +345,6 @@ public class TextUI {
 					runAsSupervisor();
 				}
 			} else if (ch == 'C') {
-				System.out.println("The current hotel is: " + this.hotelName);
 				System.out.println("Please choose a hotel: ");
 				this.hotelName = (String)getChoice(hotelNames);
 			} else if (ch == 'Q') {

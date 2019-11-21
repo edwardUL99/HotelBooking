@@ -1,3 +1,0 @@
-Hotel,Number,Name,Type,Check-in Date,Number of Nights,Number of People,Number Of Rooms,Rooms(Breakfast Included),Total Cost,Deposit
-5-star,1002,Mary,S,2020-08-17,5,2,1,Deluxe Family(true),€560.00,€0.00
-,1001,Eddy Lynch,S,2020-08-16,5,2,1,Penthouse(false),€510.00,€0.00
