@@ -63,25 +63,49 @@ public class TextUI {
 		System.out.println("Room type(Rooms Available)(Maximum Adult occupancy)(Maximum Child occupancy)"); //Have a way to check number of rooms available for the date chosen in reservation
 		while (rooms.size() != numberOfRooms) {
 			char ch = 'A';
+			ArrayList<Character> notAvailable = new ArrayList<Character>(5);
 			for (int i = 0; i < allRooms.size(); i++) {
 				Room r = allRooms.get(i);
 				if (map.get(r) > 0) {
 					System.out.println(ch + ")" + r.getType() + "(" + map.get(r) + ")" + "(" + r.occupancy(true, false) + ")" + "(" + r.occupancy(false, false) + ")");
-					ch++;
+				} else {
+					notAvailable.add(ch);
+					System.out.println(ch + ")" + r.getType() + " is booked out for these dates");
 				}
+				ch++;
 			} //This is not how it will be implemented, just until the other methods are developed
 			String input = in.nextLine();
-			int n = input.toUpperCase().charAt(0) - 'A';
-			System.out.println("Please enter how many adults and children are staying per room (number of Adults,number of Children): ");
-			String[] occupancy = in.nextLine().split(",");
-			int adults = Integer.parseInt(occupancy[0]);
-			int children = Integer.parseInt(occupancy[1]);
-			if (n >= 0 && n < allRooms.size()) {
-				Room choice = allRooms.get(n);
-				if ((adults >= choice.occupancy(true, true) && adults <= choice.occupancy(true, false)) && (children >= choice.occupancy(false, true) && children <= choice.occupancy(false,  false))) {
-					rooms.add(choice);
-				} else {
-					System.out.println("The room chosen is not suitable for the number of adults or children you entered, please try again");
+			if (notAvailable.contains(input.toUpperCase().charAt(0))) {
+				System.out.println("You cannot choose this room, as it is booked out. Please choose another.");
+			} else {
+				int n = input.toUpperCase().charAt(0) - 'A';
+				System.out.println("Please enter how many adults and children are staying per room (number of Adults,number of Children): ");
+				String[] occupancy = in.nextLine().split(",");
+				int adults = Integer.parseInt(occupancy[0]);
+				int children = Integer.parseInt(occupancy[1]);
+				if (n >= 0 && n < allRooms.size()) {
+					Room choice = allRooms.get(n);
+					if ((adults >= choice.occupancy(true, true) && adults <= choice.occupancy(true, false)) && (children >= choice.occupancy(false, true) && children <= choice.occupancy(false,  false))) {
+						boolean run = true;
+						while (run) {
+							System.out.println("Would you like breakfast included with the room? (Yes/No)");
+							String option = in.nextLine();
+							option = option.substring(0, 1).toUpperCase() + option.substring(1).toLowerCase();
+							if (option.equals("Yes")) {
+								choice.setBreakfastIncluded(true);
+								rooms.add(choice);
+								run = false;
+							} else if (option.equals("No")) {
+								choice.setBreakfastIncluded(false);
+								rooms.add(choice);
+								run = false;
+							} else {
+								System.out.println("Please choose yes/no");
+							}
+						}
+					} else {
+						System.out.println("The room chosen is not suitable for the number of adults or children you entered, please try again");
+					}
 				}
 			}
 		}
@@ -111,10 +135,12 @@ public class TextUI {
 		}
 		System.out.println("Please enter the number of nights you wish to stay: ");
 		int numNights = Integer.parseInt(in.nextLine()); //Prevents line not found errors as nextInt() does not skip to nextLine
+		System.out.println("Please enter the number of people staying: ");
+		int numPeople = Integer.parseInt(in.nextLine());
 		System.out.println("Please enter the number of rooms you wish to book: ");
 		int numRooms = Integer.parseInt(in.nextLine()); //Prevents line not found errors as nextInt() does not skip to nextLine
 		ArrayList<Room> rooms = chooseRooms(numRooms, checkin, checkin.plusDays((long)numNights));
-		this.user.createReservation(this.hotelName, this.user.name, type, checkin, numNights, numRooms, rooms);
+		this.user.createReservation(this.hotelName, this.user.name, type, checkin, numNights, numPeople, numRooms, rooms);
 	}
 
 	private void cancelReservation() {

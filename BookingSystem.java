@@ -196,7 +196,7 @@ public class BookingSystem implements CsvTools {
 				int numberTimesBooked = this.numberOfTimesRoomIsBookedAtDate(hotelName, r, from, to);
 				if (numberTimesBooked != -1) {
 					availableRooms.put(r, availableRooms.get(r) - numberTimesBooked);
-				};
+				}
 			}
 			return availableRooms;
 		}
@@ -503,16 +503,16 @@ public class BookingSystem implements CsvTools {
 		TreeMap<String, ArrayList<Reservation>> reservations = reservationOrCancellation ? this.reservations : this.cancellations;
 		int largestRoomCount = largestRoomCountBooked(reservationOrCancellation);
 		int rows = getNumberOfRows(reservationOrCancellation, hotelStay) + 1;
-		int columns = 9 + largestRoomCount;
+		int columns = 10 + largestRoomCount;
 		columns = hotelStay ? columns + 3:columns;
 		Object[][] data = new Object[rows][columns];
-		String[] attributes = {"Hotel", "Number", "Name", "Type", "Check-in Date", "Number of Nights", "Number Of Rooms", "Total Cost", "Deposit", "Checked In", "Stay Start", "Stay End"};
+		String[] attributes = {"Hotel", "Number", "Name", "Type", "Check-in Date", "Number of Nights", "Number of People", "Number Of Rooms", "Total Cost", "Deposit", "Checked In", "Stay Start", "Stay End"};
 		int row = 1;
 		int index = 0;
 		for (int col = 0; col < columns; col++) {
-			if (col == 7) {
-				data[0][col] = "Rooms";
-			} else if (col > 7 && col < 7 + largestRoomCount) {
+			if (col == 8) {
+				data[0][col] = "Rooms(Breakfast Included)";
+			} else if (col > 8 && col < 8 + largestRoomCount) {
 				data[0][col] = "";
 			} else {
 				if (index < attributes.length) { 
@@ -539,11 +539,12 @@ public class BookingSystem implements CsvTools {
 						data[row][3] = reservation.getType();
 						data[row][4] = reservation.getCheckinDate().toString();
 						data[row][5] = Integer.valueOf(reservation.getNumberOfNights()).toString();
-						data[row][6] = Integer.valueOf(reservation.getNumberOfRooms()).toString();
-						int lastIndex = 7;
+						data[row][6] = Integer.valueOf(reservation.getNumberOfPeople()).toString();
+						data[row][7] = Integer.valueOf(reservation.getNumberOfRooms()).toString();
+						int lastIndex = 8;
 						int roomsPrinted = 0;
 						for (Room r : reservation.getRooms()) {
-							data[row][lastIndex++] = r.getType();
+							data[row][lastIndex++] = r.getType() + "(" + r.isBreakfastIncluded() + ")";
 							roomsPrinted++;
 						}
 						if (roomsPrinted < largestRoomCount) {
@@ -551,7 +552,7 @@ public class BookingSystem implements CsvTools {
 								data[row][lastIndex++] = "";
 							}
 						}
-						data[row][lastIndex++] = String.format("€%.02f", reservation.getTotalCostCalculated().getAmountDue()); //look at this after figuring out check in and checkout
+						data[row][lastIndex++] = String.format("€%.02f", reservation.getTotalCost().getAmountDue()); //look at this after figuring out check in and checkout
 						data[row][lastIndex++] = String.format("€%.02f", reservation.getDeposit().getAmountDue());
 						if (hotelStay) {
 							HotelStay stay = getHotelStay(e.getKey(), reservation);
@@ -561,7 +562,7 @@ public class BookingSystem implements CsvTools {
 								data[row][lastIndex] = stay.getStayEnd().toString();
 							}
 						}
-						lastIndex = 7;
+						lastIndex = 8;
 						row++;
 					}
 				}
@@ -667,7 +668,7 @@ public class BookingSystem implements CsvTools {
 		if (data != null) {
 			int row;
 			String hotelName = "", name, type;
-			int number, numOfNights, numOfRooms;
+			int number, numOfNights, numOfPeople, numOfRooms;
 			Reservation r;
 			ArrayList<Room> rooms;
 			for (row = 1; row < data.length; row++) {
@@ -681,19 +682,23 @@ public class BookingSystem implements CsvTools {
 				String[] date = dataRow[4].split("-");
 				LocalDate checkin = LocalDate.of(Integer.parseInt(date[0]),  Integer.parseInt(date[1]), Integer.parseInt(date[2]));
 				numOfNights = Integer.parseInt(dataRow[5]);
-				numOfRooms = Integer.parseInt(dataRow[6]);
+				numOfPeople = Integer.parseInt(dataRow[6]);
+				numOfRooms = Integer.parseInt(dataRow[7]);
 				rooms = new ArrayList<Room>(numOfRooms);
-				int lastCol = 7;
-				while (lastCol < numOfRooms + 7) {
-					String roomName = dataRow[lastCol++];
+				int lastCol = 8;
+				while (lastCol < numOfRooms + 8) {
+					String room = dataRow[lastCol++];
+					String roomName = room.substring(0, room.indexOf("("));
+					boolean breakfastIncluded = Boolean.parseBoolean((room.substring(room.indexOf("(") + 1, room.length() - 1)));
 					if (!roomName.equals("")) {
-						Room room = this.getRoom(hotelName, roomName);
-						if (room != null) {
-							rooms.add(room);
+						Room rm = this.getRoom(hotelName, roomName);
+						rm.setBreakfastIncluded(breakfastIncluded);
+						if (rm != null) {
+							rooms.add(rm);
 						}	
 					}
 				}
-				r = new Reservation(number, name, type, checkin, numOfNights, numOfRooms, rooms);
+				r = new Reservation(number, name, type, checkin, numOfNights, numOfPeople, numOfRooms, rooms);
 				while (dataRow[lastCol].equals("")) {
 					lastCol++;
 				}

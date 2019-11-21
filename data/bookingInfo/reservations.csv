@@ -1,10 +1,4 @@
-Hotel,Number,Name,Type,Check-in Date,Number of Nights,Number Of Rooms,Rooms,,,Total Cost,Deposit
-3-star,1006,John Murray,S,2020-09-20,2,1,Classic Double,,,€205.00,€75.00
-4-star,1002,Mary O'Connor,S,2019-12-25,1,1,Executive Single,,,€140.00,€75.00
-,1007,Sally Murphy,AP,2021-04-18,5,1,Executive Single,,,€398.00,€75.00
-,1009,Jack Griffin,AP,2020-02-01,10,1,Executie Double,,,€806.50,€75.00
-5-star,1000,Eddy Lynch,S,2020-08-20,5,3,Deluxe Double,Deluxe Double,Deluxe Family,€1335.00,€75.00
-,1001,Olly Lynch,AP,2019-12-12,2,1,Deluxe Single,,,€222.25,€75.00
-,1004,Sean Barrett,S,2019-12-12,2,1,Deluxe Single,,,€230.00,€75.00
-,1005,Eddy Lynch,S,2020-05-15,1,1,Deluxe Double,,,€165.00,€75.00
-,1008,John,AP,2020-08-10,5,1,Deluxe Twin,,,€450.25,€75.00
+Hotel,Number,Name,Type,Check-in Date,Number of Nights,Number of People,Number Of Rooms,Rooms(Breakfast Included),Total Cost,Deposit
+5-star,1000,Eddy Lynch,S,2020-08-20,5,3,1,Deluxe Family(false),€515.00,€75.00
+,1003,Mary,S,2020-08-17,5,1,1,Deluxe Double(false),€470.00,€75.00
+,1004,Eddy ,S,2020-08-17,5,2,1,Penthouse(false),€615.00,€75.00

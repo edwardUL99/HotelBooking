@@ -25,6 +25,7 @@ public class DeskClerk extends User {
 		if (r == null) {
 			return false;
 		} else {
+			r.getTotalCostCalculated(); //Updates their bill with total cost
 			HotelStay stay = new HotelStay(r); //will be added to an arraylist in BookingSystem 
 			this.system.addHotelStay(this.hotelName, stay);
 			return true;

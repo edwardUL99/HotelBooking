@@ -1,5 +1,6 @@
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.HashMap;
 /**
  * A class to represent the reservation for a hotel room(s)
  *
@@ -12,7 +13,9 @@ public class Reservation {
 	private String type;
 	private LocalDate checkinDate;
 	private int numberOfNights;
+	private int numberOfPeople;
 	private int numberOfRooms;
+	
 	private ArrayList<Room> rooms;
 	private Bill totalCost;
 	private Bill deposit;
@@ -25,12 +28,13 @@ public class Reservation {
 	 * @param numberOfNights the number of nights the reservation is for
 	 * @param numberOfRooms the number of rooms to book
 	 */
-	public Reservation(String name, String type, LocalDate checkinDate, int numberOfNights, int numberOfRooms, ArrayList<Room> rooms) {
+	public Reservation(String name, String type, LocalDate checkinDate, int numberOfNights, int numberOfPeople, int numberOfRooms, ArrayList<Room> rooms) {
 		this.number = ++lastBookingNumber;
 		this.name = name;
 		this.type = type;
 		this.checkinDate = checkinDate;
 		this.numberOfNights = numberOfNights;
+		this.numberOfPeople = numberOfPeople;
 		this.numberOfRooms = numberOfRooms;
 		this.rooms = rooms;
 		this.totalCost = new Bill("Total Cost", checkinDate); //For both bills choose a more suitable date
@@ -47,12 +51,13 @@ public class Reservation {
 	 * @param numberOfRooms the number of rooms
 	 * @param rooms the list of rooms booked
 	 */
-	public Reservation(int number, String name, String type, LocalDate checkinDate, int numberOfNights, int numberOfRooms, ArrayList<Room> rooms) {
+	public Reservation(int number, String name, String type, LocalDate checkinDate, int numberOfNights, int numberOfPeople, int numberOfRooms, ArrayList<Room> rooms) {
 		this.setNumber(number);
 		this.name = name;
 		this.type = type;
 		this.checkinDate = checkinDate;
 		this.numberOfNights = numberOfNights;
+		this.numberOfPeople = numberOfPeople;
 		this.numberOfRooms = numberOfRooms;
 		this.rooms = rooms;
 		this.totalCost = new Bill("Total Cost", checkinDate);
@@ -89,6 +94,22 @@ public class Reservation {
 	 */
 	public String getType() {
 		return type;
+	}
+	
+	/**
+	 * Sets the number of people for this reservation
+	 * @param numberOfPeople the number of people
+	 */
+	public void setNumberOfPeople(int numberOfPeople) {
+		this.numberOfPeople = numberOfPeople;
+	}
+	
+	/**
+	 * Gets the number of people booked on this reservation
+	 * @return the number of people
+	 */
+	public int getNumberOfPeople() {
+		return this.numberOfPeople;
 	}
 	
 	/**
@@ -156,6 +177,25 @@ public class Reservation {
 	}
 	
 	/**
+	 * Calculates the cost of breakfast for this reservation
+	 * @return the cost of breakfast calculated per night per person
+	 */
+	public double calculateBreakfastCost() {
+		double breakfastCost = 14.00;
+		double calculated = 0.00;
+		
+		for (int i = 0; i < this.numberOfNights; i++) {
+			for (Room r : this.rooms) {
+				if (r.isBreakfastIncluded()) {
+					calculated += breakfastCost * this.numberOfPeople;
+				}
+			}
+		}
+		
+		return calculated;
+	}
+	
+	/**
 	 * Returns a Bill object with the amount due set to the total payable calculated using rates including deposit
 	 * Also sets the amount due of the bill total cost associated with this object to this calculated cost, so if you want to get the current total cost, either not calculated yet or discounted yet,
 	 * see getTotalCost()
@@ -165,7 +205,7 @@ public class Reservation {
 		int dayOfWeek;
 		double total = 0.00;
 		for (int i = 0; i < this.numberOfNights; i++) {
-			dayOfWeek  = this.checkinDate.plusDays((long)i).getDayOfWeek().getValue() - 1; //Our rates array from room is indexed from 0 to 6 and getDayOfWeek().getValue() returns a number 1-7
+			dayOfWeek = this.checkinDate.plusDays((long)i).getDayOfWeek().getValue() - 1; //Our rates array from room is indexed from 0 to 6 and getDayOfWeek().getValue() returns a number 1-7
 			for (Room r : this.rooms) {
 				total += r.getRate(dayOfWeek);
 			}
@@ -174,6 +214,7 @@ public class Reservation {
 			total -= total * 0.05;
 		}
 		total += this.getDeposit().getAmountDue(); //Maybe after checkout, return the deposit???
+		total += this.calculateBreakfastCost();
 		this.totalCost.setAmountDue(total);
 		return this.totalCost;
 	}
@@ -212,7 +253,7 @@ public class Reservation {
 	private String roomsBookedAsString() {
 		String returned = "";
 		for (Room r : this.rooms) {
-			returned += r + "\n";
+			returned += r + " Breakfast Included: " + r.isBreakfastIncluded() + "\n";
 		}
 		return returned;
 	}
