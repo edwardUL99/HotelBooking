@@ -417,9 +417,12 @@ public class BookingSystem implements CsvTools {
  	 * @return the hotel stay if present, null otherwise
 	 */
 	public HotelStay getHotelStay(String hotelName, Reservation r) {
-		for (HotelStay stay : this.stays.get(hotelName)) {
-			if (stay.getReservation().equals(r)) {
-				return stay;
+		ArrayList<HotelStay> stays = this.stays.get(hotelName);
+		if (stays != null) {
+			for (HotelStay stay : stays) {
+				if (stay.getReservation().equals(r)) {
+					return stay;
+				}
 			}
 		}
 		return null;
@@ -690,8 +693,7 @@ public class BookingSystem implements CsvTools {
 						}	
 					}
 				}
-				r = new Reservation(name, type, checkin, numOfNights, numOfRooms, rooms);
-				r.setNumber(number);
+				r = new Reservation(number, name, type, checkin, numOfNights, numOfRooms, rooms);
 				while (dataRow[lastCol].equals("")) {
 					lastCol++;
 				}

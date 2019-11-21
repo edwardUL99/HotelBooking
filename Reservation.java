@@ -5,6 +5,8 @@ import java.util.ArrayList;
  *
  */
 public class Reservation {
+	private static int lastBookingNumber = 999; //Keeps track of what the last booking number was and sets the next reservation to the one above it. Initialised as 999 so the very first reservation will have 1000 as its number
+	
 	private int number;
 	private String name;
 	private String type;
@@ -24,15 +26,37 @@ public class Reservation {
 	 * @param numberOfRooms the number of rooms to book
 	 */
 	public Reservation(String name, String type, LocalDate checkinDate, int numberOfNights, int numberOfRooms, ArrayList<Room> rooms) {
-		this.number = (int)(Math.random() * 8999 + 1000);
+		this.number = ++lastBookingNumber;
 		this.name = name;
 		this.type = type;
 		this.checkinDate = checkinDate;
 		this.numberOfNights = numberOfNights;
 		this.numberOfRooms = numberOfRooms;
 		this.rooms = rooms;
-		this.totalCost = new Bill("Total Cost", LocalDate.now()); //For both bills choose a more suitable date
-		this.deposit = new Bill("Deposit", LocalDate.now(), 75.00); //May change the price later
+		this.totalCost = new Bill("Total Cost", checkinDate); //For both bills choose a more suitable date
+		this.deposit = new Bill("Deposit", checkinDate, 75.00); //May change the price later
+	}
+	
+	/**
+	 * Constructor used when you want to override the default booking number generation
+	 * @param number the booking number
+	 * @param name the name to have on the reservation
+	 * @param type the type of the reservation
+	 * @param checkinDate the checkin date
+	 * @param numebrOfNights the number of nights
+	 * @param numberOfRooms the number of rooms
+	 * @param rooms the list of rooms booked
+	 */
+	public Reservation(int number, String name, String type, LocalDate checkinDate, int numberOfNights, int numberOfRooms, ArrayList<Room> rooms) {
+		this.setNumber(number);
+		this.name = name;
+		this.type = type;
+		this.checkinDate = checkinDate;
+		this.numberOfNights = numberOfNights;
+		this.numberOfRooms = numberOfRooms;
+		this.rooms = rooms;
+		this.totalCost = new Bill("Total Cost", checkinDate);
+		this.deposit = new Bill("Deposit", checkinDate, 75.00);
 	}
 
 	/**
@@ -49,6 +73,7 @@ public class Reservation {
 	 */
 	public void setNumber(int number) {
 		this.number = number;
+		lastBookingNumber++;
 	}
 	
 	/**
