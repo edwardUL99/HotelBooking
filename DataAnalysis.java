@@ -64,6 +64,10 @@ public class DataAnalysis  {
 		String path = System.getProperty("user.dir") + fileName;
 		writeDataToFile(path, data);
 	}
+		
+	public void writeOccupancyInfoToFile() {
+		
+	}
 
 	// use reInitialize and take treeMap from bookingSystem? 
 	// 
@@ -83,7 +87,7 @@ public class DataAnalysis  {
 		return dateBalance;
 	}
 	
-	public double getAverageIncome(LocalDate start, LocalDate end) {
+	public double getAverageIncomePerRoom(LocalDate start, LocalDate end) {
 		TreeMap<LocalDate, ArrayList<Double>> dateTotalCost = getFinancialInfo(start, end); //maybe a method here to read reservations from file and put them in arraylist? and pass to the method with hotelName also
 	 	double average = 0;
 	 	int numOfEarnings = 0; //Each arraylist is a list of reservations of that date, so dateTotalCost().size() just returns number of key-value mappings, not amount of payments
@@ -108,9 +112,18 @@ public class DataAnalysis  {
 		return total;
 	}
 	
-	public TreeMap<String,ArrayList<Integer>> getOccupancyInfo(LocalDate start, LocalDate end) {
+	//
+	public TreeMap<Room,Integer> getOccupancyInfo(LocalDate start, LocalDate end) {
+
+		TreeMap<Room, Integer> roomOccupants = new TreeMap<Room, Integer>();
 		
-		return null;
-	}
+		for(Reservation R : reservations) {
 			
+			if(R.getCheckinDate().compareTo(start) >= 0 && R.getCheckinDate().compareTo(end) <= 0) {
+				
+			}
+		}
+		return roomOccupants;
+	}
+
 }
