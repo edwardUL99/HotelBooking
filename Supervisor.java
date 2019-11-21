@@ -12,15 +12,18 @@ public class Supervisor extends DeskClerk {
 	}
 	
 	/** allows supervisor to apply any discount to any reservation */
-	public void applyDiscount(double discount, int reservationNumber ) {
-		
+	public boolean applyDiscount(double discount, int reservationNumber ) {
+		discount /= 100;
 		for(int i = 0; i < this.system.getReservations().get(hotelName).size(); i++) {
 			Reservation r = this.system.getReservations().get(hotelName).get(i);
-			if(r.getNumber() == reservationNumber) {
+			if(r.getNumber() == reservationNumber && r.getTotalCost().getAmountDue() != 0.00) { //discounts can only be applied on checkin so if it's not 0 they have checked in and the desk clerk has calculated their bill
 				r.getTotalCost().setAmountDue(r.getTotalCost().getAmountDue()*(1 - discount));
-				break;
+				this.system.updateFiles("Reservations");
+				this.system.updateFiles("Stays");
+				return true;
 			}
 		}
+		return false;
 	}
 	
 	/*
@@ -31,7 +34,7 @@ public class Supervisor extends DeskClerk {
 	}*/
 	
 	public double getAverageIncome(LocalDate start, LocalDate end) {
-		return analyzer.getAverageIncome(start, end);
+		return analyzer.getAverageIncomePerRoom(start, end);
 	}
 	
 	public double getTotalEarnedAmount(LocalDate start, LocalDate end) {

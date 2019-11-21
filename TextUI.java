@@ -145,9 +145,7 @@ public class TextUI {
 	}
 
 	private void cancelReservation() {
-		System.out.println("Please enter the checkIn date(dd/mm/yyyy)");
-		LocalDate checkIn = getDate();
-		Reservation reservation = this.system.getReservation(this.hotelName, this.user.name, checkIn); //if more than 1 reservation same date allow to choose which one
+		Reservation reservation = this.getReservation();
 		if (reservation == null) {
 			System.out.println("The reservation could not be found");
 		} else {
@@ -155,10 +153,15 @@ public class TextUI {
 		}
 	}
 	
-	private void viewReservation() {
+	private Reservation getReservation() {
 		System.out.println("Please enter the checkIn date(dd/mm/yyyy): ");
 		LocalDate checkIn = getDate();
 		Reservation reservation = this.system.getReservation(this.hotelName, this.user.name, checkIn); //if more than 1 reservation same date allow to choose which one
+		return reservation;
+	}
+	
+	private void viewReservation() {
+		Reservation reservation = this.getReservation();
 		if (reservation == null) {
 			System.out.println("The reservation could not be found");
 		} else {
@@ -214,8 +217,20 @@ public class TextUI {
 		}
 	}
 	
-	public void applyDiscountToReservation() {
-		
+	private void applyDiscountToReservation() {
+		System.out.println("Please enter the customer name: ");
+		this.user.name = in.nextLine();
+		Reservation reservation = this.getReservation();
+		if (reservation == null) {
+			System.out.println("The reservation could not be found and a discount cannot applied");
+		} else {
+			System.out.println("Please enter the percentage discount (0-100): ");
+			double percentageDiscount = Double.parseDouble(in.nextLine());
+			Supervisor temp = (Supervisor)this.user;
+			if (temp.applyDiscount(percentageDiscount, reservation.getNumber())) {
+				System.out.println("The discount was applied successfully");
+			}
+		}
 	}
 	
 	private void runAsCustomer() {
@@ -284,12 +299,18 @@ public class TextUI {
 				if (command == 'M') {
 					makeReservation();
 				} else if (command == 'C') {
-				cancelReservation();
+					cancelReservation();
 				}
 		
+			} else if (command == '2') {  
+				this.checkinServices();
+			} else if (command == '3') {
+				this.applyDiscountToReservation();
 			} else if (command == '5') {
 				loggedIn = false;
-			}/* else if (command == '2') 
+			}
+			
+			/* else if (command == '2') 
 			
 				System.out.println("Would you like to I)check-in or O)check-out? ");
 				command = in.nextLine().toUpperCase().charAt(0);

@@ -354,15 +354,15 @@ public class BookingSystem implements CsvTools {
 					this.cancellations.put(hotelName, new ArrayList<Reservation>());
 				}
 				this.cancellations.get(hotelName).add(reservation);
-				this.writeReservationsToFile(false, false); //writes the reservation to the cancellation file
 				this.reservations.get(hotelName).remove(reservation);
-				this.writeReservationsToFile(true, false); //updates the reservations file
+				this.updateFiles("Reservations");
+				this.updateFiles("Cancellations");
 			} else {
 				if (LocalDate.now().isAfter(reservation.getCheckoutDate().plusDays((long)30))
 						&& (this.cancellations.get(hotelName).contains(reservation) ||  //if cancelled or is a hotel stay, it has been processed
 							this.stays.get(hotelName).contains(new HotelStay(reservation)))) {
 					this.reservations.get(hotelName).remove(reservation);
-					this.writeReservationsToFile(true, false); //updates the reservations file
+					this.updateFiles("Reservations");
 				} else {
 					return false;
 				}
@@ -385,7 +385,7 @@ public class BookingSystem implements CsvTools {
 				this.reservations.put(hotelName, new ArrayList<Reservation>());
 			}
 			this.reservations.get(hotelName).add(reservation);
-			writeReservationsToFile(true, false);
+			this.updateFiles("Reservations");
 			return true;
 		}
 		return false;
@@ -407,7 +407,8 @@ public class BookingSystem implements CsvTools {
 				return false; //already checkedin
 			}
 			this.stays.get(hotelName).add(stay);
-			this.writeReservationsToFile(true, true);
+			this.updateFiles("Reservations");
+			this.updateFiles("Stays");
 		}
 		return false;
 	}
@@ -440,6 +441,7 @@ public class BookingSystem implements CsvTools {
 		if (this.containsHotel(hotelName)) {
 			if (this.stays.get(hotelName).contains(stay) && LocalDate.now().isAfter(stay.getReservation().getCheckinDate().plusYears((long)7))) {
 				this.stays.get(hotelName).remove(stay);
+				this.updateFiles("Stays");
 				return true;
 			}
 		}
@@ -492,7 +494,7 @@ public class BookingSystem implements CsvTools {
 	 * @param r the reservation
 	 * @return if the reservation has been processed to a stay
 	 */
-	private boolean isReservationStayed(String hotelName, Reservation r) {
+	public boolean isStayed(String hotelName, Reservation r) {
 		return this.getHotelStay(hotelName, r) != null;
 	}
 	
@@ -528,7 +530,7 @@ public class BookingSystem implements CsvTools {
 			for (Reservation reservation : e.getValue()) {
 				boolean canAddReservation = true;
 				if (hotelStay) {
-					canAddReservation = this.isReservationStayed(e.getKey(), reservation);
+					canAddReservation = this.isStayed(e.getKey(), reservation);
 				}
 				if (canAddReservation) { //if reservation has not been procesed to a stay and hotel stay is true, don't bother writing it
 					if (hotelNamed) {
@@ -655,6 +657,21 @@ public class BookingSystem implements CsvTools {
 			return data;
 		} else {
 			return null;
+		}
+	}
+	
+	/**
+	 * Updates the specified file
+	 * @param type type can be Reservations, Cancellations or Stays
+	 */
+	public void updateFiles(String type) {
+		type = type.substring(0, 1).toUpperCase() + type.substring(1).toLowerCase();
+		if (type.equals("Reservations")) {
+			this.writeReservationsToFile(true, false);
+		} else if (type.equals("Cancellations")) {
+			this.writeReservationsToFile(false, false);
+		} else if (type.equals("Stays")) {
+			this.writeReservationsToFile(true, true);
 		}
 	}
 	
