@@ -96,18 +96,64 @@ public class DataAnalysis  {
 		return dateBalance;
 	}
 	
-	public TreeMap<Room, Double> getAverageIncomePerRoom(LocalDate start, LocalDate end) {
-		TreeMap<LocalDate, ArrayList<Double>> dateTotalCost = getFinancialInfo(start, end); //maybe a method here to read reservations from file and put them in arraylist? and pass to the method with hotelName also
-	 	double average = 0;
-	 	int numOfEarnings = 0; //Each arraylist is a list of reservations of that date, so dateTotalCost().size() just returns number of key-value mappings, not amount of payments
-		for(Map.Entry<LocalDate, ArrayList<Double>> e : dateTotalCost.entrySet()) {
-			numOfEarnings += e.getValue().size();
+	private boolean dateLessThan(LocalDate x, LocalDate y) {
+		return x.isBefore(y);
+	}
+	
+	private boolean dateGreaterThan(LocalDate x, LocalDate y) {
+		return x.isAfter(y);
+	}
+	
+	
+	private boolean isReservationInDateRange(Reservation r, LocalDate start, LocalDate end) {
+		LocalDate checkIn = r.getCheckinDate();
+		LocalDate checkOut = r.getCheckoutDate();
+		return dateLessThan(start, checkIn) || start.equals(checkIn) && dateGreaterThan(end, checkOut) || end.equals(checkOut);
+	}
+	
+	private ArrayList<LocalDate> dateRangesForReservation(Reservation r) {
+		ArrayList<LocalDate> range = new ArrayList<LocalDate>();
+		for (LocalDate date = r.getCheckinDate(); !date.equals(r.getCheckoutDate()); date = date.plusDays((long)1)) {
+			range.add(date);
+		}
+		return range;
+	}
+	
+	private TreeMap<Room, Double> calculateAverage(TreeMap<Room, ArrayList<Double>> allRates) {
+		TreeMap<Room, Double> averages = new TreeMap<Room, Double>();
+		for (Map.Entry<Room, ArrayList<Double>> e : allRates.entrySet()) {
+			double average = 0;
 			for (double d : e.getValue()) {
 				average += d;
 			}
+			average /= e.getValue().size();
+			averages.put(e.getKey(), average);
 		}
-		average = average/(double)numOfEarnings; 
-		return average; 
+		return averages;
+	}
+	
+	public TreeMap<Room, Double> getAverageIncomePerRoom(LocalDate start, LocalDate end) {
+		TreeMap<Room, ArrayList<Double>> tempAverages = new TreeMap<Room, ArrayList<Double>>();
+		for (HotelStay stay : this.stays) {
+			Reservation r = stay.getReservation();
+			if (isReservationInDateRange(r, start, end)) {
+				ArrayList<RoomBooking> roomBookings = r.getRooms();
+				ArrayList<LocalDate> reservationDates = this.dateRangesForReservation(r);
+				for (RoomBooking rb : roomBookings) {
+					Room rm = rb.getRoom();
+					for (LocalDate date = start; !date.equals(end); date = date.plusDays((long)1)) {
+						if (reservationDates.contains(date)) {
+							double rate = rm.getRate(date.getDayOfWeek().getValue() - 1);
+							if (!tempAverages.containsKey(rm)) {
+								tempAverages.put(rm, new ArrayList<Double>());
+							} 
+							tempAverages.get(rm).add(rate);
+						}
+					}
+				}
+			}
+		}
+		return calculateAverage(tempAverages);
 	}
 	
 	public double getTotalEarned(LocalDate start, LocalDate end) {
@@ -126,11 +172,11 @@ public class DataAnalysis  {
 
 		TreeMap<String, Integer> roomOccupants = new TreeMap<String, Integer>();
 		
-		for(Reservation R : reservations) {
-			
-			if(R.getCheckinDate().compareTo(start) >= 0 && R.getCheckinDate().compareTo(end) <= 0) {
-				for(RoomBooking r: R.getRooms()) {
-					roomOccupants.put(r.getRoom().getType(), (r.getOccupancy()[0] + r.getOccupancy()[1]) );
+		for(HotelStay stay : stays) {
+			Reservation r = stay.getReservation();
+			if(r.getCheckinDate().compareTo(start) >= 0 && r.getCheckinDate().compareTo(end) <= 0) {
+				for(RoomBooking rm: r.getRooms()) {
+					roomOccupants.put(rm.getRoom().getType(), (rm.getOccupancy()[0] + rm.getOccupancy()[1]) );
 				}
 			}
 		}
