@@ -128,7 +128,7 @@ public class DataAnalysis  {
 	private boolean isReservationInDateRange(Reservation r, LocalDate start, LocalDate end) {
 		LocalDate checkIn = r.getCheckinDate();
 		LocalDate checkOut = r.getCheckoutDate();
-		return dateLessThan(start, checkIn) || start.equals(checkIn) && dateGreaterThan(end, checkOut) || end.equals(checkOut);
+		return (dateLessThan(start, checkIn) || start.equals(checkIn)) && (dateGreaterThan(end, checkOut) || end.equals(checkOut));
 	}
 	
 	private ArrayList<LocalDate> dateRangesForReservation(Reservation r) {
@@ -156,20 +156,23 @@ public class DataAnalysis  {
 		TreeMap<Room, ArrayList<Double>> tempAverages = new TreeMap<Room, ArrayList<Double>>();
 		for (HotelStay stay : this.stays) {
 			Reservation r = stay.getReservation();
-			if (isReservationInDateRange(r, start, end)) {
+			ArrayList<LocalDate> reservationDates = this.dateRangesForReservation(r);
+			if (reservationDates.contains(start) || reservationDates.contains(end)) {
 				ArrayList<RoomBooking> roomBookings = r.getRooms();
-				ArrayList<LocalDate> reservationDates = this.dateRangesForReservation(r);
 				for (RoomBooking rb : roomBookings) {
+					double totalRate = 0;
 					Room rm = rb.getRoom();
-					for (LocalDate date = start; !date.equals(end); date = date.plusDays((long)1)) {
+					LocalDate date = start;
+					while (!date.isEqual(end)) {
 						if (reservationDates.contains(date)) {
-							double rate = rm.getRate(date.getDayOfWeek().getValue() - 1);
-							if (!tempAverages.containsKey(rm)) {
-								tempAverages.put(rm, new ArrayList<Double>());
-							} 
-							tempAverages.get(rm).add(rate);
+							totalRate += rm.getRate(date.getDayOfWeek().getValue() - 1);
 						}
+						date = date.plusDays((long)1);
 					}
+					if (!tempAverages.containsKey(rm)) {
+						tempAverages.put(rm, new ArrayList<Double>());
+					} 
+					tempAverages.get(rm).add(totalRate);
 				}
 			}
 		}

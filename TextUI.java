@@ -242,7 +242,10 @@ public class TextUI {
 		if (command == '1') {
 	
 		} else if (command == '2') {
-	
+			LocalDate start = LocalDate.of(2020, 8, 20); //hard coded for testing purposes
+			LocalDate end = LocalDate.of(2020, 8, 25);
+			Supervisor temp = (Supervisor)this.user;
+			System.out.println(temp.getAverageIncomePerRoom(start, end));
 		} else if (command == '3') {
 	
 		}
@@ -311,6 +314,8 @@ public class TextUI {
 				
 				System.out.println("Would you like to M)ake a reservation or C(ancel a reservation? ");
 				command = in.nextLine().toUpperCase().charAt(0);
+				System.out.println("Please enter the customer name: ");
+				this.user.name = in.nextLine();
 				if (command == 'M') {
 					makeReservation();
 				} else if (command == 'C') {
@@ -351,7 +356,7 @@ public class TextUI {
 		boolean run = true;
 		String choice;
 		this.system = new BookingSystem();
-		java.util.Set<String> hotels = system.getRooms().keySet();
+		java.util.Set<String> hotels = system.getRoomsFromFile().keySet();
 		String[] hotelNames = new String[hotels.size()];
 		int i = 0;
 		for (String n : hotels) {

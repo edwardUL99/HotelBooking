@@ -1,4 +1,5 @@
 import java.time.LocalDate;
+import java.util.TreeMap;
 
 /**
 * A class representing the Supervisor user of the system
@@ -33,7 +34,7 @@ public class Supervisor extends DeskClerk {
 		analyzer.getFinancialInfo(start, end, this.system.readDataFromFile(filePath));
 	}*/
 	
-	public double getAverageIncome(LocalDate start, LocalDate end) {
+	public TreeMap<Room, Double> getAverageIncomePerRoom(LocalDate start, LocalDate end) {
 		return analyzer.getAverageIncomePerRoom(start, end);
 	}
 	

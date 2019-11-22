@@ -24,7 +24,7 @@ public class BookingSystem implements CsvTools {
 		this.reservations = new TreeMap<String, ArrayList<Reservation>>();
 		this.cancellations = new TreeMap<String, ArrayList<Reservation>>();
 		this.stays = new TreeMap<String, ArrayList<HotelStay>>(); //will have to save and restore too?
-		this.getRooms();
+		this.getRoomsFromFile();
 		this.reinitialise(true, false); //reinitialises reservations
 		this.reinitialise(false, false); //reinitialises cancellations
 		this.reinitialise(true, true); //reinitialises stays
@@ -41,7 +41,7 @@ public class BookingSystem implements CsvTools {
 	* It would return a TreeMap with the hotel name e.g. 5-star mapped to a treemap with eg. Deluxe Single and the Integer value 45
 	* @return the non-null TreeMap containing hotel names and the room and number of rooms that hotel has
 	*/
-	public TreeMap<String,TreeMap<Room, Integer>> getRooms() {
+	public TreeMap<String,TreeMap<Room, Integer>> getRoomsFromFile() {
 		this.allRooms = new TreeMap<String, TreeMap<Room, Integer>>();
 		File f = new File(System.getProperty("user.dir") + "/data/hotels/l4Hotels.csv");
 		try (Scanner in = new Scanner(f)) {
@@ -190,7 +190,7 @@ public class BookingSystem implements CsvTools {
 	 * @return a TreeMap with a rooms and their corresponding number of rooms available in the hotel during this period
 	 */
 	public TreeMap<Room, Integer> getCurrentRooms(String hotelName, LocalDate from, LocalDate to) {
-		TreeMap<Room, Integer> hotelRooms = this.getRooms().get(hotelName);
+		TreeMap<Room, Integer> hotelRooms = this.getRoomsFromFile().get(hotelName);
 		if (hotelRooms != null) {
 			TreeMap<Room, Integer> availableRooms = new TreeMap<Room, Integer>(hotelRooms); //Initialise it with allRooms i.e the total number of rooms in the hotel regardless of if booked or not
 			for (Room r : hotelRooms.keySet()) {
