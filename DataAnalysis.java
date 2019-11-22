@@ -196,7 +196,7 @@ public class DataAnalysis  {
 			Reservation r = stay.getReservation();
 			if(r.getCheckinDate().compareTo(start) >= 0 && r.getCheckinDate().compareTo(end) <= 0) {
 				for(RoomBooking rm: r.getRooms()) {
-					roomOccupants.put(rm.getRoom().getType(), (rm.getOccupancy()[0] + rm.getOccupancy()[1]) );
+					roomOccupants.put(rm.getRoom().getType(), (rm.getOccupancy()[0] + rm.getOccupancy()[1]));
 				}
 			}
 		}
