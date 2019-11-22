@@ -232,6 +232,22 @@ public class TextUI {
 		}
 	}
 	
+	private void dataAnalyticsServices() {
+		//choose data analytic method
+		System.out.println("would you like to \n1)get all room purchases between dates. "
+				+ "\n2)get average earnings across all rooms over chosen period "
+				+ "\n3)get Total earnings over chosen period");
+		
+		char command = in.nextLine().toUpperCase().charAt(0);
+		if (command == '1') {
+	
+		} else if (command == '2') {
+	
+		} else if (command == '3') {
+	
+		}
+	}
+	
 	private void runAsCustomer() {
 		boolean loggedIn = true;
 		System.out.println("Please enter your name: ");
@@ -305,19 +321,12 @@ public class TextUI {
 				this.checkinServices();
 			} else if (command == '3') {
 				this.applyDiscountToReservation();
+			}else if (command == '4') {
+				this.dataAnalyticsServices();
 			} else if (command == '5') {
 				loggedIn = false;
 			}
-			
-			/* else if (command == '2') 
-			
-				System.out.println("Would you like to I)check-in or O)check-out? ");
-				command = in.nextLine().toUpperCase().charAt(0);
-				if (command == 'I') {
-					checkIn();
-				} else if (command == 'O') {
-					checkOut();
-				}
+			/*
 			} else if (command == '3') {
 				//enter reservation discount applies to and size of discount
 			} else if (command == '4') {
