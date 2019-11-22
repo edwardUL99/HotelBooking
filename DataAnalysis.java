@@ -116,6 +116,7 @@ public class DataAnalysis  {
 		return dateBalance;
 	}
 	
+	/* may not be needed
 	private boolean dateLessThan(LocalDate x, LocalDate y) {
 		return x.isBefore(y);
 	}
@@ -129,7 +130,7 @@ public class DataAnalysis  {
 		LocalDate checkIn = r.getCheckinDate();
 		LocalDate checkOut = r.getCheckoutDate();
 		return (dateLessThan(start, checkIn) || start.equals(checkIn)) && (dateGreaterThan(end, checkOut) || end.equals(checkOut));
-	}
+	}*/
 	
 	private ArrayList<LocalDate> dateRangesForReservation(Reservation r) {
 		ArrayList<LocalDate> range = new ArrayList<LocalDate>();
