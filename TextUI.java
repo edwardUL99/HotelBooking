@@ -20,7 +20,7 @@ public class TextUI {
 	 */
 	private boolean isCorrectDateFormat(String dateInput) {
 		String[] date = dateInput.split("/");
-		if (date.length < 3 || date.length > 3 || dateInput.indexOf("/") == -1) {
+		if (date.length != 3 || dateInput.indexOf("/") == -1) {
 			return false;
 		} else if (Integer.parseInt(date[1]) > 12) { //If the mm value is greater than twelve, it may have been confused to be the dd value
 			return false;
@@ -156,8 +156,7 @@ public class TextUI {
 	private Reservation getReservation() {
 		System.out.println("Please enter the checkIn date(dd/mm/yyyy): ");
 		LocalDate checkIn = getDate();
-		Reservation reservation = this.system.getReservation(this.hotelName, this.user.name, checkIn); //if more than 1 reservation same date allow to choose which one
-		return reservation;
+        return this.system.getReservation(this.hotelName, this.user.name, checkIn);
 	}
 	
 	private void viewReservation() {

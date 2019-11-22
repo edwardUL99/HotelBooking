@@ -487,7 +487,7 @@ public class BookingSystem implements CsvTools {
 			for (Map.Entry<String, ArrayList<Reservation>> e : reservations.entrySet()) {
 				rows += e.getValue().size();
 			}
-		} else if (reservationOrCancellation && hotelStay) {
+		} else if (reservationOrCancellation) {
 			for (Map.Entry<String, ArrayList<HotelStay>> e : stays.entrySet()) {
 				rows += e.getValue().size();
 			}
@@ -575,8 +575,7 @@ public class BookingSystem implements CsvTools {
 								data[row][lastIndex] = stay.getStayEnd().toString();
 							}
 						}
-						lastIndex = 8;
-						row++;
+					row++;
 					}
 				}
 			}
