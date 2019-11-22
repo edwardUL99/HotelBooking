@@ -138,7 +138,7 @@ public class DataAnalysis  {
 	
 	private ArrayList<LocalDate> dateRangesForReservation(Reservation r) {
 		ArrayList<LocalDate> range = new ArrayList<LocalDate>();
-		for (LocalDate date = r.getCheckinDate(); !date.equals(r.getCheckoutDate()); date = date.plusDays((long)1)) {
+		for (LocalDate date = r.getCheckinDate(); !date.equals(r.getCheckoutDate()); date = date.plusDays(1)) {
 			range.add(date);
 		}
 		return range;
@@ -172,7 +172,7 @@ public class DataAnalysis  {
 						if (reservationDates.contains(date)) {
 							totalRate += rm.getRate(date.getDayOfWeek().getValue() - 1);
 						}
-						date = date.plusDays((long)1);
+						date = date.plusDays(1);
 					}
 					if (!tempAverages.containsKey(rm)) {
 						tempAverages.put(rm, new ArrayList<Double>());
