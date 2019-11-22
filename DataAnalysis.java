@@ -46,7 +46,7 @@ public class DataAnalysis  {
 			
 			
 			int rows = financialInfo.size();
-			int columns = 2;
+			int columns = 5;
 			
 			Object[][] data = new String[rows][columns];
 			String[] attributes = {"Date","Deposit","Reservation Cost","Total Cost"};
@@ -75,7 +75,27 @@ public class DataAnalysis  {
 	}
 		
 	public void writeOccupancyInfoToFile(LocalDate start, LocalDate end) {
+		TreeMap<String,Integer> occupancyInfo = getOccupancyInfo(start, end);
+
+		int rows = occupancyInfo.size();
+		int columns = 3;
 		
+		Object[][] data = new String[rows][columns];
+		String[] attributes = {"RoomType, numberOfOccupants"};
+		
+		data[0][0] = attributes[0]; 
+		data[0][1] = attributes[1];
+		
+		int row = 1;
+				
+		for (Entry<String, Integer> e : occupancyInfo.entrySet()) {
+				data[row][1] = e.getKey();  
+				data[row][2] = e.getValue();
+		}
+
+	String fileName = "/data/dataAnalysis/OccupancyInfo.csv";
+	String path = System.getProperty("user.dir") + fileName;
+	writeDataToFile(path, data);
 	}
 
 	// use reInitialize and take treeMap from bookingSystem? 
@@ -126,10 +146,9 @@ public class DataAnalysis  {
 
 		TreeMap<String, Integer> roomOccupants = new TreeMap<String, Integer>();
 		
-		for(Reservation R : reservations) {
-			
-			if(R.getCheckinDate().compareTo(start) >= 0 && R.getCheckinDate().compareTo(end) <= 0) {
-				for(RoomBooking r: R.getRooms()) {
+		for(HotelStay H : stays) {
+			if(H.getStayStart().compareTo(start) >= 0 && H.getStayEnd().compareTo(end) <= 0) {
+				for(RoomBooking r: (H.getReservation()).getRooms()) {
 					roomOccupants.put(r.getRoom().getType(), (r.getOccupancy()[0] + r.getOccupancy()[1]) );
 				}
 			}
