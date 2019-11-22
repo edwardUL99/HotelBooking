@@ -134,7 +134,7 @@ public class BookingSystem implements CsvTools {
 	private boolean isInTimePeriod(LocalDate from, LocalDate to, Reservation reservation) {
 		LocalDate checkIn = reservation.getCheckinDate();
 		LocalDate checkOut = reservation.getCheckoutDate();
-		for (LocalDate date = checkIn; !date.isEqual(checkOut); date = date.plusDays((long)1)) {
+		for (LocalDate date = checkIn; !date.isEqual(checkOut); date = date.plusDays(1)) {
 			if (dateGreaterThanEquals(date, from) && dateLessThan(date, to)) {
 				return true;
 			}
@@ -366,7 +366,7 @@ public class BookingSystem implements CsvTools {
 				this.updateFiles("Reservations");
 				this.updateFiles("Cancellations");
 			} else {
-				if (LocalDate.now().isAfter(reservation.getCheckoutDate().plusDays((long)30))
+				if (LocalDate.now().isAfter(reservation.getCheckoutDate().plusDays(30))
 						&& (this.cancellations.get(hotelName).contains(reservation) ||  //if cancelled or is a hotel stay, it has been processed
 							this.stays.get(hotelName).contains(new HotelStay(reservation)))) {
 					this.reservations.get(hotelName).remove(reservation);
@@ -447,7 +447,7 @@ public class BookingSystem implements CsvTools {
 	 */
 	public boolean removeHotelStay(String hotelName, HotelStay stay) {
 		if (this.containsHotel(hotelName)) {
-			if (this.stays.get(hotelName).contains(stay) && LocalDate.now().isAfter(stay.getReservation().getCheckinDate().plusYears((long)7))) {
+			if (this.stays.get(hotelName).contains(stay) && LocalDate.now().isAfter(stay.getReservation().getCheckinDate().plusYears(7))) {
 				this.stays.get(hotelName).remove(stay);
 				this.updateFiles("Stays");
 				return true;

@@ -124,13 +124,17 @@ public class DataAnalysis  {
 	private boolean dateGreaterThan(LocalDate x, LocalDate y) {
 		return x.isAfter(y);
 	}
-	
+	*/
 	
 	private boolean isReservationInDateRange(Reservation r, LocalDate start, LocalDate end) {
-		LocalDate checkIn = r.getCheckinDate();
-		LocalDate checkOut = r.getCheckoutDate();
-		return (dateLessThan(start, checkIn) || start.equals(checkIn)) && (dateGreaterThan(end, checkOut) || end.equals(checkOut));
-	}*/
+		ArrayList<LocalDate> range = this.dateRangesForReservation(r);
+		for (LocalDate date = start; !date.equals(end); date = date.plusDays(1)) {
+			if (range.contains(date)) {
+				return true;
+			}
+		}
+		return false;
+	}
 	
 	private ArrayList<LocalDate> dateRangesForReservation(Reservation r) {
 		ArrayList<LocalDate> range = new ArrayList<LocalDate>();
@@ -158,7 +162,7 @@ public class DataAnalysis  {
 		for (HotelStay stay : this.stays) {
 			Reservation r = stay.getReservation();
 			ArrayList<LocalDate> reservationDates = this.dateRangesForReservation(r);
-			if (reservationDates.contains(start) || reservationDates.contains(end)) {
+			if (this.isReservationInDateRange(r, start, end)) {
 				ArrayList<RoomBooking> roomBookings = r.getRooms();
 				for (RoomBooking rb : roomBookings) {
 					double totalRate = 0;

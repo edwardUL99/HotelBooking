@@ -140,7 +140,7 @@ public class TextUI {
 		int numPeople = Integer.parseInt(in.nextLine());
 		System.out.println("Please enter the number of rooms you wish to book: ");
 		int numRooms = Integer.parseInt(in.nextLine()); //Prevents line not found errors as nextInt() does not skip to nextLine
-		ArrayList<RoomBooking> rooms = chooseRooms(numRooms, checkin, checkin.plusDays((long)numNights));
+		ArrayList<RoomBooking> rooms = chooseRooms(numRooms, checkin, checkin.plusDays(numNights));
 		this.user.createReservation(this.hotelName, this.user.name, type, checkin, numNights, numPeople, numRooms, rooms);
 	}
 
@@ -243,7 +243,7 @@ public class TextUI {
 	
 		} else if (command == '2') {
 			LocalDate start = LocalDate.of(2020, 8, 20); //hard coded for testing purposes
-			LocalDate end = LocalDate.of(2020, 8, 25);
+			LocalDate end = LocalDate.of(2020, 8, 27);
 			Supervisor temp = (Supervisor)this.user;
 			System.out.println(temp.getAverageIncomePerRoom(start, end));
 		} else if (command == '3') {
