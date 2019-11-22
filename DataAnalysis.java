@@ -40,14 +40,17 @@ public class DataAnalysis  {
 		public void writeFinacialInfoToFile(LocalDate start, LocalDate end,TreeMap<String, ArrayList<Reservation>> reservations, String hotelName) {
 			TreeMap<LocalDate,ArrayList<Double>> financialInfo = getFinancialInfo(start, end);
 			
+			
 			int rows = financialInfo.size();
 			int columns = 2;
 			
 			Object[][] data = new String[rows][columns];
-			String[] attributes = {"date","Total Cost"};
+			String[] attributes = {"date","Deposit","reservation Cost","Total Cost"};
 			
 			data[0][1] = attributes[0]; 
 			data[0][2] = attributes[1];
+			data[0][3] = attributes[2];
+			data[0][4] = attributes[3];
 			
 			int row = 1;
 					
@@ -55,7 +58,9 @@ public class DataAnalysis  {
 				data[1][0] = e.getKey();
 				for (Double amount : e.getValue()) {
 					data[row][1] = e.getKey();  
-					data[row][2] = amount;
+					data[row][2] = 75;
+					data[row][3] = amount - 75;
+					data[row][4] = amount;
 					row++;
 				}
 			}
@@ -65,7 +70,7 @@ public class DataAnalysis  {
 		writeDataToFile(path, data);
 	}
 		
-	public void writeOccupancyInfoToFile() {
+	public void writeOccupancyInfoToFile(LocalDate start, LocalDate end) {
 		
 	}
 
@@ -112,15 +117,17 @@ public class DataAnalysis  {
 		return total;
 	}
 	
-	//
-	public TreeMap<Room,Integer> getOccupancyInfo(LocalDate start, LocalDate end) {
+	//returns a TreeMap with Room as a key linked to the number of occupants who stayed in the room between start and end.
+	public TreeMap<String, Integer> getOccupancyInfo(LocalDate start, LocalDate end) {
 
-		TreeMap<Room, Integer> roomOccupants = new TreeMap<Room, Integer>();
+		TreeMap<String, Integer> roomOccupants = new TreeMap<String, Integer>();
 		
 		for(Reservation R : reservations) {
 			
 			if(R.getCheckinDate().compareTo(start) >= 0 && R.getCheckinDate().compareTo(end) <= 0) {
-				
+				for(RoomBooking r: R.getRooms()) {
+					roomOccupants.put(r.getRoom().getType(), (r.getOccupancy()[0] + r.getOccupancy()[1]) );
+				}
 			}
 		}
 		return roomOccupants;
