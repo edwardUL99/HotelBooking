@@ -10,10 +10,14 @@ import java.util.TreeMap;
 
 
 public class DataAnalysis  {
-		private ArrayList<Reservation> reservations; //Could probably use booking system reservations when given a hotel name the supervisor is signed in as
+		private ArrayList<HotelStay> stays;
 		
-		public DataAnalysis(ArrayList<Reservation> reservations) {
-			this.reservations = reservations;
+		/**
+		 * Creates a DataAnalysis class hotel stays.
+		 * @param stays
+		 */
+		public DataAnalysis(ArrayList<HotelStay> stays) {
+			this.stays = stays;
 		}
 		
 		public void writeDataToFile(String filePath, Object[][] data) {
@@ -45,7 +49,7 @@ public class DataAnalysis  {
 			int columns = 2;
 			
 			Object[][] data = new String[rows][columns];
-			String[] attributes = {"date","Deposit","reservation Cost","Total Cost"};
+			String[] attributes = {"Date","Deposit","Reservation Cost","Total Cost"};
 			
 			data[0][1] = attributes[0]; 
 			data[0][2] = attributes[1];
@@ -79,8 +83,8 @@ public class DataAnalysis  {
 	public TreeMap<LocalDate,ArrayList<Double>> getFinancialInfo(LocalDate start, LocalDate end) {
 		
 		TreeMap<LocalDate, ArrayList<Double>> dateBalance = new TreeMap<LocalDate, ArrayList<Double>>();
-		for(Reservation r : reservations) {
-			
+		for(HotelStay stay : stays) {
+			Reservation r = stay.getReservation();
 			if(r.getCheckinDate().compareTo(start) >= 0 && r.getCheckinDate().compareTo(end) <= 0) {
 				LocalDate checkin = r.getCheckinDate();
 				if (!dateBalance.containsKey(checkin)) {
@@ -92,7 +96,7 @@ public class DataAnalysis  {
 		return dateBalance;
 	}
 	
-	public double getAverageIncomePerRoom(LocalDate start, LocalDate end) {
+	public TreeMap<Room, Double> getAverageIncomePerRoom(LocalDate start, LocalDate end) {
 		TreeMap<LocalDate, ArrayList<Double>> dateTotalCost = getFinancialInfo(start, end); //maybe a method here to read reservations from file and put them in arraylist? and pass to the method with hotelName also
 	 	double average = 0;
 	 	int numOfEarnings = 0; //Each arraylist is a list of reservations of that date, so dateTotalCost().size() just returns number of key-value mappings, not amount of payments

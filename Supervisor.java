@@ -8,7 +8,7 @@ public class Supervisor extends DeskClerk {
 	
 	public Supervisor(String hotelName, BookingSystem system) {
 		super(hotelName, system);
-		this.analyzer = new DataAnalysis(this.system.getReservations().get(this.hotelName));
+		this.analyzer = new DataAnalysis(this.system.getHotelStays().get(this.hotelName));
 	}
 	
 	/** allows supervisor to apply any discount to any reservation */

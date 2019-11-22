@@ -214,6 +214,14 @@ public class BookingSystem implements CsvTools {
 	}
 	
 	/**
+	 * Returns all the hotel stays for each hotel
+	 * @return the treemap with stays for each hotel
+	 */
+	public TreeMap<String, ArrayList<HotelStay>> getHotelStays() {
+		return this.stays;
+	}
+	
+	/**
 	 * Returns a single reservation specified by the name and the checkIn date
 	 * @param hotelName the name of the hotel
 	 * @param name the name of the customer who owns the reservation
