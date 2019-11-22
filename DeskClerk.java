@@ -25,10 +25,14 @@ public class DeskClerk extends User {
 		if (r == null) {
 			return false;
 		} else {
-			HotelStay stay = new HotelStay(r); //will be added to an arraylist in BookingSystem 
-			this.system.addHotelStay(this.hotelName, stay);
-			return true;
+			if (!this.system.isStayed(this.hotelName, r)) { //if reservation is already a stay no point checking in
+				r.getTotalCostCalculated(); //Updates their bill with total cost
+				HotelStay stay = new HotelStay(r); //will be added to an arraylist in BookingSystem 
+				this.system.addHotelStay(this.hotelName, stay);
+				return true;
+			}
 			//possibly write to file here
+			return false;
 		}
 	}
 	

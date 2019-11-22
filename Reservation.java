@@ -1,17 +1,21 @@
 import java.time.LocalDate;
 import java.util.ArrayList;
+
 /**
  * A class to represent the reservation for a hotel room(s)
  *
  */
 public class Reservation {
+	private static int lastBookingNumber = 999; //Keeps track of what the last booking number was and sets the next reservation to the one above it. Initialised as 999 so the very first reservation will have 1000 as its number
+	
 	private int number;
 	private String name;
 	private String type;
 	private LocalDate checkinDate;
 	private int numberOfNights;
+	private int numberOfPeople;
 	private int numberOfRooms;
-	private ArrayList<Room> rooms;
+	private ArrayList<RoomBooking> rooms;
 	private Bill totalCost;
 	private Bill deposit;
 	
@@ -23,16 +27,40 @@ public class Reservation {
 	 * @param numberOfNights the number of nights the reservation is for
 	 * @param numberOfRooms the number of rooms to book
 	 */
-	public Reservation(String name, String type, LocalDate checkinDate, int numberOfNights, int numberOfRooms, ArrayList<Room> rooms) {
-		this.number = (int)(Math.random() * 8999 + 1000);
+	public Reservation(String name, String type, LocalDate checkinDate, int numberOfNights, int numberOfPeople, int numberOfRooms, ArrayList<RoomBooking> rooms) {
+		this.number = ++lastBookingNumber;
 		this.name = name;
 		this.type = type;
 		this.checkinDate = checkinDate;
 		this.numberOfNights = numberOfNights;
+		this.numberOfPeople = numberOfPeople;
 		this.numberOfRooms = numberOfRooms;
 		this.rooms = rooms;
-		this.totalCost = new Bill("Total Cost", LocalDate.now()); //For both bills choose a more suitable date
-		this.deposit = new Bill("Deposit", LocalDate.now(), 75.00); //May change the price later
+		this.totalCost = new Bill("Total Cost", checkinDate); //For both bills choose a more suitable date
+		this.deposit = new Bill("Deposit", checkinDate, 75.00); //May change the price later
+	}
+	
+	/**
+	 * Constructor used when you want to override the default booking number generation
+	 * @param number the booking number
+	 * @param name the name to have on the reservation
+	 * @param type the type of the reservation
+	 * @param checkinDate the checkin date
+	 * @param numebrOfNights the number of nights
+	 * @param numberOfRooms the number of rooms
+	 * @param rooms the list of rooms booked
+	 */
+	public Reservation(int number, String name, String type, LocalDate checkinDate, int numberOfNights, int numberOfPeople, int numberOfRooms, ArrayList<RoomBooking> rooms) {
+		this.setNumber(number);
+		this.name = name;
+		this.type = type;
+		this.checkinDate = checkinDate;
+		this.numberOfNights = numberOfNights;
+		this.numberOfPeople = numberOfPeople;
+		this.numberOfRooms = numberOfRooms;
+		this.rooms = rooms;
+		this.totalCost = new Bill("Total Cost", checkinDate);
+		this.deposit = new Bill("Deposit", checkinDate, 75.00);
 	}
 
 	/**
@@ -49,6 +77,7 @@ public class Reservation {
 	 */
 	public void setNumber(int number) {
 		this.number = number;
+		lastBookingNumber++;
 	}
 	
 	/**
@@ -64,6 +93,22 @@ public class Reservation {
 	 */
 	public String getType() {
 		return type;
+	}
+	
+	/**
+	 * Sets the number of people for this reservation
+	 * @param numberOfPeople the number of people
+	 */
+	public void setNumberOfPeople(int numberOfPeople) {
+		this.numberOfPeople = numberOfPeople;
+	}
+	
+	/**
+	 * Gets the number of people booked on this reservation
+	 * @return the number of people
+	 */
+	public int getNumberOfPeople() {
+		return this.numberOfPeople;
 	}
 	
 	/**
@@ -94,7 +139,7 @@ public class Reservation {
 	 * Returns the list of all the rooms booked
 	 * @return a list of all rooms booked for this reservation
 	 */
-	public ArrayList<Room> getRooms() {
+	public ArrayList<RoomBooking> getRooms() {
 		return rooms;
 	}
 	
@@ -131,6 +176,25 @@ public class Reservation {
 	}
 	
 	/**
+	 * Calculates the cost of breakfast for this reservation
+	 * @return the cost of breakfast calculated per night per person
+	 */
+	public double calculateBreakfastCost() {
+		double breakfastCost = 14.00;
+		double calculated = 0.00;
+		
+		for (int i = 0; i < this.numberOfNights; i++) {
+			for (RoomBooking rb : this.rooms) {
+				if (rb.isBreakfastIncluded()) {
+					calculated += breakfastCost * this.numberOfPeople;
+				}
+			}
+		}
+		
+		return calculated;
+	}
+	
+	/**
 	 * Returns a Bill object with the amount due set to the total payable calculated using rates including deposit
 	 * Also sets the amount due of the bill total cost associated with this object to this calculated cost, so if you want to get the current total cost, either not calculated yet or discounted yet,
 	 * see getTotalCost()
@@ -140,8 +204,9 @@ public class Reservation {
 		int dayOfWeek;
 		double total = 0.00;
 		for (int i = 0; i < this.numberOfNights; i++) {
-			dayOfWeek  = this.checkinDate.plusDays((long)i).getDayOfWeek().getValue() - 1; //Our rates array from room is indexed from 0 to 6 and getDayOfWeek().getValue() returns a number 1-7
-			for (Room r : this.rooms) {
+			dayOfWeek = this.checkinDate.plusDays((long)i).getDayOfWeek().getValue() - 1; //Our rates array from room is indexed from 0 to 6 and getDayOfWeek().getValue() returns a number 1-7
+			for (RoomBooking rb : this.rooms) {
+				Room r = rb.getRoom();
 				total += r.getRate(dayOfWeek);
 			}
 		}
@@ -149,6 +214,7 @@ public class Reservation {
 			total -= total * 0.05;
 		}
 		total += this.getDeposit().getAmountDue(); //Maybe after checkout, return the deposit???
+		total += this.calculateBreakfastCost();
 		this.totalCost.setAmountDue(total);
 		return this.totalCost;
 	}
@@ -186,8 +252,9 @@ public class Reservation {
 	
 	private String roomsBookedAsString() {
 		String returned = "";
-		for (Room r : this.rooms) {
-			returned += r + "\n";
+		for (RoomBooking rb : this.rooms) {
+			Room r = rb.getRoom();
+			returned += r + " Breakfast Included: " + rb.isBreakfastIncluded() + "\n";
 		}
 		return returned;
 	}

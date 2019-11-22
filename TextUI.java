@@ -20,7 +20,7 @@ public class TextUI {
 	 */
 	private boolean isCorrectDateFormat(String dateInput) {
 		String[] date = dateInput.split("/");
-		if (date.length < 3 || date.length > 3 || dateInput.indexOf("/") == -1) {
+		if (date.length != 3 || dateInput.indexOf("/") == -1) {
 			return false;
 		} else if (Integer.parseInt(date[1]) > 12) { //If the mm value is greater than twelve, it may have been confused to be the dd value
 			return false;
@@ -54,34 +54,59 @@ public class TextUI {
 	
 	
 	
-	private ArrayList<Room> chooseRooms(int numberOfRooms, LocalDate from, LocalDate to) {
+	private ArrayList<RoomBooking> chooseRooms(int numberOfRooms, LocalDate from, LocalDate to) {
 		//Maybe instead of checking if the rooms are available after choosing them in the BookingSystem class, have the BookingSystem getRooms only return rooms that are available for the numberOfRooms specified
 		TreeMap<Room, Integer> map = this.system.getCurrentRooms(this.hotelName, from, to);
 		//For getCurrentRooms() method maybe supply two date parameters, indicating a time period to populate the rooms available map with the amount of rooms free at that period
 		ArrayList<Room> allRooms = new ArrayList<Room>(map.keySet());
-		ArrayList<Room> rooms = new ArrayList<Room>(numberOfRooms);
+		ArrayList<RoomBooking> rooms = new ArrayList<RoomBooking>(numberOfRooms);
 		System.out.println("Room type(Rooms Available)(Maximum Adult occupancy)(Maximum Child occupancy)"); //Have a way to check number of rooms available for the date chosen in reservation
 		while (rooms.size() != numberOfRooms) {
 			char ch = 'A';
+			ArrayList<Character> notAvailable = new ArrayList<Character>(5);
 			for (int i = 0; i < allRooms.size(); i++) {
 				Room r = allRooms.get(i);
 				if (map.get(r) > 0) {
 					System.out.println(ch + ")" + r.getType() + "(" + map.get(r) + ")" + "(" + r.occupancy(true, false) + ")" + "(" + r.occupancy(false, false) + ")");
-					ch++;
+				} else {
+					notAvailable.add(ch);
+					System.out.println(ch + ")" + r.getType() + " is booked out for these dates");
 				}
+				ch++;
 			} //This is not how it will be implemented, just until the other methods are developed
 			String input = in.nextLine();
-			int n = input.toUpperCase().charAt(0) - 'A';
-			System.out.println("Please enter how many adults and children are staying per room (number of Adults,number of Children): ");
-			String[] occupancy = in.nextLine().split(",");
-			int adults = Integer.parseInt(occupancy[0]);
-			int children = Integer.parseInt(occupancy[1]);
-			if (n >= 0 && n < allRooms.size()) {
-				Room choice = allRooms.get(n);
-				if ((adults >= choice.occupancy(true, true) && adults <= choice.occupancy(true, false)) && (children >= choice.occupancy(false, true) && children <= choice.occupancy(false,  false))) {
-					rooms.add(choice);
-				} else {
-					System.out.println("The room chosen is not suitable for the number of adults or children you entered, please try again");
+			if (notAvailable.contains(input.toUpperCase().charAt(0))) {
+				System.out.println("You cannot choose this room, as it is booked out. Please choose another.");
+			} else {
+				int n = input.toUpperCase().charAt(0) - 'A';
+				System.out.println("Please enter how many adults and children are staying per room (number of Adults,number of Children): ");
+				String[] occupancy = in.nextLine().split(",");
+				int adults = Integer.parseInt(occupancy[0]);
+				int children = Integer.parseInt(occupancy[1]);
+				if (n >= 0 && n < allRooms.size()) {
+					Room choice = allRooms.get(n);
+					if ((adults >= choice.occupancy(true, true) && adults <= choice.occupancy(true, false)) && (children >= choice.occupancy(false, true) && children <= choice.occupancy(false,  false))) {
+						boolean run = true;
+						while (run) {
+							System.out.println("Would you like breakfast included with the room? (Yes/No)");
+							String option = in.nextLine();
+							option = option.substring(0, 1).toUpperCase() + option.substring(1).toLowerCase();
+							RoomBooking booking = new RoomBooking(choice, adults, children);
+							if (option.equals("Yes")) {
+								booking.setBreakfastIncluded(true);
+								rooms.add(booking);
+								run = false;
+							} else if (option.equals("No")) {
+								booking.setBreakfastIncluded(false);
+								rooms.add(booking);
+								run = false;
+							} else {
+								System.out.println("Please choose yes/no");
+							}
+						}
+					} else {
+						System.out.println("The room chosen is not suitable for the number of adults or children you entered, please try again");
+					}
 				}
 			}
 		}
@@ -111,16 +136,16 @@ public class TextUI {
 		}
 		System.out.println("Please enter the number of nights you wish to stay: ");
 		int numNights = Integer.parseInt(in.nextLine()); //Prevents line not found errors as nextInt() does not skip to nextLine
+		System.out.println("Please enter the number of people staying: ");
+		int numPeople = Integer.parseInt(in.nextLine());
 		System.out.println("Please enter the number of rooms you wish to book: ");
 		int numRooms = Integer.parseInt(in.nextLine()); //Prevents line not found errors as nextInt() does not skip to nextLine
-		ArrayList<Room> rooms = chooseRooms(numRooms, checkin, checkin.plusDays((long)numNights));
-		this.user.createReservation(this.hotelName, this.user.name, type, checkin, numNights, numRooms, rooms);
+		ArrayList<RoomBooking> rooms = chooseRooms(numRooms, checkin, checkin.plusDays((long)numNights));
+		this.user.createReservation(this.hotelName, this.user.name, type, checkin, numNights, numPeople, numRooms, rooms);
 	}
 
 	private void cancelReservation() {
-		System.out.println("Please enter the checkIn date(dd/mm/yyyy)");
-		LocalDate checkIn = getDate();
-		Reservation reservation = this.system.getReservation(this.hotelName, this.user.name, checkIn); //if more than 1 reservation same date allow to choose which one
+		Reservation reservation = this.getReservation();
 		if (reservation == null) {
 			System.out.println("The reservation could not be found");
 		} else {
@@ -128,10 +153,14 @@ public class TextUI {
 		}
 	}
 	
-	private void viewReservation() {
+	private Reservation getReservation() {
 		System.out.println("Please enter the checkIn date(dd/mm/yyyy): ");
 		LocalDate checkIn = getDate();
-		Reservation reservation = this.system.getReservation(this.hotelName, this.user.name, checkIn); //if more than 1 reservation same date allow to choose which one
+        return this.system.getReservation(this.hotelName, this.user.name, checkIn);
+	}
+	
+	private void viewReservation() {
+		Reservation reservation = this.getReservation();
 		if (reservation == null) {
 			System.out.println("The reservation could not be found");
 		} else {
@@ -187,8 +216,39 @@ public class TextUI {
 		}
 	}
 	
-	public void applyDiscountToReservation() {
+	private void applyDiscountToReservation() {
+		System.out.println("Please enter the customer name: ");
+		this.user.name = in.nextLine();
+		Reservation reservation = this.getReservation();
+		if (reservation == null) {
+			System.out.println("The reservation could not be found and a discount cannot applied");
+		} else {
+			System.out.println("Please enter the percentage discount (0-100): ");
+			double percentageDiscount = Double.parseDouble(in.nextLine());
+			Supervisor temp = (Supervisor)this.user;
+			if (temp.applyDiscount(percentageDiscount, reservation.getNumber())) {
+				System.out.println("The discount was applied successfully");
+			}
+		}
+	}
+	
+	private void dataAnalyticsServices() {
+		//choose data analytic method
+		System.out.println("would you like to \n1)get all room purchases between dates. "
+				+ "\n2)get average earnings across all rooms over chosen period "
+				+ "\n3)get Total earnings over chosen period");
 		
+		char command = in.nextLine().toUpperCase().charAt(0);
+		if (command == '1') {
+	
+		} else if (command == '2') {
+			LocalDate start = LocalDate.of(2020, 8, 20); //hard coded for testing purposes
+			LocalDate end = LocalDate.of(2020, 8, 25);
+			Supervisor temp = (Supervisor)this.user;
+			System.out.println(temp.getAverageIncomePerRoom(start, end));
+		} else if (command == '3') {
+	
+		}
 	}
 	
 	private void runAsCustomer() {
@@ -196,6 +256,7 @@ public class TextUI {
 		System.out.println("Please enter your name: ");
 		this.user = new Customer(in.nextLine(), this.hotelName, system);
 		while (loggedIn) {
+			System.out.println("\nHotel: " + this.hotelName);
 			System.out.println("\nWould you like to M)ake a reservation, C(ancel a reservation, V)iew a reservation or L)ogout?");
 			char command = in.nextLine().toUpperCase().charAt(0);
 			if (command == 'M') {
@@ -212,8 +273,9 @@ public class TextUI {
 	
 	private void runAsDeskClerk() {
 		boolean loggedIn = true;
+		this.user = new DeskClerk(hotelName, system);
 		while (loggedIn) {
-			this.user = new DeskClerk(hotelName, system);
+			System.out.println("\nHotel: " + this.hotelName);
 			System.out.println("\nWould you like to access R)eservations, C)heck-in/out or L)ogout?");
 			char command = in.nextLine().toUpperCase().charAt(0);
 			if (command == 'R') {
@@ -242,31 +304,34 @@ public class TextUI {
 	
 	private void runAsSupervisor() {
 		boolean loggedIn = true;
+		this.user = new Supervisor(this.hotelName, system);
 		while (loggedIn) {
-			this.user = new Supervisor(this.hotelName, system);
+			System.out.println("\nHotel: " + this.hotelName);
+			
 			System.out.println("\nWould you like to access \n1)reservations \n2)check-in/out \n3)apply discounts \n4)data analytics or \n5)Logout");
 			char command = in.nextLine().toUpperCase().charAt(0);
 			if (command == '1') {
 				
 				System.out.println("Would you like to M)ake a reservation or C(ancel a reservation? ");
 				command = in.nextLine().toUpperCase().charAt(0);
+				System.out.println("Please enter the customer name: ");
+				this.user.name = in.nextLine();
 				if (command == 'M') {
 					makeReservation();
 				} else if (command == 'C') {
-				cancelReservation();
+					cancelReservation();
 				}
 		
+			} else if (command == '2') {  
+				this.checkinServices();
+			} else if (command == '3') {
+				this.applyDiscountToReservation();
+			}else if (command == '4') {
+				this.dataAnalyticsServices();
 			} else if (command == '5') {
 				loggedIn = false;
-			}/* else if (command == '2') 
-			
-				System.out.println("Would you like to I)check-in or O)check-out? ");
-				command = in.nextLine().toUpperCase().charAt(0);
-				if (command == 'I') {
-					checkIn();
-				} else if (command == 'O') {
-					checkOut();
-				}
+			}
+			/*
 			} else if (command == '3') {
 				//enter reservation discount applies to and size of discount
 			} else if (command == '4') {
@@ -291,7 +356,7 @@ public class TextUI {
 		boolean run = true;
 		String choice;
 		this.system = new BookingSystem();
-		java.util.Set<String> hotels = system.getRooms().keySet();
+		java.util.Set<String> hotels = system.getRoomsFromFile().keySet();
 		String[] hotelNames = new String[hotels.size()];
 		int i = 0;
 		for (String n : hotels) {
@@ -314,7 +379,6 @@ public class TextUI {
 					runAsSupervisor();
 				}
 			} else if (ch == 'C') {
-				System.out.println("The current hotel is: " + this.hotelName);
 				System.out.println("Please choose a hotel: ");
 				this.hotelName = (String)getChoice(hotelNames);
 			} else if (ch == 'Q') {

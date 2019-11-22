@@ -12,4 +12,6 @@
 /User.class
 *.class
 bin/*
+/.idea
+HotelBooking.iml
 /bin/
