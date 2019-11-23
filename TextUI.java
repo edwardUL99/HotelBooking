@@ -4,14 +4,21 @@ import java.util.ArrayList;
 import java.util.Scanner;
 import java.util.TreeMap;
 
+/**
+ * A class for the textual user interface for the user to use the system
+ */
 public class TextUI {
 	private Scanner in;
 	private BookingSystem system;
 	private User user;
 	private String hotelName;
 
+	/**
+	 * Initialises the Text UI by creating a new instance of scanner and starting the Booking System
+	 */
 	public TextUI() {
 		in = new Scanner(System.in);
+		this.system = new BookingSystem();
 	}
 	
 	/**
@@ -58,6 +65,10 @@ public class TextUI {
 		}
 	}
 	
+	/**
+	 * Allows a supervisor to choose the start and end dates for the data analysis functions
+	 * @return an array of the 2 LocalDate objects
+	 */
 	private LocalDate[] getDatesForDataAnalysis() {
 		LocalDate[] dates = new LocalDate[2];
 		System.out.println("Please enter the start date: ");
@@ -76,16 +87,21 @@ public class TextUI {
 		return dates;
 	}
 	
+	/**
+	 * Provides the interface to the user to choose the rooms for a reservation being created
+	 * @param numberOfRooms the number of rooms the user wants to reserve
+	 * @param from the date from when the reservation starts
+	 * @param to the date at which the reservation ends
+	 * @return an ArrayList of room bookings for the rooms selected
+	 */
 	private ArrayList<RoomBooking> chooseRooms(int numberOfRooms, LocalDate from, LocalDate to) {
-		//Maybe instead of checking if the rooms are available after choosing them in the BookingSystem class, have the BookingSystem getRooms only return rooms that are available for the numberOfRooms specified
 		TreeMap<Room, Integer> map = this.system.getCurrentRooms(this.hotelName, from, to);
-		//For getCurrentRooms() method maybe supply two date parameters, indicating a time period to populate the rooms available map with the amount of rooms free at that period
 		ArrayList<Room> allRooms = new ArrayList<Room>(map.keySet());
 		ArrayList<RoomBooking> rooms = new ArrayList<RoomBooking>(numberOfRooms);
-		System.out.println("Room type(Rooms Available)(Maximum Adult occupancy)(Maximum Child occupancy)"); //Have a way to check number of rooms available for the date chosen in reservation
+		System.out.println("Room type(Rooms Available)(Maximum Adult occupancy)(Maximum Child occupancy)"); 
 		while (rooms.size() != numberOfRooms) {
 			char ch = 'A';
-			ArrayList<Character> notAvailable = new ArrayList<Character>(5);
+			ArrayList<Character> notAvailable = new ArrayList<Character>(5); //Keeps track of rooms that are not available i.e. their rooms available count is 0 
 			for (int i = 0; i < allRooms.size(); i++) {
 				Room r = allRooms.get(i);
 				if (map.get(r) > 0) {
@@ -97,33 +113,37 @@ public class TextUI {
 				ch++;
 			} //This is not how it will be implemented, just until the other methods are developed
 			String input = in.nextLine();
-			if (notAvailable.contains(input.toUpperCase().charAt(0))) {
+			if (notAvailable.contains(input.toUpperCase().charAt(0))) { //If notAvailable contains the choice, the user tried to choose a room that has been booked out
 				System.out.println("You cannot choose this room, as it is booked out. Please choose another.");
 			} else {
 				int n = input.toUpperCase().charAt(0) - 'A';
 				System.out.println("Please enter how many adults and children are staying per room (number of Adults,number of Children): ");
 				String[] occupancy = in.nextLine().split(",");
-				int adults = Integer.parseInt(occupancy[0]);
-				int children = Integer.parseInt(occupancy[1]);
-				if (n >= 0 && n < allRooms.size()) {
-					Room choice = allRooms.get(n);
-					if ((adults >= choice.occupancy(true, true) && adults <= choice.occupancy(true, false)) && (children >= choice.occupancy(false, true) && children <= choice.occupancy(false,  false))) {
-						boolean run = true;
-						while (run) {
-							System.out.println("Would you like breakfast included with the room? (Yes/No)");
-							String option = in.nextLine();
-							option = option.substring(0, 1).toUpperCase() + option.substring(1).toLowerCase();
-							RoomBooking booking = new RoomBooking(choice, adults, children);
-							if (option.equals("Yes")) {
-								booking.setBreakfastIncluded(true);
-								rooms.add(booking);
-								run = false;
-							} else if (option.equals("No")) {
-								booking.setBreakfastIncluded(false);
-								rooms.add(booking);
-								run = false;
-							} else {
-								System.out.println("Please choose yes/no");
+				if (occupancy.length < 2) {
+					System.out.println("Please enter occupancy as: number of adults,number of children (with the comma)");
+				} else {
+					int adults = Integer.parseInt(occupancy[0]);
+					int children = Integer.parseInt(occupancy[1]);
+					if (n >= 0 && n < allRooms.size()) {
+						Room choice = allRooms.get(n);
+						if ((adults >= choice.occupancy(true, true) && adults <= choice.occupancy(true, false)) && (children >= choice.occupancy(false, true) && children <= choice.occupancy(false,  false))) {
+							boolean run = true;
+							while (run) {
+								System.out.println("Would you like breakfast included with the room? (Yes/No)");
+								String option = in.nextLine();
+								option = option.substring(0, 1).toUpperCase() + option.substring(1).toLowerCase();
+								RoomBooking booking = new RoomBooking(choice, adults, children);
+								if (option.equals("Yes")) {
+									booking.setBreakfastIncluded(true);
+									rooms.add(booking);
+									run = false;
+								} else if (option.equals("No")) {
+									booking.setBreakfastIncluded(false);
+									rooms.add(booking);
+									run = false;
+								} else {
+									System.out.println("Please choose yes/no");
+								}
 							}
 						}
 					} else {
@@ -135,7 +155,9 @@ public class TextUI {
 		return rooms;
 	}
 	
-	
+	/**
+	 * Provides the user with the interface to create a reservation and all users can use this interface.
+	 */
 	private void makeReservation() {
 		System.out.println("Do you want to make a S)tandard booking or A)dvanced Purchase?");
 		char choice = in.nextLine().toUpperCase().charAt(0);
@@ -145,17 +167,9 @@ public class TextUI {
 		} else {
 			type = "AP";
 		}
-		boolean run = true;
 		LocalDate checkin = null;
-		while (run) {
-			System.out.println("Please enter your check-in date(dd/mm/yyyy): ");
-			checkin = getDate(true);
-			if (!this.system.onlyBookingOnCheckInDate(this.hotelName, this.user.name, checkin)) {
-				System.out.println("You already have a reservation on this date, please try again");
-			} else {
-				run = false;
-			}
-		}
+		System.out.println("Please enter your check-in date(dd/mm/yyyy): ");
+		checkin = getDate(true);
 		System.out.println("Please enter the number of nights you wish to stay: ");
 		int numNights = Integer.parseInt(in.nextLine()); //Prevents line not found errors as nextInt() does not skip to nextLine
 		System.out.println("Please enter the number of people staying: ");
@@ -166,6 +180,9 @@ public class TextUI {
 		this.user.createReservation(this.hotelName, this.user.name, type, checkin, numNights, numPeople, numRooms, rooms);
 	}
 
+	/**
+	 * Allows any user to cancel a reservation provided that the reservation exists in the first place
+	 */
 	private void cancelReservation() {
 		Reservation reservation = this.getReservation();
 		if (reservation == null) {
@@ -175,12 +192,21 @@ public class TextUI {
 		}
 	}
 	
+	/**
+	 * Retrieves reservations from the booking system when given the check-in date, booking number and customer id
+	 * @return
+	 */
 	private Reservation getReservation() {
 		System.out.println("Please enter the checkIn date(dd/mm/yyyy): ");
 		LocalDate checkIn = getDate(true);
-        return this.system.getReservation(this.hotelName, this.user.name, checkIn);
+		System.out.println("Please enter the booking number: ");
+		int number = Integer.parseInt(in.nextLine()); //using in.nextInt() cause no next line errors
+        return this.system.getReservation(this.hotelName, this.user.name, checkIn, number);
 	}
 	
+	/**
+	 * Provides the user with an interface to view booking details, for example the rooms booked etc
+	 */
 	private void viewReservation() {
 		Reservation reservation = this.getReservation();
 		if (reservation == null) {
@@ -189,55 +215,66 @@ public class TextUI {
 			System.out.println(reservation.format());
 		}
 	}
-
-	public void checkInUser() {
-		boolean run = true;
-		while (run) {
-			//call getTotalCostCalculated() for a reservation either here or at checkout
-			System.out.println("Please enter the customer name: ");
-			String name = in.nextLine();
-			System.out.println("Please enter the check-in date(dd/mm/yyyy): ");
-			LocalDate checkin = getDate(true);
-			if (this.user instanceof DeskClerk) {
-				DeskClerk clerk = (DeskClerk)this.user;
-				clerk.checkIn(name, checkin); //may replace with LocalDate.now() as checkin and check is it the right date for the ckeckin to occur, i.e if the reservation for this checkin date is null, it doesnt exist or is the wrong day to check in
+	
+	/**
+	 * Provides the interface to the user to check in a customer
+	 */
+	private void checkInUser() {
+		//call getTotalCostCalculated() for a reservation either here or at checkout
+		System.out.println("Please enter the customer name: ");
+		String name = in.nextLine();
+		System.out.println("Please enter the check-in date(dd/mm/yyyy): ");
+		LocalDate checkin = getDate(true);
+		System.out.println("Please enter the booking number: ");
+		int number = Integer.parseInt(in.nextLine());
+		if (this.user instanceof DeskClerk) {
+			DeskClerk clerk = (DeskClerk)this.user;
+			if (clerk.checkIn(name, checkin, number)) {
+				System.out.println("Booking #" + number + " checked in successfully");
+			} else {
+				System.out.println("Booking #" + number + " was not checked in successfully");
 			}
-			run = false;
 		}
 	}
 	
-	public void checkOutUser() {
-		boolean run = true;
-		while (run) {
-			System.out.println("Please enter the customer name: ");
-			String name = in.nextLine();
-			System.out.println("Please enter the check-in date(dd/mm/yyyy): ");
-			LocalDate checkin = getDate(true);
-			System.out.println("Please enter the check-out date(dd/mm/yyyy): "); //may replace with LocalDate.now() as if this was a checkout it would be current time. Same with checkin and check is it the right date for the checkin to occur
-			LocalDate checkout = getDate(true);
-			if (this.user instanceof DeskClerk) {
-				DeskClerk clerk = (DeskClerk)this.user;
-				clerk.checkOut(name, checkin, checkout); //check if it was successful, if not print out an error message
+	/**
+	 * Provides the interface for checking out a user
+	 */
+	private void checkOutUser() {
+		System.out.println("Please enter the customer name: ");
+		String name = in.nextLine();
+		System.out.println("Please enter the check-in date(dd/mm/yyyy): ");			
+		LocalDate checkin = getDate(true);
+		System.out.println("Please enter the check-out date(dd/mm/yyyy): "); //may replace with LocalDate.now() as if this was a checkout it would be current time. Same with checkin and check is it the right date for the checkin to occur
+		LocalDate checkout = getDate(true);
+		System.out.println("Please enter the booking number: ");
+		int number = Integer.parseInt(in.nextLine());
+		if (this.user instanceof DeskClerk) {
+			DeskClerk clerk = (DeskClerk)this.user;
+			if (clerk.checkOut(name, checkin, checkout, number)) {
+				System.out.println("Booking #" + number + " checked out");
+			} else {
+				System.out.println("Booking #" + number + " could not be checked out");
 			}
-			run = false;
 		}
 	}
 	
+	/** 
+	 * Provides the user with the option to use the check in or checkout services
+	 */
 	private void checkinServices() {
-		boolean run = true;
-		while (run) {
-			System.out.println("Would you like to A)Check In or B)Check Out?");
-			char choice = in.nextLine().toUpperCase().charAt(0);
-			if (choice == 'A') {
-				checkInUser();
-				run = false;
-			} else if (choice == 'B') {
-				checkOutUser();
-				run = false;
-			}
+		System.out.println("Would you like to A)Check In or B)Check Out?");
+		char choice = in.nextLine().toUpperCase().charAt(0);
+		if (choice == 'A') {
+			checkInUser();
+		} else if (choice == 'B') {
+			checkOutUser();
 		}
 	}
 	
+	/**
+	 * Provides the interface for a supervisor to apply a discount to a reservation
+	 */
 	private void applyDiscountToReservation() {
 		System.out.println("Please enter the customer name: ");
 		this.user.name = in.nextLine();
@@ -254,6 +291,9 @@ public class TextUI {
 		}
 	}
 	
+	/**
+	 * Provides the interface for the supervisor to access the data analytics
+	 */
 	private void dataAnalyticsServices() {
 		Supervisor temp = (Supervisor)this.user;
 		//choose data analytic method
@@ -297,6 +337,9 @@ public class TextUI {
 		}
 	}
 	
+	/**
+	 * Provides the interface visible to the customer
+	 */
 	private void runAsCustomer() {
 		boolean loggedIn = true;
 		System.out.println("Please enter your name: ");
@@ -317,6 +360,9 @@ public class TextUI {
 		}
 	}
 	
+	/**
+	 * Provides the interface visible to the desk clerk
+	 */
 	private void runAsDeskClerk() {
 		boolean loggedIn = true;
 		this.user = new DeskClerk(hotelName, system);
@@ -348,6 +394,9 @@ public class TextUI {
 		}
 	}
 	
+	/**
+	 * Provides the interface visible to the supervisor
+	 */
 	private void runAsSupervisor() {
 		boolean loggedIn = true;
 		this.user = new Supervisor(this.hotelName, system);
@@ -398,10 +447,12 @@ public class TextUI {
 		}
 	}
 	
+	/**
+	 * The only publicly accessible method after created the object, i.e. the only starting point to the program
+	 */
 	public void run() {
 		boolean run = true;
 		String choice;
-		this.system = new BookingSystem();
 		java.util.Set<String> hotels = system.getRoomsFromFile().keySet();
 		String[] hotelNames = new String[hotels.size()];
 		int i = 0;
@@ -433,6 +484,11 @@ public class TextUI {
 		} 
 	}
 	
+	/**
+	 * Allows the user choose a single object from the objs array and returns that object
+	 * @param objs an array of objects to choose from
+	 * @return the chosen object
+	 */
 	private Object getChoice(Object[] objs) {
 		while (true) {
 			char ch = 'A';
@@ -449,6 +505,12 @@ public class TextUI {
 		}
 	}
 	
+	/**
+	 * Allow a user to choose days in the range between start and end(including) and returns them in a list
+	 * @param start the start date of the period
+	 * @param end the end date of the period
+	 * @return an array list of chosen dates
+	 */
 	private ArrayList<LocalDate> getDaysChoice(LocalDate start, LocalDate end) {
 		ArrayList<LocalDate> allDays = new ArrayList<LocalDate>();
 		for (LocalDate date = start; !date.equals(end); date = date.plusDays(1)) {
