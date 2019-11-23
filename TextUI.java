@@ -235,8 +235,8 @@ public class TextUI {
 	private void dataAnalyticsServices() {
 		//choose data analytic method
 		System.out.println("would you like to \n1)get all room purchases between dates. "
-				+ "\n2)get average earnings across all rooms over chosen period "
-				+ "\n3)get Total earnings over chosen period");
+				+ "\n2)get average earnings for each room over chosen period "
+				+ "\n3)get Total earnings for each room over chosen period");
 		
 		char command = in.nextLine().toUpperCase().charAt(0);
 		if (command == '1') {
@@ -247,7 +247,10 @@ public class TextUI {
 			Supervisor temp = (Supervisor)this.user;
 			System.out.println(temp.getAverageIncomePerRoom(start, end));
 		} else if (command == '3') {
-	
+			LocalDate start = LocalDate.of(2020, 8, 20); //hard coded for testing purposes
+			LocalDate end = LocalDate.of(2020, 8, 27);
+			Supervisor temp = (Supervisor)this.user;
+			System.out.println(temp.getTotalIncomePerRoom(start, end));
 		}
 	}
 	

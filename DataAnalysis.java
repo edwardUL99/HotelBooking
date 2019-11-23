@@ -44,12 +44,12 @@ public class DataAnalysis  {
 		public void writeFinacialInfoToFile(LocalDate start, LocalDate end,TreeMap<String, ArrayList<Reservation>> reservations, String hotelName) {
 			TreeMap<LocalDate,ArrayList<Double>> financialInfo = getFinancialInfo(start, end);
 			
+			String[] attributes = {"Date","Deposit","Reservation Cost","Total Cost"};
 			
 			int rows = financialInfo.size();
-			int columns = 5;
+			int columns = attributes.length;
 			
 			Object[][] data = new String[rows][columns];
-			String[] attributes = {"Date","Deposit","Reservation Cost","Total Cost"};
 			
 			data[0][1] = attributes[0]; 
 			data[0][2] = attributes[1];
@@ -77,11 +77,12 @@ public class DataAnalysis  {
 	public void writeOccupancyInfoToFile(LocalDate start, LocalDate end) {
 		TreeMap<String,Integer> occupancyInfo = getOccupancyInfo(start, end);
 
+		String[] attributes = {"RoomType, numberOfOccupants"};
+		
 		int rows = occupancyInfo.size();
-		int columns = 3;
+		int columns = attributes.length;
 		
 		Object[][] data = new String[rows][columns];
-		String[] attributes = {"RoomType, numberOfOccupants"};
 		
 		data[0][0] = attributes[0]; 
 		data[0][1] = attributes[1];
