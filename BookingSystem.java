@@ -185,8 +185,6 @@ public class BookingSystem implements CsvTools {
 	 * @param hotelName the name of the hotel in question
 	 * @param from the date at the start of the time period
 	 * @param to the date at the end of the time period
-	 * @param adultOcc the number of adults staying per room
-	 * @param childOcc the number of children staying per room
 	 * @return a TreeMap with a rooms and their corresponding number of rooms available in the hotel during this period
 	 */
 	public TreeMap<Room, Integer> getCurrentRooms(String hotelName, LocalDate from, LocalDate to) {
@@ -260,7 +258,6 @@ public class BookingSystem implements CsvTools {
 	
 	/**
 	 * Returns a Tree Map with the room type and the number of rooms in the reservation for each room
-	 * @param hotelName the name of the hotel
 	 * @param reservation the reservation
 	 * @return a treemap with the room types mapped to the number of rooms booked for each type in reservation
 	 */
@@ -318,7 +315,6 @@ public class BookingSystem implements CsvTools {
 	/**
 	 * Checks if there is no other reservation for the same checkin date for the same person on the system
 	 * @param hotelName the name of the hotel
-	 * @param reservation the reservation to be checked
 	 * @return if this is the only reservation for this person for this checkin date
 	 */
 	public boolean onlyBookingOnCheckInDate(String hotelName, String name, LocalDate checkin) {
@@ -458,7 +454,7 @@ public class BookingSystem implements CsvTools {
 	
 	/**
 	 * Searches through all reservations and for the reservation with the most rooms booked, returns the room count
-	 * @param reservationOrCancelled returns highest number of rooms booked in one reservation from reservations if true, cancellations if false
+	 * @param reservationOrCancellation returns highest number of rooms booked in one reservation from reservations if true, cancellations if false
 	 * @return the room count of the reservation with the most rooms booked
 	 */
 	private int largestRoomCountBooked(boolean reservationOrCancellation) {
@@ -508,7 +504,7 @@ public class BookingSystem implements CsvTools {
 	
 	/**
 	 * Writes reservations or cancellations to a file
-	 * @param reservationsOrCancellations if true, reservations will be written to the file, if false, cancellations
+	 * @param reservationOrCancellation if true, reservations will be written to the file, if false, cancellations
 	 * @param hotelStay true if writing a hotel stay to file, false if not. Note reservationOrCancellation must be true also
 	 */
 	public void writeReservationsToFile(boolean reservationOrCancellation, boolean hotelStay) {
@@ -570,7 +566,7 @@ public class BookingSystem implements CsvTools {
 						if (hotelStay) {
 							HotelStay stay = getHotelStay(e.getKey(), reservation);
 							if (stay != null) {
-								data[row][lastIndex++] = Boolean.valueOf(stay.isCheckedIn());
+								data[row][lastIndex++] = stay.isCheckedIn();
 								data[row][lastIndex++] = stay.getStayStart().toString();
 								data[row][lastIndex] = stay.getStayEnd().toString();
 							}
@@ -641,11 +637,11 @@ public class BookingSystem implements CsvTools {
 		return count;
 	}
 
-	@Override
 	/**
 	 * Reads in data from the specified filePath and reads it into an Object matrix
 	 * @param filePath the path to the file
 	 */
+	@Override
 	public String[][] readDataFromFile(String filePath) {
 		if (new File(filePath).exists()) {
 			String[][] data = new String[getRows(filePath)][getCols(filePath)];

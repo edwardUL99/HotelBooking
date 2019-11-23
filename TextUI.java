@@ -243,7 +243,7 @@ public class TextUI {
 	
 		} else if (command == '2') {
 			LocalDate start = LocalDate.of(2020, 8, 20); //hard coded for testing purposes
-			LocalDate end = LocalDate.of(2020, 8, 27);
+			LocalDate end = LocalDate.of(2020, 8, 20);
 			Supervisor temp = (Supervisor)this.user;
 			System.out.println(temp.getAverageIncomePerRoom(start, end));
 		} else if (command == '3') {

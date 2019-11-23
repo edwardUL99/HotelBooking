@@ -41,7 +41,7 @@ public class DataAnalysis  {
 			}
 		}
 		
-		public void writeFinacialInfoToFile(LocalDate start, LocalDate end,TreeMap<String, ArrayList<Reservation>> reservations, String hotelName) {
+		public void writeFinancialInfoToFile(LocalDate start, LocalDate end,TreeMap<String, ArrayList<Reservation>> reservations, String hotelName) {
 			TreeMap<LocalDate,ArrayList<Double>> financialInfo = getFinancialInfo(start, end);
 			
 			
