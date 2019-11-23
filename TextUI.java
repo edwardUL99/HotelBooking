@@ -401,7 +401,7 @@ public class TextUI {
 	 * Provides the interface visible to the desk clerk
 	 */
 	private void runAsDeskClerk() {
-		String Password = "admin";
+		String Password = "deskAdmin";
 		System.out.println("Enter Password: ");
         boolean run = true;
         while (run) {
@@ -450,7 +450,22 @@ public class TextUI {
 	 * Provides the interface visible to the supervisor
 	 */
 	private void runAsSupervisor() {
-		boolean loggedIn = true;
+		boolean loggedIn = false;
+		String password = "admin";
+		boolean run = true;
+		while (run) {
+			System.out.println("Please enter your password: ");
+			String input = in.nextLine();
+			if (password.equals(password)) {
+				System.out.println("You have been logged in!");
+				loggedIn = true;
+				run = false;
+			} else if (input.equals("C")) {
+				run = false;
+			} else {
+				System.out.println("Password incorrect. Please try again or cancel(C)");
+			}
+		}
 		this.user = new Supervisor(this.hotelName, system);
 		while (loggedIn) {
 			System.out.println("\nHotel: " + this.hotelName);
