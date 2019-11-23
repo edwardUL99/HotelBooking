@@ -245,11 +245,12 @@ public class BookingSystem implements CsvTools {
 	 * @param hotelName the name of the hotel
 	 * @param name the name of the customer who owns the reservation
 	 * @param checkIn the check in date
+	 * @param number the booking number
 	 * @return a reservation if the map of reservations contains the reservation, null if not
 	 */
-	public Reservation getReservation(String hotelName, String name, LocalDate checkIn) {
+	public Reservation getReservation(String hotelName, String name, LocalDate checkIn, int number) {
 		for (Reservation r : this.reservations.get(hotelName)) {
-			if (r.getName().equals(name) && r.getCheckinDate().equals(checkIn)) {
+			if (r.getName().equals(name) && r.getCheckinDate().equals(checkIn) && r.getNumber() == number) {
 				return r;
 			}
 		}
@@ -746,34 +747,43 @@ public class BookingSystem implements CsvTools {
 						}	
 					}
 				}
-				r = new Reservation(number, name, type, checkin, numOfNights, numOfPeople, numOfRooms, rooms);
+				if (!hotelStay) { 
+					r = new Reservation(number, name, type, checkin, numOfNights, numOfPeople, numOfRooms, rooms);
+				} else if (reservationOrCancellation) {
+					r = this.getReservation(hotelName, name, checkin, number);	
+				} else {
+					r = new Reservation(number, name, type, checkin, numOfNights, numOfPeople, numOfRooms, rooms);
+					Reservation.setLastBookingNumber(Reservation.getLastBookingNumber() - 1);
+				}
 				while (dataRow[lastCol].equals("")) {
 					lastCol++;
 				}
-				r.setTotalCost(Double.parseDouble(dataRow[lastCol++].substring(1)));
-				r.setDeposit(Double.parseDouble(dataRow[lastCol].substring(1)));
-				TreeMap<String, ArrayList<Reservation>> reservations = reservationOrCancellation ? this.reservations:this.cancellations;
-				if (!reservations.containsKey(hotelName)) {
-					reservations.put(hotelName, new ArrayList<Reservation>());
-				}
-				if (!reservations.get(hotelName).contains(r)) {
-					reservations.get(hotelName).add(r);
-				}
-				if (reservationOrCancellation && hotelStay) {
-					lastCol++;
-					boolean checkedIn = Boolean.parseBoolean(dataRow[lastCol++]);
-					String[] start = dataRow[lastCol++].split("-");
-					LocalDate startDate = LocalDate.of(Integer.parseInt(start[0]), Integer.parseInt(start[1]), Integer.parseInt(start[2]));
-					String[] end = dataRow[lastCol].split("-");
-					LocalDate endDate = LocalDate.of(Integer.parseInt(end[0]), Integer.parseInt(end[1]), Integer.parseInt(end[2]));
-					HotelStay stay = new HotelStay(r);
-					stay.setCheckedIn(checkedIn);
-					stay.setStayStart(startDate);
-					stay.setStayEnd(endDate);
-					if (!stays.containsKey(hotelName)) {
-						stays.put(hotelName, new ArrayList<HotelStay>());
+				if (r != null) {
+					r.setTotalCost(Double.parseDouble(dataRow[lastCol++].substring(1)));
+					r.setDeposit(Double.parseDouble(dataRow[lastCol].substring(1)));
+					TreeMap<String, ArrayList<Reservation>> reservations = reservationOrCancellation ? this.reservations:this.cancellations;
+					if (!reservations.containsKey(hotelName)) {
+						reservations.put(hotelName, new ArrayList<Reservation>());
 					}
-					stays.get(hotelName).add(stay);
+					if (!reservations.get(hotelName).contains(r)) {
+						reservations.get(hotelName).add(r);
+					}
+					if (reservationOrCancellation && hotelStay) {
+						lastCol++;
+						boolean checkedIn = Boolean.parseBoolean(dataRow[lastCol++]);
+						String[] start = dataRow[lastCol++].split("-");
+						LocalDate startDate = LocalDate.of(Integer.parseInt(start[0]), Integer.parseInt(start[1]), Integer.parseInt(start[2]));
+						String[] end = dataRow[lastCol].split("-");
+						LocalDate endDate = LocalDate.of(Integer.parseInt(end[0]), Integer.parseInt(end[1]), Integer.parseInt(end[2]));
+						HotelStay stay = new HotelStay(r);
+						stay.setCheckedIn(checkedIn);
+						stay.setStayStart(startDate);
+						stay.setStayEnd(endDate);
+						if (!stays.containsKey(hotelName)) {
+							stays.put(hotelName, new ArrayList<HotelStay>());
+						}
+						stays.get(hotelName).add(stay);
+					}
 				}
 			}
 		}

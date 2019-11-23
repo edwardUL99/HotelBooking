@@ -72,6 +72,22 @@ public class Reservation {
 	}
 	
 	/**
+	 * Sets the last booking number used to update the new booking number
+	 * @param lastBookingNumber 
+	 */
+	public static void setLastBookingNumber(int lastBookingNumber) {
+		Reservation.lastBookingNumber = lastBookingNumber;
+	}
+	
+	/**
+	 * Gets the last booking number 
+	 * @return last booking number
+	 */
+	public static int getLastBookingNumber() {
+		return lastBookingNumber;
+	}
+	
+	/**
 	 * Sets the new reservation number, particularly useful for when reading in a new reservation from data in a file
 	 * @param number the reservation number
 	 */
@@ -271,4 +287,5 @@ public class Reservation {
 	public String toString() {
 		return String.format("Reservation name: %s, Type: %s, Number: %d, Checkin Date: %s, Number of nights: %d, Number of rooms: %d", this.name, this.type, this.number, this.checkinDate.toString(), this.numberOfNights, this.numberOfRooms);
 	}
+	
 }
