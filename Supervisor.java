@@ -96,7 +96,7 @@ public class Supervisor extends DeskClerk {
 	 * @param end the end date of the period
 	 * @return the TreeMap with the room mapped to its average occupants
 	 */
-	public TreeMap<Room, Integer> getAverageOccupantsPerRoom(LocalDate start, LocalDate end) {
+	public TreeMap<Room, Double> getAverageOccupantsPerRoom(LocalDate start, LocalDate end) {
 		return analyzer.getAverageOccupantsPerRoom(start, end);
 	}
 	
@@ -128,6 +128,6 @@ public class Supervisor extends DeskClerk {
 	 * @return the filename at which the analysis was stored
 	 */
 	public String requestRoomOccupantsInformation(LocalDate start, LocalDate end, java.util.ArrayList<LocalDate> days) {
-		return analyzer.requestIncomeInformation(start, end, days);
+		return analyzer.requestOccupantInformation(start, end, days);
 	}
 }
