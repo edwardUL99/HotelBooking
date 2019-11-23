@@ -203,7 +203,7 @@ public class DataAnalysis  {
 		TreeMap<LocalDate, ArrayList<Double>> dateBalance = new TreeMap<LocalDate, ArrayList<Double>>();
 		for (HotelStay stay : stays) {
 			Reservation r = stay.getReservation();
-			if(r.getCheckinDate().compareTo(start) >= 0 && r.getCheckinDate().compareTo(end) <= 0) {
+			if(isReservationInDateRange(r, start, end)) {
 				LocalDate checkin = r.getCheckinDate();
 				if (!dateBalance.containsKey(checkin)) {
 					dateBalance.put(r.getCheckinDate(), new ArrayList<Double>());
@@ -528,7 +528,7 @@ public class DataAnalysis  {
 		
 		for (HotelStay stay : stays) {
 			Reservation r = stay.getReservation();
-			if(r.getCheckinDate().compareTo(start) >= 0 && r.getCheckinDate().compareTo(end) <= 0) {
+			if(isReservationInDateRange(r, start,end)) {
 				for (RoomBooking rm: r.getRooms()) {
 					if (!roomOccupants.containsKey(rm.getRoom())) {
 						roomOccupants.put(rm.getRoom(), (rm.getOccupancy()[0] + rm.getOccupancy()[1]));
