@@ -396,6 +396,26 @@ public class BookingSystem implements CsvTools {
 	}
 	
 	/**
+	 * After each check in, this method scans for if any reservation was a no show and cancels it with np refund
+	 * @param hotelName the name of the hotel to check for no shows in
+	 */
+	private void scanForNoShows(String hotelName) {
+		ArrayList<Reservation> reservations = this.reservations.get(hotelName);
+		if (reservations != null) {
+			LocalDate current = LocalDate.now();
+			for (Reservation r : reservations) {
+				if ((r.getCheckinDate().isBefore(current) || r.getCheckinDate().equals(current)) && !this.isStayed(hotelName, r)) {
+					r.getTotalCostCalculated();
+					this.cancellations.get(hotelName).add(r); //if its a no show cancel it with no refund
+					this.reservations.get(hotelName).remove(r);
+					this.updateFiles("Reservations");
+					this.updateFiles("Cancellations");
+				}
+			}
+		}
+	}
+	
+	/**
 	 * Adds a hotel stay to the system
 	 * @param hotelName the name of the hotel
 	 * @param stay the hotel stay to add
@@ -403,6 +423,7 @@ public class BookingSystem implements CsvTools {
 	 */
 	public boolean addHotelStay(String hotelName, HotelStay stay) {
 		if (this.containsHotel(hotelName)) {
+			this.scanForNoShows(hotelName);
 			if (!this.stays.containsKey(hotelName)) {
 				this.stays.put(hotelName, new ArrayList<HotelStay>());
 			}

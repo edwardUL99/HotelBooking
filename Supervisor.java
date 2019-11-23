@@ -46,6 +46,10 @@ public class Supervisor extends DeskClerk {
 		return analyzer.requestIncomeInformation(start, end);
 	}
 	
+	public String requestRoomIncomeInformation(LocalDate start, LocalDate end, java.util.ArrayList<LocalDate> days) {
+		return analyzer.requestIncomeInformation(start, end, days);
+	}
+	
 	//gets data analysis of what rooms are occupied between two dates
 	public void getOccupancyInfo(LocalDate start, LocalDate end) {
 		

@@ -254,6 +254,10 @@ public class TextUI {
 		} else if (command == '4') {
 			LocalDate start = LocalDate.of(2020, 8, 20);
 			LocalDate end = LocalDate.of(2020, 8, 27); //hard coded for testing purposes
+			/*ArrayList<LocalDate> days = new ArrayList<LocalDate>();
+			for (LocalDate date = start; !date.equals(start.plusDays(4)); date = date.plusDays(1)) {
+				days.add(date);
+			}*/
 			String fileName = temp.requestRoomIncomeInformation(start, end);
 			System.out.println("Information saved to: " + fileName);
 		}

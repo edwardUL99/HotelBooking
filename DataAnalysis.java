@@ -27,38 +27,86 @@ public class DataAnalysis  {
 		 * Writes billing info to a file each per date period specified
 		 * @param start the start date of the period
 		 * @param end the end date of the period
+		 * @param dailyTotals the total income for each room at each day of the range between start and end
 		 * @param averages the TreeMap of average income per room
 		 * @param totals the TreeMap of total income per room
+		 * @param days the dates to include
 		 * @param returns the filename
 		 */
-		private String writeBillingInfoToFile(LocalDate start, LocalDate end, TreeMap<Room, Double> averages, TreeMap<Room, Double> totals) {
+		private String writeBillingInfoToFile(LocalDate start, LocalDate end, TreeMap<Room, ArrayList<Double>> dailyTotals, TreeMap<Room, Double> averages, TreeMap<Room, Double> totals, ArrayList<LocalDate> days) {
 			String fileName = String.format("/data/dataAnalysis/%s_billing_%s_to_%s.csv", this.hotelName, start.toString(), end.toString());
 			String filePath = System.getProperty("user.dir") + fileName;
-			String[] attributes = {"Hotel Name", "Rooms", "Average Income Per Room", "Total Income Per Room"};
-			Object[][] data = new Object[averages.size() + 2][attributes.length];
-			for (int i = 0; i < attributes.length; i++) {
-				data[0][i] = attributes[i];
-			}
+			String[] attributes = {"Hotel Name", "Rooms", "Number of Rooms Booked in Period", "Average Income Per Room", "Total Income Per Room"};
+			int numDays = days.size();
+			Object[][] data = new Object[averages.size() + 2][attributes.length + numDays];
+			int aIndex = 0; 
+			TreeMap<Room, Double> recordedTotals = new TreeMap<Room, Double>();
+			LocalDate date = start;
+			for (int i = 0; i < attributes.length + numDays; i++) {
+				if (i <= 1 || i > numDays + 1) {
+					data[0][i] = attributes[aIndex++];
+				} else {
+					data[0][i] = date.toString();
+					date = date.plusDays(1);
+				}
+			}			
 			int row = 1;
-			data[1][0] = this.hotelName;
-			for (Map.Entry<Room, Double> e : averages.entrySet()) {
-				data[row][0] = "";
-				data[row][1] = e.getKey();
-				data[row][2] = String.format("€%.02f", e.getValue());
+			row = 1;
+			int lastIndex = 1;
+			for (Map.Entry<Room, ArrayList<Double>> e : dailyTotals.entrySet()) {
+				lastIndex = 1;
+				data[row][lastIndex++] = e.getKey().getType();
+				for (int i = 0; i < numDays; i++) {
+					data[row][lastIndex++] = "€" + e.getValue().get(i);
+				}
 				row++;
 			}
 			row = 1;
-			for (Map.Entry<Room, Double> e : totals.entrySet()) {
+			for (Map.Entry<Room, Double> e : averages.entrySet()) {
 				data[row][0] = "";
-				data[row][3] = String.format("€%.02f", e.getValue());
+				data[row][lastIndex] = this.getNumberOfRooms(e.getKey(), start, end, days);
+				data[row][lastIndex+1] = String.format("€%.02f", e.getValue());
 				row++;
 			}
-			data[row][0] = "";
-			data[row][1] = "";
-			data[row][2] = "Total: €" + this.getTotalForAllRooms(start, end);
-			data[row][3] = "Total Average: €" + this.getAverageForAllRooms(start, end);
+			
+			row = 1;
+			lastIndex += 2;
+			for (Map.Entry<Room, Double> e : totals.entrySet()) {
+				data[row][lastIndex] = String.format("€%.02f", e.getValue());
+				if (!recordedTotals.containsKey(e.getKey())) {
+					recordedTotals.put(e.getKey(), e.getValue());
+				}
+				row++;
+			}
+			
+			lastIndex -= 1;
+			
+			for (int i = 0; i < lastIndex; i++) {
+				data[row][i] = "";
+			}
+			double total = this.sumUpTotalIncomes(recordedTotals);
+			data[row][lastIndex] = "Total: €" + String.format("%.02f", total);
+			data[row][lastIndex+1] = "Total Average: €" + String.format("%.02f", total/(double)recordedTotals.size());
+			data[1][0] = this.hotelName;
 			writeDataToFile(filePath, data);
 			return fileName;
+		}
+	
+		/**
+		 * Takes a TreeMap of total income mapped to to rooms and returns it as one summed up total
+		 * @param totals the TreeMap containing all the totals 
+		 * @return the totals summed up
+		 */
+		private double sumUpTotalIncomes(TreeMap<Room, Double> totals) {
+			double sum = 0;
+			for (Map.Entry<Room, Double> e : totals.entrySet()) {
+				sum += e.getValue();
+			}
+			return sum;
+		}
+		
+		private String writeBillingInfoToFile(LocalDate start, LocalDate end, TreeMap<Room, ArrayList<Double>> dailyTotals, TreeMap<Room, Double> averages, TreeMap<Room, Double> totals) {
+			return writeBillingInfoToFile(start, end, dailyTotals, averages, totals, getAllDaysInPeriod(start, end));
 		}
 		
 		/**
@@ -115,16 +163,16 @@ public class DataAnalysis  {
 				}
 			}
 
-		String fileName = "/data/dataAnalysis/FinanacialInfo.csv";
-		String path = System.getProperty("user.dir") + fileName;
-		writeDataToFile(path, data);
-	}
+			String fileName = "/data/dataAnalysis/FinanacialInfo.csv";
+			String path = System.getProperty("user.dir") + fileName;
+			writeDataToFile(path, data);
+		}
 	
 	/**
-	 * Writes occupancy info for the specified date period to a file
-	 * @param start the start date of the date period
-	 * @param end the end date of the date period
-	 */
+	* Writes occupancy info for the specified date period to a file
+	* @param start the start date of the date period
+	* @param end the end date of the date period
+	*/
 	public void writeOccupancyInfoToFile(LocalDate start, LocalDate end) {
 		TreeMap<Room,Integer> occupancyInfo = getOccupancyInfo(start, end);
 
@@ -145,9 +193,9 @@ public class DataAnalysis  {
 				data[row][2] = e.getValue();
 		}
 
-	String fileName = "/data/dataAnalysis/OccupancyInfo.csv";
-	String path = System.getProperty("user.dir") + fileName;
-	writeDataToFile(path, data);
+		String fileName = "/data/dataAnalysis/OccupancyInfo.csv";
+		String path = System.getProperty("user.dir") + fileName;
+		writeDataToFile(path, data);
 	}
 
 	public TreeMap<LocalDate,ArrayList<Double>> getFinancialInfo(LocalDate start, LocalDate end) {
@@ -226,9 +274,10 @@ public class DataAnalysis  {
 	 * Returns the total income over the date period for all rooms that have been booked for this date period
 	 * @param start the start date of the date period
 	 * @param end the end date for the date period
-	 * @return the toal income generated by all rooms in the date period
+	 * @param the list of days to calculate total for
+	 * @return the total income generated by all rooms in the date period
 	 */
-	private double getTotalForAllRooms(LocalDate start, LocalDate end) {
+	private double getTotalForAllRooms(LocalDate start, LocalDate end, ArrayList<LocalDate> days) {
 		double total = 0;
 		for (Map.Entry<Room, Double> e : this.getTotalIncomePerRoom(start, end).entrySet()) {
 			total += e.getValue();
@@ -240,11 +289,58 @@ public class DataAnalysis  {
 	 * Returns the average income earned by all rooms that have been booked for this date period
 	 * @param start the start date of the time period
 	 * @param end the end date of the time period
+	 * @param the days of the period to include
 	 * @return the average income generated by all rooms in the date period
 	 */
-	private double getAverageForAllRooms(LocalDate start, LocalDate end) {
-		TreeMap<Room, Double> totals = this.getTotalIncomePerRoom(start, end);
-		return getTotalForAllRooms(start, end) / (double)totals.size();
+	private double getAverageForAllRooms(LocalDate start, LocalDate end, ArrayList<LocalDate> days) {
+		TreeMap<Room, Double> totals = this.getTotalIncomePerRoom(start, end, days);
+		return getTotalForAllRooms(start, end, days) / (double)totals.size();
+	}
+	
+	/**
+	 * Returns a TreeMap of total income per room per day in the days lis in the range of start and end
+	 * @param start the start date of the period
+	 * @param end the end date of the period
+	 * @param days the days to calculate the total for
+	 * @return a TreeMap with a list of daily totals per room
+	 */
+	private TreeMap<Room, ArrayList<Double>> totalsPerRoomPerDay(LocalDate start, LocalDate end, ArrayList<LocalDate> days) {
+		TreeMap<Room, ArrayList<Double>> totals = new TreeMap<Room, ArrayList<Double>>();
+		for (LocalDate date = start; !date.equals(end); date = date.plusDays(1)) {
+			if (days.contains(date)) {
+				for (Map.Entry<Room, Double> e : getTotalIncomePerRoom(date, date, days).entrySet()) {
+					if (!totals.containsKey(e.getKey())) {
+						totals.put(e.getKey(), new ArrayList<Double>());
+					} 
+					totals.get(e.getKey()).add(e.getValue());
+				}
+			}
+		}
+		return totals;
+	}
+	
+	/**
+	 * Returns all the days between that period, including end
+	 * @param start the start date of the period
+	 * @param end the end date of the period
+	 * @return the ArrayList with all the dates in the period
+	 */
+	private ArrayList<LocalDate> getAllDaysInPeriod(LocalDate start, LocalDate end) {
+		ArrayList<LocalDate> days = new ArrayList<LocalDate>();
+		for (LocalDate date = start; !date.equals(end); date = date.plusDays(1)) {
+			days.add(date);
+		}
+		return days;
+	}
+	
+	/**
+	 * Returns the total for the rooms per day in the date period for all days
+	 * @param start the start date of the period
+	 * @param end the end date of the period
+	 * @return a TreeMap with room mapping to the list of totals of the days for the period
+	 */
+	private TreeMap<Room, ArrayList<Double>> totalsPerRoomPerDay(LocalDate start, LocalDate end) {
+		return this.totalsPerRoomPerDay(start, end, getAllDaysInPeriod(start, end));
 	}
 	
 	/**
@@ -252,63 +348,106 @@ public class DataAnalysis  {
 	 * i.e. if there are 5 rooms of the same type, it will have all 5 totals in the array list referenced by the room 
 	 * @param start the start date of the date period 
 	 * @param end the end date of the date period
+	 * @param days the days to specify for the total
 	 * @return a TreeMap of the room and an ArrayList of all totals for that room in the date period not totalled or averaged
 	 */
-	private TreeMap<Room, ArrayList<Double>> getAllTotalsPerRoom(LocalDate start, LocalDate end) {
+	private TreeMap<Room, ArrayList<Double>> getAllTotalsPerRoom(LocalDate start, LocalDate end, ArrayList<LocalDate> days) {
 		TreeMap<Room, ArrayList<Double>> allTotals = new TreeMap<Room, ArrayList<Double>>();
 		for (HotelStay stay : this.stays) {
 			Reservation r = stay.getReservation();
 			ArrayList<LocalDate> reservationDates = this.dateRangesForReservation(r);
-			if (this.isReservationInDateRange(r, start, end)) {
-				ArrayList<RoomBooking> roomBookings = r.getRooms();
-				for (RoomBooking rb : roomBookings) {
-					double totalRate = 0;
-					Room rm = rb.getRoom();
-					if (start.equals(end)) {
-						if (reservationDates.contains(start)) {
+			ArrayList<RoomBooking> roomBookings = r.getRooms();
+			for (RoomBooking rb : roomBookings) {
+				double totalRate = 0;
+				Room rm = rb.getRoom();
+				if (start.equals(end)) {
+					if (reservationDates.contains(start)) {
 							totalRate += rm.getRate(start.getDayOfWeek().getValue() - 1);
-						}
 					} else {
-						for (LocalDate date = start; !date.equals(end); date = date.plusDays(1)) {
-							if (reservationDates.contains(date)) {
-								totalRate += rm.getRate(date.getDayOfWeek().getValue() - 1);
-							}
-						}
+						totalRate += 0;
 					}
-					if (totalRate != 0) {
-						if (!allTotals.containsKey(rm)) {
-							allTotals.put(rm, new ArrayList<Double>());
-						} 
-						allTotals.get(rm).add(totalRate);
+				} else {
+					for (LocalDate date = start; !date.equals(end); date = date.plusDays(1)) {
+						if (reservationDates.contains(date) && days.contains(date)) {
+							totalRate += rm.getRate(date.getDayOfWeek().getValue() - 1);
+						} else {
+							totalRate += 0;
+						}
 					}
 				}
+				if (!allTotals.containsKey(rm)) {
+					allTotals.put(rm, new ArrayList<Double>());
+				} 
+				allTotals.get(rm).add(totalRate);
 			}	
 		}
 		return allTotals;
 	 }
 	
 	/**
-	 * Requests the average and total income per room for the date period to be written to a file
+	 * Requests the average and total income per room for all the days of the date period to be written to a file
 	 * @param start the start date of the date period
 	 * @param end the end date of the date period
 	 * @return the name of the file the information was stored to
 	 */
 	public String requestIncomeInformation(LocalDate start, LocalDate end) {
-		TreeMap<Room, Double> averages = getAverageIncomePerRoom(start, end);
-		TreeMap<Room, Double> totals = getTotalIncomePerRoom(start, end);
-		String fileName = this.writeBillingInfoToFile(start, end, averages, totals);
+		return requestIncomeInformation(start, end, getAllDaysInPeriod(start, end));
+	}
+	
+	/**
+	 * Requests the average and total income per room for the days specified in the date range
+	 * @param start the start date of the date period
+	 * @param end the end date of the date period
+	 * @param days the days of the date period to display total incomes for
+	 * @return
+	 */
+	public String requestIncomeInformation(LocalDate start, LocalDate end, ArrayList<LocalDate> days) {
+		TreeMap<Room, Double> averages = getAverageIncomePerRoom(start, end, days);
+		TreeMap<Room, Double> totals = getTotalIncomePerRoom(start, end, days);
+		TreeMap<Room, ArrayList<Double>> allTotals = this.totalsPerRoomPerDay(start, end, days);
+		String fileName = this.writeBillingInfoToFile(start, end, allTotals, averages, totals, days);
 		return fileName.split("/")[fileName.split("/").length - 1];
 	}
 	
 	/**
-	 * Returns for each room the average income that room generated during the date period 
+	 * Returns the number of rooms rm booked in the specified date period by checking how much totals belong to that room from the getAllTotalsPerRoom() method
+	 * @param rm the room to find the count of
+	 * @param start the start date of the date period
+	 * @param end the end date of the date period
+	 * @param days the days to restrict however much rooms
+	 * @return the count of the room booked during the date period
+	 */
+	private int getNumberOfRooms(Room rm, LocalDate start, LocalDate end, ArrayList<LocalDate> days) {
+		TreeMap<Room, ArrayList<Double>> totals = this.getAllTotalsPerRoom(start, end, days);
+		for (Map.Entry<Room, ArrayList<Double>> e : totals.entrySet()) {
+			if (e.getKey().equals(rm)) {
+				return e.getValue().size();
+			}
+		}
+		return 0;
+	}
+	
+	/**
+	 * Returns number of rooms rm booked for all days in the date period
+	 * @param rm the room to calculate the count for 
+	 * @param start the start of the date period
+	 * @param end the end of the date period
+	 * @return the count 
+	 */
+	private int getNumberOfRooms(Room rm, LocalDate start, LocalDate end) {
+		return getNumberOfRooms(rm, start, end, getAllDaysInPeriod(start, end));
+	}
+	
+	/**
+	 * Returns for each room the average income that room generated on the days specified during the date period 
 	 * @param start the start date of the time period
 	 * @param end the end date of the time period 
+	 * @param days the days to calculate the average for
 	 * @return a TreeMap with the average income generated mapped to that room during the date period
 	 */
-	public TreeMap<Room, Double> getAverageIncomePerRoom(LocalDate start, LocalDate end) {
+	public TreeMap<Room, Double> getAverageIncomePerRoom(LocalDate start, LocalDate end, ArrayList<LocalDate> days) {
 		TreeMap<Room, Double> averages = new TreeMap<Room, Double>();
-		for (Map.Entry<Room, ArrayList<Double>> e : this.getAllTotalsPerRoom(start, end).entrySet()) {
+		for (Map.Entry<Room, ArrayList<Double>> e : this.getAllTotalsPerRoom(start, end, days).entrySet()) {
 			double average = 0;
 			for (double d : e.getValue()) {
 				average += d;
@@ -320,14 +459,25 @@ public class DataAnalysis  {
 	}
 	
 	/**
+	 * Returns average for each room generated for all the days in the date period
+	 * @param start the start date of the date period
+	 * @param end the end date of the date period
+	 * @return a TreeMap of the average income of the room generated over the whole date period mapped to the room
+	 */
+	public TreeMap<Room, Double> getAverageIncomePerRoom(LocalDate start, LocalDate end) {
+		return getAverageIncomePerRoom(start, end, getAllDaysInPeriod(start, end));
+	}
+	
+	/**
 	 * Like the getAverageIncomePerRoom() method, but instead maps the total income generated to the room
 	 * @param start the start date of the time period
 	 * @param end the end date of the time period
+	 * @param days the days to include the totals for
 	 * @return a TreeMap of each room mapped to the total income generated for that room in the date period
 	 */
-	public TreeMap<Room, Double> getTotalIncomePerRoom(LocalDate start, LocalDate end) {
+	public TreeMap<Room, Double> getTotalIncomePerRoom(LocalDate start, LocalDate end, ArrayList<LocalDate> days) {
 		TreeMap<Room, Double> totals = new TreeMap<Room, Double>();
-		for (Map.Entry<Room, ArrayList<Double>> e : this.getAllTotalsPerRoom(start, end).entrySet()) {
+		for (Map.Entry<Room, ArrayList<Double>> e : this.getAllTotalsPerRoom(start, end, days).entrySet()) {
 			double total = 0;
 			for (double d : e.getValue()) {
 				total += d;
@@ -335,6 +485,16 @@ public class DataAnalysis  {
 			totals.put(e.getKey(), total);
 		}
 		return totals;
+	}
+	
+	/**
+	 * Gets all totals for all days in the period
+	 * @param start the start date of the date period
+	 * @param end the end date of the date period
+	 * @return the TreeMap with the total income for all days between the period mapped to the corresponding room
+	 */
+	public TreeMap<Room, Double> getTotalIncomePerRoom(LocalDate start, LocalDate end) {
+		return getTotalIncomePerRoom(start, end, getAllDaysInPeriod(start, end));
 	}
 	
 	//What's this method doing? do we need it?
