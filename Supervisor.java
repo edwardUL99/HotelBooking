@@ -38,8 +38,8 @@ public class Supervisor extends DeskClerk {
 		return analyzer.getAverageIncomePerRoom(start, end);
 	}
 	
-	public double getTotalEarnedAmount(LocalDate start, LocalDate end) {
-		return analyzer.getTotalEarned(start, end);
+	public TreeMap<Room, Double> getTotalIncomePerRoom(LocalDate start, LocalDate end) {
+		return analyzer.getTotalIncomePerRoom(start, end);
 	}
 	
 	//gets data analysis of what rooms are occupied between two dates
