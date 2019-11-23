@@ -148,7 +148,7 @@ public class Reservation {
 	 * @return the check out date for this reservation
 	 */
 	public LocalDate getCheckoutDate() {
-		return this.checkinDate.plusDays((long)this.numberOfNights);
+		return this.checkinDate.plusDays(this.numberOfNights);
 	}
 	
 	/**
@@ -204,7 +204,7 @@ public class Reservation {
 		int dayOfWeek;
 		double total = 0.00;
 		for (int i = 0; i < this.numberOfNights; i++) {
-			dayOfWeek = this.checkinDate.plusDays((long)i).getDayOfWeek().getValue() - 1; //Our rates array from room is indexed from 0 to 6 and getDayOfWeek().getValue() returns a number 1-7
+			dayOfWeek = this.checkinDate.plusDays(i).getDayOfWeek().getValue() - 1; //Our rates array from room is indexed from 0 to 6 and getDayOfWeek().getValue() returns a number 1-7
 			for (RoomBooking rb : this.rooms) {
 				Room r = rb.getRoom();
 				total += r.getRate(dayOfWeek);
