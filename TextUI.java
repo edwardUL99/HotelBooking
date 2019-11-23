@@ -401,6 +401,19 @@ public class TextUI {
 	 * Provides the interface visible to the desk clerk
 	 */
 	private void runAsDeskClerk() {
+	/** password for clerk. Password is "admin",
+	*/
+	String Password = "admin";
+        Scanner pass1 = new Scanner(System.in);
+        System.out.println("Enter Password; ");
+        String password = pass1.next();
+        	if(password.equals(Password)) {
+          	  System.out.println("Correct Password! Welcome!");
+       	  } else {
+         	   System.out.println("Incorrect Password. Please Try Again!");       
+          		  runAsDeskClerk();
+        }
+		
 		boolean loggedIn = true;
 		this.user = new DeskClerk(hotelName, system);
 		while (loggedIn) {
