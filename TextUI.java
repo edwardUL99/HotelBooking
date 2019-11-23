@@ -257,14 +257,16 @@ public class TextUI {
 	private void dataAnalyticsServices() {
 		Supervisor temp = (Supervisor)this.user;
 		//choose data analytic method
-		System.out.println("would you like to \n1)view all room purchases between dates. "
-				+ "\n2)view average earnings for each room over chosen period "
+		System.out.println("would you like to \n1)view all room purchases between dates"
+				+ "\n2)view average earnings for each room over chosen period"
 				+ "\n3)view Total earnings for each room over chosen period"
-				+ "\n4)request all income information for rooms over chosen period? (writes to file)?");
+				+ "\n4)request all income information for rooms over chosen period? (writes to file)?"
+				+ "\n5)view number of occupants that stayed in each room over chosen period");
 		
 		char command = in.nextLine().toUpperCase().charAt(0);
 		if (command == '1') {
-	
+			LocalDate start = LocalDate.of(2020, 8, 20); //hard coded for testing purposes
+			LocalDate end = LocalDate.of(2020, 8, 20);
 		} else if (command == '2') {
 			LocalDate start = LocalDate.of(2020, 8, 20); //hard coded for testing purposes
 			LocalDate end = LocalDate.of(2020, 8, 20);
@@ -289,6 +291,9 @@ public class TextUI {
 			} else {
 				System.out.println("Input not recognised, analysis not saved to file");
 			}
+		}else if(command == '5') {
+			LocalDate start = LocalDate.of(2020, 8, 20); //hard coded for testing purposes
+			LocalDate end = LocalDate.of(2020, 8, 20);
 		}
 	}
 	
