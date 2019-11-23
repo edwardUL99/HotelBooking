@@ -21,7 +21,7 @@ public class TextUI {
 		this.system = new BookingSystem();
 	}
 	
-	/**
+	/*
 	 * Checks if the date supplied is in the form dd/mm/yyyy 
 	 * @param dateInput date the date to be checked
 	 * @return if the date is of the correct format
@@ -43,7 +43,7 @@ public class TextUI {
 		}
 	}
 	
-	/**
+	/*
 	 * Returns a date selected by the user
 	 * @param futureDate if true, the user will only be allowed choose dates in the future
 	 * @return the date chosen
@@ -65,7 +65,7 @@ public class TextUI {
 		}
 	}
 	
-	/**
+	/*
 	 * Allows a supervisor to choose the start and end dates for the data analysis functions
 	 * @return an array of the 2 LocalDate objects
 	 */
@@ -87,7 +87,7 @@ public class TextUI {
 		return dates;
 	}
 	
-	/**
+	/*
 	 * Provides the interface to the user to choose the rooms for a reservation being created
 	 * @param numberOfRooms the number of rooms the user wants to reserve
 	 * @param from the date from when the reservation starts
@@ -155,7 +155,7 @@ public class TextUI {
 		return rooms;
 	}
 	
-	/**
+	/*
 	 * Provides the user with the interface to create a reservation and all users can use this interface.
 	 */
 	private void makeReservation() {
@@ -180,7 +180,7 @@ public class TextUI {
 		this.user.createReservation(this.hotelName, this.user.name, type, checkin, numNights, numPeople, numRooms, rooms);
 	}
 
-	/**
+	/*
 	 * Allows any user to cancel a reservation provided that the reservation exists in the first place
 	 */
 	private void cancelReservation() {
@@ -192,7 +192,7 @@ public class TextUI {
 		}
 	}
 	
-	/**
+	/*
 	 * Retrieves reservations from the booking system when given the check-in date, booking number and customer id
 	 * @return
 	 */
@@ -204,7 +204,7 @@ public class TextUI {
         return this.system.getReservation(this.hotelName, this.user.name, checkIn, number);
 	}
 	
-	/**
+	/*
 	 * Provides the user with an interface to view booking details, for example the rooms booked etc
 	 */
 	private void viewReservation() {
@@ -216,7 +216,7 @@ public class TextUI {
 		}
 	}
 	
-	/**
+	/*
 	 * Provides the interface to the user to check in a customer
 	 */
 	private void checkInUser() {
@@ -237,7 +237,7 @@ public class TextUI {
 		}
 	}
 	
-	/**
+	/*
 	 * Provides the interface for checking out a user
 	 */
 	private void checkOutUser() {
@@ -259,7 +259,7 @@ public class TextUI {
 		}
 	}
 	
-	/** 
+	/*
 	 * Provides the user with the option to use the check in or checkout services
 	 */
 	private void checkinServices() {
@@ -272,7 +272,7 @@ public class TextUI {
 		}
 	}
 	
-	/**
+	/*
 	 * Provides the interface for a supervisor to apply a discount to a reservation
 	 */
 	private void applyDiscountToReservation() {
@@ -291,7 +291,7 @@ public class TextUI {
 		}
 	}
 	
-	/**
+	/*
 	 * Provides the interface for the supervisor to access the data analytics
 	 */
 	private void dataAnalyticsServices() {
@@ -374,7 +374,7 @@ public class TextUI {
 		}
 	}
 	
-	/**
+	/*
 	 * Provides the interface visible to the customer
 	 */
 	private void runAsCustomer() {
@@ -397,7 +397,7 @@ public class TextUI {
 		}
 	}
 	
-	/**
+	/*
 	 * Provides the interface visible to the desk clerk
 	 */
 	private void runAsDeskClerk() {
@@ -446,7 +446,7 @@ public class TextUI {
         }
 	}
 	
-	/**
+	/*
 	 * Provides the interface visible to the supervisor
 	 */
 	private void runAsSupervisor() {
@@ -551,7 +551,7 @@ public class TextUI {
 		} 
 	}
 	
-	/**
+	/*
 	 * Allows the user choose a single object from the objs array and returns that object
 	 * @param objs an array of objects to choose from
 	 * @return the chosen object
@@ -572,7 +572,7 @@ public class TextUI {
 		}
 	}
 	
-	/**
+	/*
 	 * Allow a user to choose days in the range between start and end(including) and returns them in a list
 	 * @param start the start date of the period
 	 * @param end the end date of the period

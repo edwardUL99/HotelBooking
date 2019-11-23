@@ -90,15 +90,16 @@ public class BookingSystem implements CsvTools {
 		}
 		return allRooms;
 	}
+	
 	/**
-	 * Retrieves hotel Name and rooms available in it 
+	 * Retrieves hotel Name and the room identified by the roomType 
 	 * @param hotelName gets the hotel name
 	 * @param roomName gets the room types available in the hotel
 	 * @return types of room in the hotel named
 	 */
-	public Room getRoom(String hotelName, String roomName) {
+	public Room getRoom(String hotelName, String roomType) {
 		for (Room r : this.allRooms.get(hotelName).keySet()) {
-			if (r.getType().equals(roomName)) {
+			if (r.getType().equals(roomType)) {
 				return r;
 			}
 		}
@@ -113,7 +114,7 @@ public class BookingSystem implements CsvTools {
 		return this.allRooms; //Just here for testing until we save room info to csv file
 	}
 	
-	/**
+	/*
 	 * Equivalent to for example y <= x in maths but for dates
 	 * @param d1 the variable to check thats greater than or equals to
 	 * @param compare the variable to compare d1 against
@@ -123,7 +124,7 @@ public class BookingSystem implements CsvTools {
 		return d1.isEqual(compare) || d1.isAfter(compare);
 	}
 	
-	/**
+	/*
 	 * Equivalent to for example x <= y in maths but for dates
 	 * @param d1 the variable to check thats greater than or equals to
 	 * @param compare the variable to compare d1 against
@@ -133,7 +134,7 @@ public class BookingSystem implements CsvTools {
 		return d1.isBefore(compare);
 	}
 	
-	/**
+	/*
 	 * Checks if the specified reservation is between the given time period, i.e if the reservation checkIn date + number of nights infringes on the time period
 	 * @param from the starting date of the time period
 	 * @param to the ending date of the time period
@@ -151,7 +152,7 @@ public class BookingSystem implements CsvTools {
 		return false;
 	}
 	
-	/** 
+	/* 
 	 * Returns a list of reservations that are booked in the period between the date period specified
 	 * @param hotelName the name of the hotel
 	 * @param from the date the period starts at
@@ -172,7 +173,7 @@ public class BookingSystem implements CsvTools {
 		return null;
 	}
 	
-	/**
+	/*
 	 * Returns the number of rooms booked between certain dates
 	 * @param hotelName returns the name of the Hotel
 	 * @param room specifys the type of room
@@ -274,7 +275,7 @@ public class BookingSystem implements CsvTools {
 		return null;
 	}
 	
-	/**
+	/*
 	 * Returns a Tree Map with the room type and the number of rooms in the reservation for each room
 	 * @param reservation the reservation
 	 * @return a treemap with the room types mapped to the number of rooms booked for each type in reservation
@@ -293,7 +294,7 @@ public class BookingSystem implements CsvTools {
 		return roomNumbers;
 	}
 	
-	/**
+	/*
 	 * Checks if there is enough rooms free in the hotel chosen to add the rooms chosen in the reservation.
 	 * Take the following reservation for example:
 	 * 		Deluxe Double - 3 rooms
@@ -321,7 +322,7 @@ public class BookingSystem implements CsvTools {
 		}
 	}
 	
-	/**
+	/*
 	 * Checks if the hotel that is being provided exists in the system
 	 * @param hotelName The name of the hotel of the chain
 	 * @return if the hotel is in the system
@@ -347,7 +348,7 @@ public class BookingSystem implements CsvTools {
 		return true;
 	}
 	
-	/**
+	/*
 	 * Checks if the specific hotel has the reservation in the system
 	 * @param hotelName the name of the hotel
 	 * @param reservation the reservation being queried
@@ -413,7 +414,7 @@ public class BookingSystem implements CsvTools {
 		return false;
 	}
 	
-	/**
+	/*
 	 * After each check in, this method scans for if any reservation was a no show and cancels it with np refund
 	 * @param hotelName the name of the hotel to check for no shows in
 	 */
@@ -491,7 +492,7 @@ public class BookingSystem implements CsvTools {
 		return false;
 	}
 	
-	/**
+	/*
 	 * Searches through all reservations and for the reservation with the most rooms booked, returns the room count
 	 * @param reservationOrCancellation returns highest number of rooms booked in one reservation from reservations if true, cancellations if false
 	 * @return the room count of the reservation with the most rooms booked
@@ -509,7 +510,7 @@ public class BookingSystem implements CsvTools {
 		return largestRoomCount;
 	}
 	
-	/**
+	/*
 	 * Gets the number of rows for a reservation data matrix
 	 * @param reservationOrCancellation returns number of rows for reservations if true, cancellations if false
 	 * @param hotelStay true if you want to find number of rows for hotel stays
@@ -655,7 +656,7 @@ public class BookingSystem implements CsvTools {
 		}
 	}
 	
-	/**
+	/*
 	 * Gets the number of data rows in a file
 	 * @param filePath the path of the file
 	 * @return the number of data rows in the file
@@ -672,7 +673,7 @@ public class BookingSystem implements CsvTools {
 		return count;
 	}
 	
-	/**
+	/*
 	 * Gets the number of columns in a file
 	 * @param filePath the path to the file
 	 * @return the number of columns
@@ -733,7 +734,7 @@ public class BookingSystem implements CsvTools {
 		}
 	}
 	
-	/**
+	/*
 	 * Reinitialises the hotel system with reservations, cancellations or stays
 	 * @param reservationOrCancellation true if it is a reservation, false if cancellation
 	 * @param hotelStay true if its a hotelStay, but since a hotelStay is based on a reservation, reservationOrCancellation should also be true
