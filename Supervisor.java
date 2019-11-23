@@ -89,4 +89,45 @@ public class Supervisor extends DeskClerk {
 	public void getOccupancyInfo(LocalDate start, LocalDate end) {
 		
 	}
+	
+	/**
+	 * Returns the TreeMap of average occupants per room between the specified date period
+	 * @param start the start date of the period
+	 * @param end the end date of the period
+	 * @return the TreeMap with the room mapped to its average occupants
+	 */
+	public TreeMap<Room, Integer> getAverageOccupantsPerRoom(LocalDate start, LocalDate end) {
+		return analyzer.getAverageOccupantsPerRoom(start, end);
+	}
+	
+	/**
+	 * Returns the TreeMap of total occupants per room between the specified date period
+	 * @param start the start date of the period
+	 * @param end the end date of the period
+	 * @return the TreeMap with the room mapped to its total occupants
+	 */
+	public TreeMap<Room, Integer> getTotalOccupantsPerRoom(LocalDate start, LocalDate end) {
+		return analyzer.getTotalOccupantsPerRoom(start, end);
+	}
+	
+	/**
+	 * Requests all room Occupancy information (i.e. billing) for all the dates in the date range and stores it in a file
+	 * @param start the start date of the period
+	 * @param end the end date of the period
+	 * @return the filename at which the analysis was stored
+	 */
+	public String requestRoomOccupantsInformation(LocalDate start, LocalDate end) {
+		return analyzer.requestOccupantInformation(start, end);
+	}
+	
+	/**
+	 * Requests all room Occupancy information (i.e. billing) for the days specified between the date range and stores it in a file
+	 * @param start the start date of the period
+	 * @param end the end date of the period
+	 * @param days the days of the date range to show 
+	 * @return the filename at which the analysis was stored
+	 */
+	public String requestRoomOccupantsInformation(LocalDate start, LocalDate end, java.util.ArrayList<LocalDate> days) {
+		return analyzer.requestIncomeInformation(start, end, days);
+	}
 }
