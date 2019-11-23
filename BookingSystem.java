@@ -105,7 +105,11 @@ public class BookingSystem implements CsvTools {
 		return null;
 	}
 	
-	public TreeMap<String, TreeMap<Room, Integer>> getCurrentRooms() {
+	/**
+	 * Returns all the rooms that have been read into the system
+	 * @return a TreeMap of the rooms and their amounts per hotel
+	 */
+	public TreeMap<String, TreeMap<Room, Integer>> getAllRooms() {
 		return this.allRooms; //Just here for testing until we save room info to csv file
 	}
 	
@@ -302,7 +306,7 @@ public class BookingSystem implements CsvTools {
 	 */
 	private boolean hasEnoughRoomsFree(String hotelName, Reservation reservation) {
 		TreeMap<String, Integer> roomNumbers = numberOfRoomsBooked(reservation);
-		TreeMap<Room, Integer> rooms = this.getCurrentRooms().get(hotelName);
+		TreeMap<Room, Integer> rooms = this.getAllRooms().get(hotelName);
 		if (rooms != null) {
 			for (Map.Entry<Room, Integer> e : rooms.entrySet()) {
 				String type = e.getKey().getType();
@@ -651,6 +655,11 @@ public class BookingSystem implements CsvTools {
 		}
 	}
 	
+	/**
+	 * Gets the number of data rows in a file
+	 * @param filePath the path of the file
+	 * @return the number of data rows in the file
+	 */
 	private int getRows(String filePath) {
 		int count = 0;
 		try (Scanner in = new Scanner(new File(filePath))) {
@@ -663,6 +672,11 @@ public class BookingSystem implements CsvTools {
 		return count;
 	}
 	
+	/**
+	 * Gets the number of columns in a file
+	 * @param filePath the path to the file
+	 * @return the number of columns
+	 */
 	private int getCols(String filePath) {
 		int count = 0;
 		try (Scanner in = new Scanner(new File(filePath))) {
@@ -719,6 +733,11 @@ public class BookingSystem implements CsvTools {
 		}
 	}
 	
+	/**
+	 * Reinitialises the hotel system with reservations, cancellations or stays
+	 * @param reservationOrCancellation true if it is a reservation, false if cancellation
+	 * @param hotelStay true if its a hotelStay, but since a hotelStay is based on a reservation, reservationOrCancellation should also be true
+	 */
 	private void reinitialise(boolean reservationOrCancellation, boolean hotelStay) {
 		String fileName;
 		if (reservationOrCancellation && !hotelStay) {
