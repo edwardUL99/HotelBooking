@@ -401,47 +401,49 @@ public class TextUI {
 	 * Provides the interface visible to the desk clerk
 	 */
 	private void runAsDeskClerk() {
-	/** password for clerk. Password is "admin",
-	*/
-	String Password = "admin";
-        Scanner pass1 = new Scanner(System.in);
-        System.out.println("Enter Password; ");
-        String password = pass1.next();
-        	if(password.equals(Password)) {
-          	  System.out.println("Correct Password! Welcome!");
-       	  } else {
-         	   System.out.println("Incorrect Password. Please Try Again!");       
-          		  runAsDeskClerk();
+		String Password = "admin";
+		System.out.println("Enter Password: ");
+        boolean run = true;
+        while (run) {
+        	boolean loggedIn = false;
+        	String password = in.nextLine();
+        	if (password.equals(Password)) {
+        		System.out.println("Correct Password! Welcome!");
+        		loggedIn = true;
+        		run = false;
+        	} else if (password.equals("C")) {
+        		run = false;
+        	} else {
+        		System.out.println("Incorrect Password. Please Try Again or Cancel (C)");       
+        	}
+        	this.user = new DeskClerk(hotelName, system);
+        	while (loggedIn) {
+        		System.out.println("\nHotel: " + this.hotelName);
+        		System.out.println("\nWould you like to access R)eservations, C)heck-in/out or L)ogout?");
+        		char command = in.nextLine().toUpperCase().charAt(0);
+        		if (command == 'R') {
+        			System.out.println("Would you like to M)ake a reservation, C(ancel a reservation or V)iew a reservation?");
+        			command = in.nextLine().toUpperCase().charAt(0);
+        			if (command == 'M') {
+        				System.out.println("Please enter the customer name: ");
+        				this.user.name = in.nextLine();
+        				makeReservation();
+        			} else if (command == 'C') {
+        				System.out.println("Please enter the customer name: ");
+        				this.user.name = in.nextLine();
+        				cancelReservation();
+        			} else if (command == 'V') {
+        				System.out.println("Please enter the customer name: ");
+        				this.user.name = in.nextLine();
+        				viewReservation();
+        			}	
+        		} else if (command == 'C') {
+        			this.checkinServices();
+        		} else if (command == 'L') {
+        			loggedIn = false;
+        		}
+        	}
         }
-		
-		boolean loggedIn = true;
-		this.user = new DeskClerk(hotelName, system);
-		while (loggedIn) {
-			System.out.println("\nHotel: " + this.hotelName);
-			System.out.println("\nWould you like to access R)eservations, C)heck-in/out or L)ogout?");
-			char command = in.nextLine().toUpperCase().charAt(0);
-			if (command == 'R') {
-				System.out.println("Would you like to M)ake a reservation, C(ancel a reservation or V)iew a reservation?");
-				command = in.nextLine().toUpperCase().charAt(0);
-				if (command == 'M') {
-					System.out.println("Please enter the customer name: ");
-					this.user.name = in.nextLine();
-					makeReservation();
-				} else if (command == 'C') {
-					System.out.println("Please enter the customer name: ");
-					this.user.name = in.nextLine();
-					cancelReservation();
-				} else if (command == 'V') {
-					System.out.println("Please enter the customer name: ");
-					this.user.name = in.nextLine();
-					viewReservation();
-				}
-			} else if (command == 'C') {
-				this.checkinServices();
-			} else if (command == 'L') {
-				loggedIn = false;
-			}
-		}
 	}
 	
 	/**

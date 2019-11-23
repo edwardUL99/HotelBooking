@@ -292,9 +292,11 @@ public class BookingSystem implements CsvTools {
 		return this.allRooms.containsKey(hotelName);
 	}
 	
+	/* May not need this method since now we have unique ids and people can have same name */
 	/**
 	 * Checks if there is no other reservation for the same checkin date for the same person on the system
 	 * @param hotelName the name of the hotel
+	 * @param name Customer name
 	 * @return if this is the only reservation for this person for this checkin date
 	 */
 	public boolean onlyBookingOnCheckInDate(String hotelName, String name, LocalDate checkin) {
