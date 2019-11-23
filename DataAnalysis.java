@@ -306,6 +306,9 @@ public class DataAnalysis  {
 	 */
 	private TreeMap<Room, ArrayList<Double>> totalsPerRoomPerDay(LocalDate start, LocalDate end, ArrayList<LocalDate> days) {
 		TreeMap<Room, ArrayList<Double>> totals = new TreeMap<Room, ArrayList<Double>>();
+		if (start.equals(end)) {
+			end = end.plusDays(1);
+		}
 		for (LocalDate date = start; !date.equals(end); date = date.plusDays(1)) {
 			if (days.contains(date)) {
 				for (Map.Entry<Room, Double> e : getTotalIncomePerRoom(date, date, days).entrySet()) {
@@ -327,8 +330,12 @@ public class DataAnalysis  {
 	 */
 	private ArrayList<LocalDate> getAllDaysInPeriod(LocalDate start, LocalDate end) {
 		ArrayList<LocalDate> days = new ArrayList<LocalDate>();
-		for (LocalDate date = start; !date.equals(end); date = date.plusDays(1)) {
-			days.add(date);
+		if (start.equals(end)) {
+			days.add(start);
+		} else {
+			for (LocalDate date = start; !date.equals(end); date = date.plusDays(1)) {
+				days.add(date);
+			}
 		}
 		return days;
 	}

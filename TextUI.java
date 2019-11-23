@@ -1,4 +1,5 @@
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Scanner;
 import java.util.TreeMap;
@@ -35,15 +36,20 @@ public class TextUI {
 		}
 	}
 	
-	private LocalDate getDate() {
+	/**
+	 * Returns a date selected by the user
+	 * @param futureDate if true, the user will only be allowed choose dates in the future
+	 * @return the date chosen
+	 */
+	private LocalDate getDate(boolean futureDate) {
 		while (true) {
 			String dateInput = in.nextLine();
 			if (!isCorrectDateFormat(dateInput)) {
 				System.out.println("Date is in incorrect format, please try again: ");
 			} else {
-				String[] date = dateInput.split("/");
-				LocalDate dateChosen = LocalDate.of(Integer.parseInt(date[2]), Integer.parseInt(date[1]), Integer.parseInt(date[0]));
-				if (!dateChosen.isAfter(LocalDate.now())) {
+				DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+				LocalDate dateChosen = LocalDate.parse(dateInput, dateFormat);
+				if (!dateChosen.isAfter(LocalDate.now()) && futureDate) {
 					System.out.println("Please choose a date that is in the future: ");
 				} else {
 					return dateChosen;
@@ -52,7 +58,23 @@ public class TextUI {
 		}
 	}
 	
-	
+	private LocalDate[] getDatesForDataAnalysis() {
+		LocalDate[] dates = new LocalDate[2];
+		System.out.println("Please enter the start date: ");
+		LocalDate d1 = getDate(false); //allow previous dates also as may want to do analysis on historical data
+		System.out.println("Please enter the end date: ");
+		LocalDate d2 = getDate(false);
+		
+		if (d1.isAfter(d2)) {
+			LocalDate temp = LocalDate.of(d1.getYear(), d1.getMonthValue(), d1.getDayOfMonth());
+			d1 = LocalDate.of(d2.getYear(), d2.getMonthValue(), d2.getDayOfMonth());
+			d2 = LocalDate.of(temp.getYear(), temp.getMonthValue(), temp.getDayOfMonth());
+		}
+		
+		dates[0] = d1;
+		dates[1] = d2;
+		return dates;
+	}
 	
 	private ArrayList<RoomBooking> chooseRooms(int numberOfRooms, LocalDate from, LocalDate to) {
 		//Maybe instead of checking if the rooms are available after choosing them in the BookingSystem class, have the BookingSystem getRooms only return rooms that are available for the numberOfRooms specified
@@ -127,7 +149,7 @@ public class TextUI {
 		LocalDate checkin = null;
 		while (run) {
 			System.out.println("Please enter your check-in date(dd/mm/yyyy): ");
-			checkin = getDate();
+			checkin = getDate(true);
 			if (!this.system.onlyBookingOnCheckInDate(this.hotelName, this.user.name, checkin)) {
 				System.out.println("You already have a reservation on this date, please try again");
 			} else {
@@ -155,7 +177,7 @@ public class TextUI {
 	
 	private Reservation getReservation() {
 		System.out.println("Please enter the checkIn date(dd/mm/yyyy): ");
-		LocalDate checkIn = getDate();
+		LocalDate checkIn = getDate(true);
         return this.system.getReservation(this.hotelName, this.user.name, checkIn);
 	}
 	
@@ -175,7 +197,7 @@ public class TextUI {
 			System.out.println("Please enter the customer name: ");
 			String name = in.nextLine();
 			System.out.println("Please enter the check-in date(dd/mm/yyyy): ");
-			LocalDate checkin = getDate();
+			LocalDate checkin = getDate(true);
 			if (this.user instanceof DeskClerk) {
 				DeskClerk clerk = (DeskClerk)this.user;
 				clerk.checkIn(name, checkin); //may replace with LocalDate.now() as checkin and check is it the right date for the ckeckin to occur, i.e if the reservation for this checkin date is null, it doesnt exist or is the wrong day to check in
@@ -190,9 +212,9 @@ public class TextUI {
 			System.out.println("Please enter the customer name: ");
 			String name = in.nextLine();
 			System.out.println("Please enter the check-in date(dd/mm/yyyy): ");
-			LocalDate checkin = getDate();
+			LocalDate checkin = getDate(true);
 			System.out.println("Please enter the check-out date(dd/mm/yyyy): "); //may replace with LocalDate.now() as if this was a checkout it would be current time. Same with checkin and check is it the right date for the checkin to occur
-			LocalDate checkout = getDate();
+			LocalDate checkout = getDate(true);
 			if (this.user instanceof DeskClerk) {
 				DeskClerk clerk = (DeskClerk)this.user;
 				clerk.checkOut(name, checkin, checkout); //check if it was successful, if not print out an error message
@@ -252,14 +274,21 @@ public class TextUI {
 			LocalDate end = LocalDate.of(2020, 8, 20);
 			System.out.println(temp.getTotalIncomePerRoom(start, end));
 		} else if (command == '4') {
-			LocalDate start = LocalDate.of(2020, 8, 20);
-			LocalDate end = LocalDate.of(2020, 8, 27); //hard coded for testing purposes
-			/*ArrayList<LocalDate> days = new ArrayList<LocalDate>();
-			for (LocalDate date = start; !date.equals(start.plusDays(4)); date = date.plusDays(1)) {
-				days.add(date);
-			}*/
-			String fileName = temp.requestRoomIncomeInformation(start, end);
-			System.out.println("Information saved to: " + fileName);
+			LocalDate[] dates = this.getDatesForDataAnalysis();
+			System.out.println("Would you like to choose days over the period to only include?(Yes/No)");
+			String choice = in.nextLine().toUpperCase();
+			String fileName;
+			if (choice.equals("YES")) {
+				System.out.println("Please choose from the list of days: ");
+				ArrayList<LocalDate> days = this.getDaysChoice(dates[0], dates[1]);
+				fileName = temp.requestRoomIncomeInformation(dates[0], dates[1], days);
+				System.out.println("Information saved to: " + fileName);
+			} else if (choice.equals("NO")) {
+				fileName = temp.requestRoomIncomeInformation(dates[0], dates[1]);
+				System.out.println("Information saved to: " + fileName);
+			} else {
+				System.out.println("Input not recognised, analysis not saved to file");
+			}
 		}
 	}
 	
@@ -411,6 +440,33 @@ public class TextUI {
 			int index = input - 'A';
 			if (index >= 0 && index < objs.length) {
 				return objs[index];
+			}
+		}
+	}
+	
+	private ArrayList<LocalDate> getDaysChoice(LocalDate start, LocalDate end) {
+		ArrayList<LocalDate> allDays = new ArrayList<LocalDate>();
+		for (LocalDate date = start; !date.equals(end); date = date.plusDays(1)) {
+			allDays.add(date);
+		}
+		ArrayList<LocalDate> days = new ArrayList<LocalDate>();
+		while (true) {
+			char ch = 'A';
+			for (LocalDate d : allDays) {
+				System.out.println(ch + ")" + d);
+				ch++;
+			}
+			System.out.println("Q)uit selection");
+			char input = in.nextLine().toUpperCase().charAt(0);
+			if (input == 'Q' || days.size() == allDays.size()) {
+				return days;
+			}
+			int index = input - 'A';
+			if (index >= 0 && index <= allDays.size()) {
+				LocalDate choice = allDays.get(index);
+				if (!days.contains(choice)) {
+					days.add(choice);
+				}
 			}
 		}
 	}

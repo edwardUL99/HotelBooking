@@ -3,3 +3,4 @@ Hotel,Number,Name,Type,Check-in Date,Number of Nights,Number of People,Number Of
 ,1001,Mary Byrnes,S,2020-08-20,5,2,2,Deluxe Single(false_1_0),Deluxe Single(false_1_0),€815.00,€75.00
 ,1004,Sean,S,2020-08-25,3,1,1,Deluxe Single(false_1_0),,€290.00,€75.00
 ,1006,John Byrne,S,2020-08-19,10,5,1,Penthouse(false_5_0),,€1165.00,€75.00
+,1008,Joe Brooks,S,2020-08-20,5,1,1,Deluxe Single(false_1_0),,€445.00,€75.00
