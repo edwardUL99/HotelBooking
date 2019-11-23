@@ -406,12 +406,12 @@ public class TextUI {
         boolean run = true;
         while (run) {
         	boolean loggedIn = false;
-        	String password = in.nextLine();
-        	if (password.equals(Password)) {
+        	String input = in.nextLine();
+        	if (input.equals(Password)) {
         		System.out.println("Correct Password! Welcome!");
         		loggedIn = true;
         		run = false;
-        	} else if (password.equals("C")) {
+        	} else if (input.equals("C") || input.equals("c")) {
         		run = false;
         	} else {
         		System.out.println("Incorrect Password. Please Try Again or Cancel (C)");       
@@ -460,7 +460,7 @@ public class TextUI {
 				System.out.println("You have been logged in!");
 				loggedIn = true;
 				run = false;
-			} else if (input.equals("C")) {
+			} else if (input.equals("C") || input.equals("c")) {
 				run = false;
 			} else {
 				System.out.println("Password incorrect. Please try again or cancel(C)");
