@@ -9,7 +9,7 @@ public class Supervisor extends DeskClerk {
 	
 	public Supervisor(String hotelName, BookingSystem system) {
 		super(hotelName, system);
-		this.analyzer = new DataAnalysis(this.system.getHotelStays().get(this.hotelName));
+		this.analyzer = new DataAnalysis(this.hotelName, this.system.getHotelStays().get(this.hotelName));
 	}
 	
 	/** allows supervisor to apply any discount to any reservation */
@@ -40,6 +40,10 @@ public class Supervisor extends DeskClerk {
 	
 	public TreeMap<Room, Double> getTotalIncomePerRoom(LocalDate start, LocalDate end) {
 		return analyzer.getTotalIncomePerRoom(start, end);
+	}
+	
+	public String requestRoomIncomeInformation(LocalDate start, LocalDate end) {
+		return analyzer.requestIncomeInformation(start, end);
 	}
 	
 	//gets data analysis of what rooms are occupied between two dates

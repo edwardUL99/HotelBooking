@@ -233,10 +233,12 @@ public class TextUI {
 	}
 	
 	private void dataAnalyticsServices() {
+		Supervisor temp = (Supervisor)this.user;
 		//choose data analytic method
-		System.out.println("would you like to \n1)get all room purchases between dates. "
-				+ "\n2)get average earnings for each room over chosen period "
-				+ "\n3)get Total earnings for each room over chosen period");
+		System.out.println("would you like to \n1)view all room purchases between dates. "
+				+ "\n2)view average earnings for each room over chosen period "
+				+ "\n3)view Total earnings for each room over chosen period"
+				+ "\n4)request all income information for rooms over chosen period? (writes to file)?");
 		
 		char command = in.nextLine().toUpperCase().charAt(0);
 		if (command == '1') {
@@ -244,13 +246,16 @@ public class TextUI {
 		} else if (command == '2') {
 			LocalDate start = LocalDate.of(2020, 8, 20); //hard coded for testing purposes
 			LocalDate end = LocalDate.of(2020, 8, 20);
-			Supervisor temp = (Supervisor)this.user;
 			System.out.println(temp.getAverageIncomePerRoom(start, end));
 		} else if (command == '3') {
 			LocalDate start = LocalDate.of(2020, 8, 20); //hard coded for testing purposes
-			LocalDate end = LocalDate.of(2020, 8, 27);
-			Supervisor temp = (Supervisor)this.user;
+			LocalDate end = LocalDate.of(2020, 8, 20);
 			System.out.println(temp.getTotalIncomePerRoom(start, end));
+		} else if (command == '4') {
+			LocalDate start = LocalDate.of(2020, 8, 20);
+			LocalDate end = LocalDate.of(2020, 8, 27); //hard coded for testing purposes
+			String fileName = temp.requestRoomIncomeInformation(start, end);
+			System.out.println("Information saved to: " + fileName);
 		}
 	}
 	
