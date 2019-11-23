@@ -90,7 +90,12 @@ public class BookingSystem implements CsvTools {
 		}
 		return allRooms;
 	}
-	
+	/**
+	 * Retrieves hotel Name and rooms available in it 
+	 * @param hotelName gets the hotel name
+	 * @param roomName gets the room types available in the hotel
+	 * @return types of room in the hotel named
+	 */
 	public Room getRoom(String hotelName, String roomName) {
 		for (Room r : this.allRooms.get(hotelName).keySet()) {
 			if (r.getType().equals(roomName)) {
@@ -163,6 +168,14 @@ public class BookingSystem implements CsvTools {
 		return null;
 	}
 	
+	/**
+	 * Returns the number of rooms booked between certain dates
+	 * @param hotelName returns the name of the Hotel
+	 * @param room specifys the type of room
+	 * @param from the date the period begins
+	 * @param to the date the period ends
+	 * @return the list of rooms in that time period that are booked
+	 */
 	private int numberOfTimesRoomIsBookedAtDate(String hotelName, Room room, LocalDate from, LocalDate to) {
 		ArrayList<Reservation> bookings = bookingsInTimePeriod(hotelName, from, to);
 		if (bookings != null) {
@@ -217,6 +230,27 @@ public class BookingSystem implements CsvTools {
 	 */
 	public TreeMap<String, ArrayList<HotelStay>> getHotelStays() {
 		return this.stays;
+	}
+	
+	/**
+	 * Returns a single reservation specified by the name and the checkIn date
+	 * @param hotelName the name of the hotel
+	 * @param name the name of the customer who owns the reservation
+	 * @param checkIn the check in date
+	 * @return a list of reservations matching the name and checkout date, null if the hotel doesn't exist
+	 */
+	public ArrayList<Reservation> getReservations(String hotelName, String name, LocalDate checkIn) {
+		ArrayList<Reservation> reservations = this.reservations.get(hotelName);
+		if (reservations != null) {
+			ArrayList<Reservation> matches = new ArrayList<Reservation>();
+			for (Reservation r : reservations) {
+				if (r.getName().equals(name) && r.getCheckinDate().isEqual(checkIn)) {
+					matches.add(r);
+				}
+			}
+			return matches;
+		}
+		return null;
 	}
 	
 	/**
@@ -292,11 +326,9 @@ public class BookingSystem implements CsvTools {
 		return this.allRooms.containsKey(hotelName);
 	}
 	
-	/* May not need this method since now we have unique ids and people can have same name */
 	/**
 	 * Checks if there is no other reservation for the same checkin date for the same person on the system
 	 * @param hotelName the name of the hotel
-	 * @param name Customer name
 	 * @return if this is the only reservation for this person for this checkin date
 	 */
 	public boolean onlyBookingOnCheckInDate(String hotelName, String name, LocalDate checkin) {
@@ -564,8 +596,8 @@ public class BookingSystem implements CsvTools {
 								data[row][lastIndex++] = "";
 							}
 						}
-						data[row][lastIndex++] = String.format("€%.02f", reservation.getTotalCost().getAmountDue()); //look at this after figuring out check in and checkout
-						data[row][lastIndex++] = String.format("€%.02f", reservation.getDeposit().getAmountDue());
+						data[row][lastIndex++] = String.format("â‚¬%.02f", reservation.getTotalCost().getAmountDue()); //look at this after figuring out check in and checkout
+						data[row][lastIndex++] = String.format("â‚¬%.02f", reservation.getDeposit().getAmountDue());
 						if (hotelStay) {
 							HotelStay stay = getHotelStay(e.getKey(), reservation);
 							if (stay != null) {
@@ -592,6 +624,11 @@ public class BookingSystem implements CsvTools {
 	
 	
 
+	/**
+	 * Writes data into a file
+	 * @param filePath location of the file
+	 * @param data is the data being put into the file
+	 */
 	@Override
 	public void writeDataToFile(String filePath, Object[][] data) {
 		File file = new File(filePath);
@@ -643,6 +680,7 @@ public class BookingSystem implements CsvTools {
 	/**
 	 * Reads in data from the specified filePath and reads it into an Object matrix
 	 * @param filePath the path to the file
+	 * @return the data found
 	 */
 	@Override
 	public String[][] readDataFromFile(String filePath) {
