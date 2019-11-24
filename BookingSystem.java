@@ -700,7 +700,7 @@ public class BookingSystem implements CsvTools {
 																													// check
 																													// in
 																													// and
-																													// checkout
+															//unicode for euro symbol														// checkout
 					data[row][lastIndex++] = String.format("\u20ac%.02f", reservation.getDeposit().getAmountDue());
 					if (hotelStay) {
 						HotelStay stay = getHotelStay(e.getKey(), reservation);
