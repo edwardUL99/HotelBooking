@@ -154,40 +154,6 @@ public class DataAnalysis {
 		}
 	}
 
-	public void writeFinancialInfoToFile(LocalDate start, LocalDate end,
-			TreeMap<String, ArrayList<Reservation>> reservations, String hotelName) {
-		TreeMap<LocalDate, ArrayList<Double>> financialInfo = getFinancialInfo(start, end);
-
-		String[] attributes = { "Date", "Deposit", "Reservation Cost", "Total Cost" };
-
-		int rows = financialInfo.size();
-		int columns = attributes.length;
-
-		Object[][] data = new String[rows][columns];
-
-		data[0][1] = attributes[0];
-		data[0][2] = attributes[1];
-		data[0][3] = attributes[2];
-		data[0][4] = attributes[3];
-
-		int row = 1;
-
-		for (Entry<LocalDate, ArrayList<Double>> e : financialInfo.entrySet()) {
-			data[1][0] = e.getKey();
-			for (Double amount : e.getValue()) {
-				data[row][1] = e.getKey();
-				data[row][2] = 75;
-				data[row][3] = amount - 75;
-				data[row][4] = amount;
-				row++;
-			}
-		}
-
-		String fileName = "/data/dataAnalysis/FinanacialInfo.csv";
-		String path = System.getProperty("user.dir") + fileName;
-		writeDataToFile(path, data);
-	}
-
 	/*
 	 * Writes occupancy info for the specified date period to a file
 	 * 
