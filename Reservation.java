@@ -25,7 +25,9 @@ public class Reservation {
 	 * @param type the type of booking S/AP
 	 * @param checkinDate the date of check-in
 	 * @param numberOfNights the number of nights the reservation is for
+	 * @param numberOfPeople the number of people staying in the reservation
 	 * @param numberOfRooms the number of rooms to book
+	 * @param rooms the rooms to add to the reservation
 	 */
 	public Reservation(String name, String type, LocalDate checkinDate, int numberOfNights, int numberOfPeople, int numberOfRooms, ArrayList<RoomBooking> rooms) {
 		this.number = ++lastBookingNumber;
@@ -46,7 +48,8 @@ public class Reservation {
 	 * @param name the name to have on the reservation
 	 * @param type the type of the reservation
 	 * @param checkinDate the checkin date
-	 * @param numebrOfNights the number of nights
+	 * @param numberOfNights the number of nights
+	 * @param numberOfPeople the number of peple for this reservation
 	 * @param numberOfRooms the number of rooms
 	 * @param rooms the list of rooms booked
 	 */
@@ -73,7 +76,7 @@ public class Reservation {
 	
 	/**
 	 * Sets the last booking number used to update the new booking number
-	 * @param lastBookingNumber 
+	 * @param lastBookingNumber the last booking number you want to subsequent reservation to take
 	 */
 	public static void setLastBookingNumber(int lastBookingNumber) {
 		Reservation.lastBookingNumber = lastBookingNumber;
@@ -245,7 +248,7 @@ public class Reservation {
 	
 	/**
 	 * Overriding the equals method of Object 
-	 * @param the object to check against
+	 * @param obj the object to check against
 	 */
 	@Override
 	public boolean equals(Object obj) {
@@ -283,6 +286,10 @@ public class Reservation {
 		return String.format("Reservation name: %s\nReservation type: %s\nResrvation number: %d\nCheck-in Date: %s\nNumber of nights: %d\nNumber of rooms: %d\nRooms Booked:\n%sTotal Cost (incl. deposit): €%.02f\nDeposit: €%.02f", this.name, this.type, this.number, this.checkinDate.toString(), this.numberOfNights, this.numberOfRooms, roomsBookedAsString(), this.getTotalCost().getAmountDue(), this.deposit.getAmountDue());
 	}
 	
+	/**
+	 * Returns a string representation of this reservation object
+	 * @return string representation
+	 */
 	@Override
 	public String toString() {
 		return String.format("Reservation name: %s, Type: %s, Number: %d, Checkin Date: %s, Number of nights: %d, Number of rooms: %d", this.name, this.type, this.number, this.checkinDate.toString(), this.numberOfNights, this.numberOfRooms);

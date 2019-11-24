@@ -16,7 +16,7 @@ public class DataAnalysis {
 	 * Creates a DataAnalysis class hotel stays.
 	 * 
 	 * @param hotelName the name of the hotel this DataAnalysis object is working in
-	 * @param stays
+	 * @param stays the list of HotelStays in the hotel
 	 */
 	public DataAnalysis(String hotelName, ArrayList<HotelStay> stays) {
 		this.hotelName = hotelName;
@@ -284,9 +284,11 @@ public class DataAnalysis {
 		return fileName;
 	}
 
-	private TreeMap<Room, ArrayList<Integer>> getDailyRoomCount(LocalDate start, LocalDate end,
-			ArrayList<LocalDate> days) {
+	private TreeMap<Room, ArrayList<Integer>> getDailyRoomCount(LocalDate start, LocalDate end, ArrayList<LocalDate> days) {
 		TreeMap<Room, ArrayList<Integer>> dailyTotals = new TreeMap<Room, ArrayList<Integer>>();
+		if (start.equals(end)) {
+			end = end.plusDays(1);
+		} 
 		for (LocalDate date = start; !date.equals(end); date = date.plusDays(1)) {
 			if (days.contains(date)) {
 				for (Map.Entry<Room, Integer> e : getAllTotalRoomCount(date, date, days).entrySet()) {
@@ -337,48 +339,12 @@ public class DataAnalysis {
 		return totals;
 	}
 
-	private TreeMap<Room, Integer> getTotalRoomCountPerPeriod(LocalDate start, LocalDate end,
-			ArrayList<LocalDate> days) {
+	private TreeMap<Room, Integer> getTotalRoomCountPerPeriod(LocalDate start, LocalDate end, ArrayList<LocalDate> days) {
 		TreeMap<Room, Integer> counts = new TreeMap<Room, Integer>();
 		for (Room r : this.getAllTotalRoomCount(start, end, days).keySet()) {
 			counts.put(r, this.getNumberOfRooms(r, start, end, days));
 		}
 		return counts;
-	}
-
-	/*
-	 * Checks if a reservation is made in the date period specified by the start and
-	 * end dates. i.e. If the whole reservation is in the date period, it is
-	 * trivially in range For example:
-	 * 
-	 * Reservation r1 = 20/08/2020 - 25/08/2020 and start = 20/08/2020 end =
-	 * 25/08/2020 r1 is trivially in the range returns true However, if only part of
-	 * the reservation lies in range it is still in this period For Example:
-	 * Reservation 21 = 15/08/2020 - 24/08/2020 and start = 20/08/2020 end =
-	 * 25/08/2020 returns true
-	 * 
-	 * @param r the reservation to check in the date period
-	 * 
-	 * @param start the start date of the period
-	 * 
-	 * @param end the end date of the period
-	 * 
-	 * @return if the reservation is in range
-	 */
-	private boolean isReservationInDateRange(Reservation r, LocalDate start, LocalDate end) {
-		ArrayList<LocalDate> range = this.dateRangesForReservation(r);
-		if (start.equals(end)) {
-			if (range.contains(start)) {
-				return true;
-			}
-		} else {
-			for (LocalDate date = start; !date.equals(end); date = date.plusDays(1)) {
-				if (range.contains(date)) {
-					return true;
-				}
-			}
-		}
-		return false;
 	}
 
 	/*
@@ -398,7 +364,7 @@ public class DataAnalysis {
 	}
 
 	/*
-	 * Returns a TreeMap of total income per room per day in the days lis in the
+	 * Returns a TreeMap of total income per room per day in the days list in the
 	 * range of start and end
 	 * 
 	 * @param start the start date of the period
@@ -409,8 +375,7 @@ public class DataAnalysis {
 	 * 
 	 * @return a TreeMap with a list of daily totals per room
 	 */
-	private TreeMap<Room, ArrayList<Double>> totalsPerRoomPerDay(LocalDate start, LocalDate end,
-			ArrayList<LocalDate> days) {
+	private TreeMap<Room, ArrayList<Double>> totalsPerRoomPerDay(LocalDate start, LocalDate end, ArrayList<LocalDate> days) {
 		TreeMap<Room, ArrayList<Double>> totals = new TreeMap<Room, ArrayList<Double>>();
 		if (start.equals(end)) {
 			end = end.plusDays(1);
@@ -514,9 +479,9 @@ public class DataAnalysis {
 	 * date range
 	 * 
 	 * @param start the start date of the date period
-	 * @param end   the end date of the date period
-	 * @param days  the days of the date period to display total incomes for
-	 * @return
+	 * @param end the end date of the date period
+	 * @param days the days of the date period to display total incomes for
+	 * @return the file name of where the analysis was saved to
 	 */
 	public String requestIncomeInformation(LocalDate start, LocalDate end, ArrayList<LocalDate> days) {
 		TreeMap<Room, Double> averages = getAverageIncomePerRoom(start, end, days);
@@ -551,7 +516,7 @@ public class DataAnalysis {
 		return 0;
 	}
 
-	/**
+	/*
 	 * Returns for each room the average income that room generated on the days
 	 * specified during the date period
 	 * 
@@ -561,7 +526,7 @@ public class DataAnalysis {
 	 * @return a TreeMap with the average income generated mapped to that room
 	 *         during the date period
 	 */
-	public TreeMap<Room, Double> getAverageIncomePerRoom(LocalDate start, LocalDate end, ArrayList<LocalDate> days) {
+	private TreeMap<Room, Double> getAverageIncomePerRoom(LocalDate start, LocalDate end, ArrayList<LocalDate> days) {
 		TreeMap<Room, Double> averages = new TreeMap<Room, Double>();
 		for (Map.Entry<Room, ArrayList<Double>> e : this.getAllTotalsPerRoom(start, end, days).entrySet()) {
 			double average = 0;
@@ -574,19 +539,7 @@ public class DataAnalysis {
 		return averages;
 	}
 
-	/**
-	 * Returns average for each room generated for all the days in the date period
-	 * 
-	 * @param start the start date of the date period
-	 * @param end   the end date of the date period
-	 * @return a TreeMap of the average income of the room generated over the whole
-	 *         date period mapped to the room
-	 */
-	public TreeMap<Room, Double> getAverageIncomePerRoom(LocalDate start, LocalDate end) {
-		return getAverageIncomePerRoom(start, end, getAllDaysInPeriod(start, end));
-	}
-
-	/**
+	/*
 	 * Like the getAverageIncomePerRoom() method, but instead maps the total income
 	 * generated to the room
 	 * 
@@ -597,7 +550,7 @@ public class DataAnalysis {
 	 *         room in the date period
 	 */
 	// 11
-	public TreeMap<Room, Double> getTotalIncomePerRoom(LocalDate start, LocalDate end, ArrayList<LocalDate> days) {
+	private TreeMap<Room, Double> getTotalIncomePerRoom(LocalDate start, LocalDate end, ArrayList<LocalDate> days) {
 		TreeMap<Room, Double> totals = new TreeMap<Room, Double>();
 		for (Map.Entry<Room, ArrayList<Double>> e : this.getAllTotalsPerRoom(start, end, days).entrySet()) {
 			double total = 0;
@@ -609,62 +562,7 @@ public class DataAnalysis {
 		return totals;
 	}
 
-	/**
-	 * Gets all totals for all days in the period
-	 * 
-	 * @param start the start date of the date period
-	 * @param end   the end date of the date period
-	 * @return the TreeMap with the total income for all days between the period
-	 *         mapped to the corresponding room
-	 */
-	public TreeMap<Room, Double> getTotalIncomePerRoom(LocalDate start, LocalDate end) {
-		return getTotalIncomePerRoom(start, end, getAllDaysInPeriod(start, end));
-	}
-
-	/**
-	 * Returns the occupancy of a room in the date period
-	 * 
-	 * @param start the start date of the period
-	 * @param end   the end date of the period
-	 * @return a TreeMap with the number of occupants in the room
-	 */
-	public TreeMap<Room, Integer> getOccupancyInfo(LocalDate start, LocalDate end) {
-		// may need to change to an arraylist of integer as many of the same room can be
-		// booked
-		TreeMap<Room, Integer> roomOccupants = new TreeMap<Room, Integer>();
-		for (HotelStay stay : stays) {
-			Reservation r = stay.getReservation();
-			if (isReservationInDateRange(r, start, end)) {
-				for (RoomBooking rm : r.getRooms()) {
-					if (!roomOccupants.containsKey(rm.getRoom())) {
-						roomOccupants.put(rm.getRoom(), (rm.getOccupancy()[0] + rm.getOccupancy()[1]));
-					} else {
-						roomOccupants.put(rm.getRoom(),
-								roomOccupants.get(rm.getRoom()) + rm.getOccupancy()[0] + rm.getOccupancy()[1]); // be
-																												// careful
-																												// not
-																												// to
-																												// overwrite
-																												// rooms
-																												// in
-																												// the
-																												// treemap
-					}
-				}
-			}
-		}
-		return roomOccupants;
-	}
-
-	/**
-	 * 
-	 * @param start
-	 * @param end
-	 * @param days
-	 * @return
-	 */
-	private TreeMap<Room, ArrayList<Integer>> getAllOccupantsPerRoom(LocalDate start, LocalDate end,
-			ArrayList<LocalDate> days) {
+	private TreeMap<Room, ArrayList<Integer>> getAllOccupantsPerRoom(LocalDate start, LocalDate end, ArrayList<LocalDate> days) {
 		TreeMap<Room, ArrayList<Integer>> allOccupantTotals = new TreeMap<Room, ArrayList<Integer>>();
 		for (HotelStay stay : this.stays) {
 			Reservation r = stay.getReservation();
@@ -697,46 +595,7 @@ public class DataAnalysis {
 		return allOccupantTotals;
 	}
 
-	/**
-	 * 
-	 * @param start
-	 * @param end
-	 * @param days
-	 * @return
-	 */
-	public TreeMap<Room, Double> getAverageOccupantsPerRoomPerDay(LocalDate start, LocalDate end,
-			ArrayList<LocalDate> days) {
-		TreeMap<Room, Double> averages = new TreeMap<Room, Double>();
-		for (Entry<Room, ArrayList<Integer>> e : this.getAllOccupantsPerRoom(start, end, days).entrySet()) {
-			double average = 0;
-			for (int d : e.getValue()) {
-				average += (double) d;
-			}
-			average /= (double) (e.getValue()).size();
-			average /= days.size();
-			averages.put(e.getKey(), (double) average);
-		}
-		return averages;
-	}
-
-	/**
-	 * 
-	 * @param start
-	 * @param end
-	 * @return
-	 */
-	public TreeMap<Room, Double> getAverageOccupantsPerRoomPerDay(LocalDate start, LocalDate end) {
-		return getAverageOccupantsPerRoomPerDay(start, end, getAllDaysInPeriod(start, end));
-	}
-
-	/**
-	 * 
-	 * @param start
-	 * @param end
-	 * @param days
-	 * @return
-	 */
-	public TreeMap<Room, Double> getAverageOccupantsPerRoom(LocalDate start, LocalDate end, ArrayList<LocalDate> days) {
+	private TreeMap<Room, Double> getAverageOccupantsPerRoom(LocalDate start, LocalDate end, ArrayList<LocalDate> days) {
 		TreeMap<Room, Double> averages = new TreeMap<Room, Double>();
 		for (Entry<Room, ArrayList<Integer>> e : this.getAllOccupantsPerRoom(start, end, days).entrySet()) {
 			double average = 0;
@@ -747,10 +606,6 @@ public class DataAnalysis {
 			averages.put(e.getKey(), (double) average);
 		}
 		return averages;
-	}
-
-	public TreeMap<Room, Double> getAverageOccupantsPerRoom(LocalDate start, LocalDate end) {
-		return getAverageOccupantsPerRoom(start, end, getAllDaysInPeriod(start, end));
 	}
 
 	/*
@@ -797,8 +652,7 @@ public class DataAnalysis {
 	 * @return the name of the file the information was stored to
 	 */
 	// 6
-	public String requestOccupantInformation(LocalDate start, LocalDate end, TreeMap<Room, Integer> hotelRooms,
-			boolean numberOfOccupants) {
+	public String requestOccupantInformation(LocalDate start, LocalDate end, TreeMap<Room, Integer> hotelRooms, boolean numberOfOccupants) {
 		return requestOccupantInformation(start, end, getAllDaysInPeriod(start, end), hotelRooms, numberOfOccupants);
 	}
 
@@ -835,7 +689,7 @@ public class DataAnalysis {
 		}
 	}
 
-	/**
+	/*
 	 * Like the getAverageOccupantsPerRoom() method, but instead maps the total
 	 * occupants per room
 	 * 
@@ -846,7 +700,7 @@ public class DataAnalysis {
 	 *         room in the date period
 	 */
 	// 11
-	public TreeMap<Room, Integer> getTotalOccupantsPerRoom(LocalDate start, LocalDate end, ArrayList<LocalDate> days) {
+	private TreeMap<Room, Integer> getTotalOccupantsPerRoom(LocalDate start, LocalDate end, ArrayList<LocalDate> days) {
 		TreeMap<Room, Integer> totals = new TreeMap<Room, Integer>();
 		for (Map.Entry<Room, ArrayList<Integer>> e : this.getAllOccupantsPerRoom(start, end, days).entrySet()) {
 			Integer total = 0;
@@ -856,17 +710,5 @@ public class DataAnalysis {
 			totals.put(e.getKey(), total);
 		}
 		return totals;
-	}
-
-	/**
-	 * Gets all totals for all days in the period
-	 * 
-	 * @param start the start date of the date period
-	 * @param end   the end date of the date period
-	 * @return the TreeMap with the total income for all days between the period
-	 *         mapped to the corresponding room
-	 */
-	public TreeMap<Room, Integer> getTotalOccupantsPerRoom(LocalDate start, LocalDate end) {
-		return getTotalOccupantsPerRoom(start, end, getAllDaysInPeriod(start, end));
 	}
 }

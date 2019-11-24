@@ -1,5 +1,4 @@
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.TreeMap;
 
 /**
@@ -49,35 +48,6 @@ public class Supervisor extends DeskClerk {
 		return false;
 	}
 
-	public TreeMap<LocalDate, ArrayList<Double>> getFinancialDataAnalysis(LocalDate start, LocalDate end,
-			String filePath) {
-		return analyzer.getFinancialInfo(start, end);
-	}
-
-	/**
-	 * Returns the TreeMap of average income per room between the specified date
-	 * period
-	 * 
-	 * @param start the start date of the period
-	 * @param end   the end date of the period
-	 * @return the TreeMap with the room mapped to its average income
-	 */
-	public TreeMap<Room, Double> getAverageIncomePerRoom(LocalDate start, LocalDate end) {
-		return analyzer.getAverageIncomePerRoom(start, end);
-	}
-
-	/**
-	 * Returns the TreeMap of total income per room between the specified date
-	 * period
-	 * 
-	 * @param start the start date of the period
-	 * @param end   the end date of the period
-	 * @return the TreeMap with the room mapped to its total income
-	 */
-	public TreeMap<Room, Double> getTotalIncomePerRoom(LocalDate start, LocalDate end) {
-		return analyzer.getTotalIncomePerRoom(start, end);
-	}
-
 	/**
 	 * Requests all room income information (i.e. billing) for all the dates in the
 	 * date range and stores it in a file
@@ -101,46 +71,6 @@ public class Supervisor extends DeskClerk {
 	 */
 	public String requestRoomIncomeInformation(LocalDate start, LocalDate end, java.util.ArrayList<LocalDate> days) {
 		return analyzer.requestIncomeInformation(start, end, days);
-	}
-
-	// gets data analysis of what rooms are occupied between two dates
-	public TreeMap<Room, Integer> getOccupancyInfo(LocalDate start, LocalDate end) {
-		return analyzer.getOccupancyInfo(start, end);
-	}
-
-	/**
-	 * Returns the TreeMap of average occupants per room between the specified date
-	 * period
-	 * 
-	 * @param start the start date of the period
-	 * @param end   the end date of the period
-	 * @return the TreeMap with the room mapped to its average occupants
-	 */
-	public TreeMap<Room, Double> getAverageOccupantsPerRoom(LocalDate start, LocalDate end) {
-		return analyzer.getAverageOccupantsPerRoom(start, end);
-	}
-
-	/**
-	 * 
-	 * @param start
-	 * @param end
-	 * @return
-	 */
-
-	public TreeMap<Room, Double> getAverageOccupantsPerRoomPerDay(LocalDate start, LocalDate end) {
-		return analyzer.getAverageOccupantsPerRoomPerDay(start, end);
-	}
-
-	/**
-	 * Returns the TreeMap of total occupants per room between the specified date
-	 * period
-	 * 
-	 * @param start the start date of the period
-	 * @param end   the end date of the period
-	 * @return the TreeMap with the room mapped to its total occupants
-	 */
-	public TreeMap<Room, Integer> getTotalOccupantsPerRoom(LocalDate start, LocalDate end) {
-		return analyzer.getTotalOccupantsPerRoom(start, end);
 	}
 
 	/**

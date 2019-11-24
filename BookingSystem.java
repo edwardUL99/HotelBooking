@@ -95,8 +95,8 @@ public class BookingSystem implements CsvTools {
 	/**
 	 * Retrieves hotel Name and the room identified by the roomType
 	 * 
-	 * @param hotelName gets the hotel name
-	 * @param roomName  gets the room types available in the hotel
+	 * @param hotelName the hotel name
+	 * @param roomType the room type
 	 * @return types of room in the hotel named
 	 */
 	public Room getRoom(String hotelName, String roomType) {
@@ -382,8 +382,9 @@ public class BookingSystem implements CsvTools {
 	/**
 	 * Checks if there is no other reservation for the same checkin date for the
 	 * same person on the system
-	 * 
 	 * @param hotelName the name of the hotel
+	 * @param name the name of the person making the reservation
+	 * @param checkin the checkin date for the reservation
 	 * @return if this is the only reservation for this person for this checkin date
 	 */
 	public boolean onlyBookingOnCheckInDate(String hotelName, String name, LocalDate checkin) {
@@ -424,7 +425,7 @@ public class BookingSystem implements CsvTools {
 	 * @param reservation  the reservation to be cancelled
 	 * @param cancellation true if it's a cancellation, false if its being removed
 	 *                     from the system
-	 * @return
+	 * @return true if the reservation was removed successfully
 	 */
 	public boolean removeReservation(String hotelName, Reservation reservation, boolean cancellation) {
 		if (containsReservation(hotelName, reservation)) {

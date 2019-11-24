@@ -38,7 +38,7 @@ public class Bill {
 	}
 	
 	/**
-	 * 
+	 * Gets the name of this bill
 	 * @return the name of the bill
 	 */
 	public String getBillName() {
@@ -46,7 +46,7 @@ public class Bill {
 	}
 	
 	/**
-	 * 
+	 * Gets the date at which the bill was created
 	 * @return the date this bill was created
 	 */
 	public LocalDate getBilledDate() {
@@ -54,7 +54,7 @@ public class Bill {
 	}
 	
 	/**
-	 * 
+	 * Gets the amount that this bill is billed for
 	 * @return the amount due of this bill
 	 */
 	public double getAmountDue() {
@@ -69,6 +69,10 @@ public class Bill {
 		this.amountDue = amountDue;
 	}
 	
+	/**
+	 * Returns a string representation for this bill object
+	 * @return string representation of this bill
+	 */
 	@Override
 	public String toString() {
 		return "Name: " + billName + "\n" + "Date: " + billedDate + "\n" + "Total amount due: "  + amountDue;
