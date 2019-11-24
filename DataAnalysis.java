@@ -204,11 +204,12 @@ public class DataAnalysis {
 			}
 			row++;
 		}
+		
 		row = 1;
 		for (Entry<Room, Double> e : averages.entrySet()) {
 			data[row][0] = "";
 			data[row][lastIndex] = this.getNumberOfRooms(e.getKey(), start, end, days);
-			data[row][lastIndex + 1] = String.format("%.02f", e.getValue());
+			data[row][lastIndex+1] = String.format("%.02f", e.getValue());
 			row++;
 		}
 		
@@ -216,7 +217,6 @@ public class DataAnalysis {
 		lastIndex += 1;
 		for (Entry<Room, Double> e : averagesPerDay.entrySet()) {
 			data[row][0] = "";
-			data[row][lastIndex] = this.getNumberOfRooms(e.getKey(), start, end, days);
 			data[row][lastIndex + 1] = String.format("%.02f", e.getValue());
 			row++;
 		}
