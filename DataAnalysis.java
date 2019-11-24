@@ -181,10 +181,8 @@ public class DataAnalysis {
 	 * 
 	 * @return the filename the info was written to
 	 */
-	private String writeOccupantNumbersToFile(LocalDate start, LocalDate end,
-			TreeMap<Room, ArrayList<Integer>> dailyTotals, TreeMap<Room, Double> averages,TreeMap<Room, Double> averagesPerDay,
-			TreeMap<Room, Integer> totals, ArrayList<LocalDate> days) {
-		String fileName = String.format("/data/dataAnalysis/%s_occupancy__occupant_numbers_%s_to_%s.csv",
+	private String writeOccupantNumbersToFile(LocalDate start, LocalDate end, TreeMap<Room, ArrayList<Integer>> dailyTotals, TreeMap<Room, Double> averages, TreeMap<Room, Double> averagesPerDay, TreeMap<Room, Integer> totals, ArrayList<LocalDate> days) {
+		String fileName = String.format("/data/dataAnalysis/%s_occupancy_occupant_numbers_%s_to_%s.csv",
 				this.hotelName, start.toString(), end.toString());
 		String filePath = System.getProperty("user.dir") + fileName;
 		String[] attributes = { "Hotel Name", "Rooms", "Number of Rooms Booked in Period", "Average Occupants Per Room",
@@ -208,8 +206,12 @@ public class DataAnalysis {
 			lastIndex = 1;
 			data[row][lastIndex++] = e.getKey().getType();
 			for (int i = 0; i < numDays; i++) {
-				data[row][lastIndex++] = e.getValue().get(i);
-			}
+				if (i < e.getValue().size()) {
+					data[row][lastIndex++] = e.getValue().get(i);
+				} else {
+					data[row][lastIndex++] = 0;
+				}
+			} 
 			row++;
 		}
 		
@@ -623,6 +625,23 @@ public class DataAnalysis {
 	}
 	
 	/*
+	 * Checks if the given reservation has any days in the start end range
+	 */
+	private boolean isReservationInRange(Reservation r, LocalDate start, LocalDate end) {
+		ArrayList<LocalDate> dates = this.dateRangesForReservation(r);
+		if (start.equals(end)) {
+			return dates.contains(start);
+		} else {
+			for (LocalDate date = start; !date.equals(end); date = date.plusDays(1)) {
+				if (dates.contains(date)) {
+					return true;
+				}
+			}
+			return false;
+		}
+	}
+	
+	/*
 	 * 
 	 * @param start the start date of the date period 
 	 * @param end the end date of the date period
@@ -653,10 +672,12 @@ public class DataAnalysis {
 						}
 					}
 				}
-				if (!allOccupantTotals.containsKey(rm)) {
-					allOccupantTotals.put(rm, new ArrayList<Integer>());
+				if (this.isReservationInRange(r, start, end)) { //prevents rooms that havent even been booked in this time period being printed
+					if (!allOccupantTotals.containsKey(rm)) {
+						allOccupantTotals.put(rm, new ArrayList<Integer>());
+					}
+					allOccupantTotals.get(rm).add(totalOccupants);
 				}
-				allOccupantTotals.get(rm).add(totalOccupants);
 			}
 		}
 		return allOccupantTotals;
@@ -716,8 +737,7 @@ public class DataAnalysis {
 	 * 
 	 * @return a TreeMap with a list of daily totals per room
 	 */
-	private TreeMap<Room, ArrayList<Integer>> occupantsPerRoomPerDay(LocalDate start, LocalDate end,
-			ArrayList<LocalDate> days) {
+	private TreeMap<Room, ArrayList<Integer>> occupantsPerRoomPerDay(LocalDate start, LocalDate end, ArrayList<LocalDate> days) {
 		TreeMap<Room, ArrayList<Integer>> totals = new TreeMap<Room, ArrayList<Integer>>();
 		if (start.equals(end)) {
 			end = end.plusDays(1);
@@ -766,8 +786,7 @@ public class DataAnalysis {
 	 *                          false if you want to retrieve number of rooms booked
 	 * @return the name of the file the information was stored to
 	 */
-	public String requestOccupantInformation(LocalDate start, LocalDate end, ArrayList<LocalDate> days,
-			TreeMap<Room, Integer> hotelRooms, boolean numberOfOccupants) {
+	public String requestOccupantInformation(LocalDate start, LocalDate end, ArrayList<LocalDate> days, TreeMap<Room, Integer> hotelRooms, boolean numberOfOccupants) {
 		if (numberOfOccupants) {
 			TreeMap<Room, Double> averages = getAverageOccupantsPerRoom(start, end, days);
 			TreeMap<Room, Double> averagesPerDay = getAverageOccupantsPerRoomPerDay(start, end, days);

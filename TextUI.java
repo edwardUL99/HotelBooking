@@ -80,9 +80,9 @@ public class TextUI {
 	 */
 	private LocalDate[] getDatesForDataAnalysis() {
 		LocalDate[] dates = new LocalDate[2];
-		System.out.println("Please enter the start date: ");
+		System.out.println("Please enter the start date(dd/mm/yy): ");
 		LocalDate d1 = getDate(false); // allow previous dates also as may want to do analysis on historical data
-		System.out.println("Please enter the end date: ");
+		System.out.println("Please enter the end date(dd/mm/yy): ");
 		LocalDate d2 = getDate(false);
 
 		if (d1.isAfter(d2)) {
@@ -109,10 +109,10 @@ public class TextUI {
 	 * @return an ArrayList of room bookings for the rooms selected
 	 */
 	private ArrayList<RoomBooking> chooseRooms(int numberOfRooms, LocalDate from, LocalDate to) {
-		TreeMap<Room, Integer> map = this.system.getCurrentRooms(this.hotelName, from, to);
+		TreeMap<Room, Integer> map = new TreeMap<Room, Integer>(this.system.getCurrentRooms(this.hotelName, from, to));
 		ArrayList<Room> allRooms = new ArrayList<Room>(map.keySet());
 		ArrayList<RoomBooking> rooms = new ArrayList<RoomBooking>(numberOfRooms);
-		System.out.println("Room type(Rooms Available)(Maximum Adult occupancy)(Maximum Child occupancy)");
+		System.out.println("Room type");
 		while (rooms.size() != numberOfRooms) {
 			char ch = 'A';
 			ArrayList<Character> notAvailable = new ArrayList<Character>(5); // Keeps track of rooms that are not
@@ -121,8 +121,7 @@ public class TextUI {
 			for (int i = 0; i < allRooms.size(); i++) {
 				Room r = allRooms.get(i);
 				if (map.get(r) > 0) {
-					System.out.println(ch + ")" + r.getType() + "(" + map.get(r) + ")" + "(" + r.occupancy(true, false)
-							+ ")" + "(" + r.occupancy(false, false) + ")");
+					System.out.println(ch + ")" + r.getType() + " " + map.get(r) + " available. Maximum adult occupancy: " + r.occupancy(true, false)+ ". Maximum children occupancy: " + r.occupancy(false, false) + ".");
 				} else {
 					notAvailable.add(ch);
 					System.out.println(ch + ")" + r.getType() + " is booked out for these dates");
@@ -137,8 +136,7 @@ public class TextUI {
 				System.out.println("You cannot choose this room, as it is booked out. Please choose another.");
 			} else {
 				int n = input.toUpperCase().charAt(0) - 'A';
-				System.out.println(
-						"Please enter how many adults and children are staying per room (number of Adults,number of Children): ");
+				System.out.println("Please enter how many adults and children are staying per room (number of Adults,number of Children): ");
 				String[] occupancy = in.nextLine().split(",");
 				if (occupancy.length < 2) {
 					System.out
@@ -148,6 +146,7 @@ public class TextUI {
 					int children = Integer.parseInt(occupancy[1]);
 					if (n >= 0 && n < allRooms.size()) {
 						Room choice = allRooms.get(n);
+						map.put(choice, map.get(choice) - 1); //decrement as this room was chosen
 						if ((adults >= choice.occupancy(true, true) && adults <= choice.occupancy(true, false))
 								&& (children >= choice.occupancy(false, true)
 										&& children <= choice.occupancy(false, false))) {
