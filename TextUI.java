@@ -14,26 +14,30 @@ public class TextUI {
 	private String hotelName;
 
 	/**
-	 * Initialises the Text UI by creating a new instance of scanner and starting the Booking System
+	 * Initialises the Text UI by creating a new instance of scanner and starting
+	 * the Booking System
 	 */
 	public TextUI() {
 		in = new Scanner(System.in);
 		this.system = new BookingSystem();
 	}
-	
+
 	/*
-	 * Checks if the date supplied is in the form dd/mm/yyyy 
+	 * Checks if the date supplied is in the form dd/mm/yyyy
+	 * 
 	 * @param dateInput date the date to be checked
+	 * 
 	 * @return if the date is of the correct format
 	 */
 	private boolean isCorrectDateFormat(String dateInput) {
 		String[] date = dateInput.split("/");
 		if (date.length != 3 || dateInput.indexOf("/") == -1) {
 			return false;
-		} else if (Integer.parseInt(date[1]) > 12) { //If the mm value is greater than twelve, it may have been confused to be the dd value
+		} else if (Integer.parseInt(date[1]) > 12) { // If the mm value is greater than twelve, it may have been
+														// confused to be the dd value
 			return false;
 		} else {
-			int[] requiredLengths = {2, 2, 4};
+			int[] requiredLengths = { 2, 2, 4 };
 			for (int i = 0; i < date.length; i++) {
 				if (date[i].length() != requiredLengths[i]) {
 					return false;
@@ -42,10 +46,13 @@ public class TextUI {
 			return true;
 		}
 	}
-	
+
 	/*
 	 * Returns a date selected by the user
-	 * @param futureDate if true, the user will only be allowed choose dates in the future
+	 * 
+	 * @param futureDate if true, the user will only be allowed choose dates in the
+	 * future
+	 * 
 	 * @return the date chosen
 	 */
 	private LocalDate getDate(boolean futureDate) {
@@ -64,69 +71,86 @@ public class TextUI {
 			}
 		}
 	}
-	
+
 	/*
-	 * Allows a supervisor to choose the start and end dates for the data analysis functions
+	 * Allows a supervisor to choose the start and end dates for the data analysis
+	 * functions
+	 * 
 	 * @return an array of the 2 LocalDate objects
 	 */
 	private LocalDate[] getDatesForDataAnalysis() {
 		LocalDate[] dates = new LocalDate[2];
 		System.out.println("Please enter the start date: ");
-		LocalDate d1 = getDate(false); //allow previous dates also as may want to do analysis on historical data
+		LocalDate d1 = getDate(false); // allow previous dates also as may want to do analysis on historical data
 		System.out.println("Please enter the end date: ");
 		LocalDate d2 = getDate(false);
-		
+
 		if (d1.isAfter(d2)) {
 			LocalDate temp = LocalDate.of(d1.getYear(), d1.getMonthValue(), d1.getDayOfMonth());
 			d1 = LocalDate.of(d2.getYear(), d2.getMonthValue(), d2.getDayOfMonth());
 			d2 = LocalDate.of(temp.getYear(), temp.getMonthValue(), temp.getDayOfMonth());
 		}
-		
+
 		dates[0] = d1;
 		dates[1] = d2;
 		return dates;
 	}
-	
+
 	/*
-	 * Provides the interface to the user to choose the rooms for a reservation being created
+	 * Provides the interface to the user to choose the rooms for a reservation
+	 * being created
+	 * 
 	 * @param numberOfRooms the number of rooms the user wants to reserve
+	 * 
 	 * @param from the date from when the reservation starts
+	 * 
 	 * @param to the date at which the reservation ends
+	 * 
 	 * @return an ArrayList of room bookings for the rooms selected
 	 */
 	private ArrayList<RoomBooking> chooseRooms(int numberOfRooms, LocalDate from, LocalDate to) {
 		TreeMap<Room, Integer> map = this.system.getCurrentRooms(this.hotelName, from, to);
 		ArrayList<Room> allRooms = new ArrayList<Room>(map.keySet());
 		ArrayList<RoomBooking> rooms = new ArrayList<RoomBooking>(numberOfRooms);
-		System.out.println("Room type(Rooms Available)(Maximum Adult occupancy)(Maximum Child occupancy)"); 
+		System.out.println("Room type(Rooms Available)(Maximum Adult occupancy)(Maximum Child occupancy)");
 		while (rooms.size() != numberOfRooms) {
 			char ch = 'A';
-			ArrayList<Character> notAvailable = new ArrayList<Character>(5); //Keeps track of rooms that are not available i.e. their rooms available count is 0 
+			ArrayList<Character> notAvailable = new ArrayList<Character>(5); // Keeps track of rooms that are not
+																				// available i.e. their rooms available
+																				// count is 0
 			for (int i = 0; i < allRooms.size(); i++) {
 				Room r = allRooms.get(i);
 				if (map.get(r) > 0) {
-					System.out.println(ch + ")" + r.getType() + "(" + map.get(r) + ")" + "(" + r.occupancy(true, false) + ")" + "(" + r.occupancy(false, false) + ")");
+					System.out.println(ch + ")" + r.getType() + "(" + map.get(r) + ")" + "(" + r.occupancy(true, false)
+							+ ")" + "(" + r.occupancy(false, false) + ")");
 				} else {
 					notAvailable.add(ch);
 					System.out.println(ch + ")" + r.getType() + " is booked out for these dates");
 				}
 				ch++;
-			} //This is not how it will be implemented, just until the other methods are developed
+			} // This is not how it will be implemented, just until the other methods are
+				// developed
 			String input = in.nextLine();
-			if (notAvailable.contains(input.toUpperCase().charAt(0))) { //If notAvailable contains the choice, the user tried to choose a room that has been booked out
+			if (notAvailable.contains(input.toUpperCase().charAt(0))) { // If notAvailable contains the choice, the user
+																		// tried to choose a room that has been booked
+																		// out
 				System.out.println("You cannot choose this room, as it is booked out. Please choose another.");
 			} else {
 				int n = input.toUpperCase().charAt(0) - 'A';
-				System.out.println("Please enter how many adults and children are staying per room (number of Adults,number of Children): ");
+				System.out.println(
+						"Please enter how many adults and children are staying per room (number of Adults,number of Children): ");
 				String[] occupancy = in.nextLine().split(",");
 				if (occupancy.length < 2) {
-					System.out.println("Please enter occupancy as: number of adults,number of children (with the comma)");
+					System.out
+							.println("Please enter occupancy as: number of adults,number of children (with the comma)");
 				} else {
 					int adults = Integer.parseInt(occupancy[0]);
 					int children = Integer.parseInt(occupancy[1]);
 					if (n >= 0 && n < allRooms.size()) {
 						Room choice = allRooms.get(n);
-						if ((adults >= choice.occupancy(true, true) && adults <= choice.occupancy(true, false)) && (children >= choice.occupancy(false, true) && children <= choice.occupancy(false,  false))) {
+						if ((adults >= choice.occupancy(true, true) && adults <= choice.occupancy(true, false))
+								&& (children >= choice.occupancy(false, true)
+										&& children <= choice.occupancy(false, false))) {
 							boolean run = true;
 							while (run) {
 								System.out.println("Would you like breakfast included with the room? (Yes/No)");
@@ -147,16 +171,18 @@ public class TextUI {
 							}
 						}
 					} else {
-						System.out.println("The room chosen is not suitable for the number of adults or children you entered, please try again");
+						System.out.println(
+								"The room chosen is not suitable for the number of adults or children you entered, please try again");
 					}
 				}
 			}
 		}
 		return rooms;
 	}
-	
+
 	/*
-	 * Provides the user with the interface to create a reservation and all users can use this interface.
+	 * Provides the user with the interface to create a reservation and all users
+	 * can use this interface.
 	 */
 	private void makeReservation() {
 		System.out.println("Do you want to make a S)tandard booking or A)dvanced Purchase?");
@@ -171,17 +197,21 @@ public class TextUI {
 		System.out.println("Please enter your check-in date(dd/mm/yyyy): ");
 		checkin = getDate(true);
 		System.out.println("Please enter the number of nights you wish to stay: ");
-		int numNights = Integer.parseInt(in.nextLine()); //Prevents line not found errors as nextInt() does not skip to nextLine
+		int numNights = Integer.parseInt(in.nextLine()); // Prevents line not found errors as nextInt() does not skip to
+															// nextLine
 		System.out.println("Please enter the number of people staying: ");
 		int numPeople = Integer.parseInt(in.nextLine());
 		System.out.println("Please enter the number of rooms you wish to book: ");
-		int numRooms = Integer.parseInt(in.nextLine()); //Prevents line not found errors as nextInt() does not skip to nextLine
+		int numRooms = Integer.parseInt(in.nextLine()); // Prevents line not found errors as nextInt() does not skip to
+														// nextLine
 		ArrayList<RoomBooking> rooms = chooseRooms(numRooms, checkin, checkin.plusDays(numNights));
-		this.user.createReservation(this.hotelName, this.user.name, type, checkin, numNights, numPeople, numRooms, rooms);
+		this.user.createReservation(this.hotelName, this.user.name, type, checkin, numNights, numPeople, numRooms,
+				rooms);
 	}
 
 	/*
-	 * Allows any user to cancel a reservation provided that the reservation exists in the first place
+	 * Allows any user to cancel a reservation provided that the reservation exists
+	 * in the first place
 	 */
 	private void cancelReservation() {
 		Reservation reservation = this.getReservation();
@@ -191,21 +221,24 @@ public class TextUI {
 			this.user.cancelReservation(hotelName, reservation);
 		}
 	}
-	
+
 	/*
-	 * Retrieves reservations from the booking system when given the check-in date, booking number and customer id
+	 * Retrieves reservations from the booking system when given the check-in date,
+	 * booking number and customer id
+	 * 
 	 * @return
 	 */
 	private Reservation getReservation() {
 		System.out.println("Please enter the checkIn date(dd/mm/yyyy): ");
 		LocalDate checkIn = getDate(true);
 		System.out.println("Please enter the booking number: ");
-		int number = Integer.parseInt(in.nextLine()); //using in.nextInt() cause no next line errors
-        return this.system.getReservation(this.hotelName, this.user.name, checkIn, number);
+		int number = Integer.parseInt(in.nextLine()); // using in.nextInt() cause no next line errors
+		return this.system.getReservation(this.hotelName, this.user.name, checkIn, number);
 	}
-	
+
 	/*
-	 * Provides the user with an interface to view booking details, for example the rooms booked etc
+	 * Provides the user with an interface to view booking details, for example the
+	 * rooms booked etc
 	 */
 	private void viewReservation() {
 		Reservation reservation = this.getReservation();
@@ -215,12 +248,12 @@ public class TextUI {
 			System.out.println(reservation.format());
 		}
 	}
-	
+
 	/*
 	 * Provides the interface to the user to check in a customer
 	 */
 	private void checkInUser() {
-		//call getTotalCostCalculated() for a reservation either here or at checkout
+		// call getTotalCostCalculated() for a reservation either here or at checkout
 		System.out.println("Please enter the customer name: ");
 		String name = in.nextLine();
 		System.out.println("Please enter the check-in date(dd/mm/yyyy): ");
@@ -228,7 +261,7 @@ public class TextUI {
 		System.out.println("Please enter the booking number: ");
 		int number = Integer.parseInt(in.nextLine());
 		if (this.user instanceof DeskClerk) {
-			DeskClerk clerk = (DeskClerk)this.user;
+			DeskClerk clerk = (DeskClerk) this.user;
 			if (clerk.checkIn(name, checkin, number)) {
 				System.out.println("Booking #" + number + " checked in successfully");
 			} else {
@@ -236,21 +269,25 @@ public class TextUI {
 			}
 		}
 	}
-	
+
 	/*
 	 * Provides the interface for checking out a user
 	 */
 	private void checkOutUser() {
 		System.out.println("Please enter the customer name: ");
 		String name = in.nextLine();
-		System.out.println("Please enter the check-in date(dd/mm/yyyy): ");			
+		System.out.println("Please enter the check-in date(dd/mm/yyyy): ");
 		LocalDate checkin = getDate(true);
-		System.out.println("Please enter the check-out date(dd/mm/yyyy): "); //may replace with LocalDate.now() as if this was a checkout it would be current time. Same with checkin and check is it the right date for the checkin to occur
+		System.out.println("Please enter the check-out date(dd/mm/yyyy): "); // may replace with LocalDate.now() as if
+																				// this was a checkout it would be
+																				// current time. Same with checkin and
+																				// check is it the right date for the
+																				// checkin to occur
 		LocalDate checkout = getDate(true);
 		System.out.println("Please enter the booking number: ");
 		int number = Integer.parseInt(in.nextLine());
 		if (this.user instanceof DeskClerk) {
-			DeskClerk clerk = (DeskClerk)this.user;
+			DeskClerk clerk = (DeskClerk) this.user;
 			if (clerk.checkOut(name, checkin, checkout, number)) {
 				System.out.println("Booking #" + number + " checked out");
 			} else {
@@ -258,7 +295,7 @@ public class TextUI {
 			}
 		}
 	}
-	
+
 	/*
 	 * Provides the user with the option to use the check in or checkout services
 	 */
@@ -271,7 +308,7 @@ public class TextUI {
 			checkOutUser();
 		}
 	}
-	
+
 	/*
 	 * Provides the interface for a supervisor to apply a discount to a reservation
 	 */
@@ -284,22 +321,21 @@ public class TextUI {
 		} else {
 			System.out.println("Please enter the percentage discount (0-100): ");
 			double percentageDiscount = Double.parseDouble(in.nextLine());
-			Supervisor temp = (Supervisor)this.user;
+			Supervisor temp = (Supervisor) this.user;
 			if (temp.applyDiscount(percentageDiscount, reservation.getNumber())) {
 				System.out.println("The discount was applied successfully");
 			}
 		}
 	}
-	
+
 	/*
 	 * Provides the interface for the supervisor to access the data analytics
 	 */
 	private void dataAnalyticsServices() {
-		Supervisor temp = (Supervisor)this.user;
-		System.out.println("Would you like to \n1) access billing analysis"
-							+ "\n2) access occupancy analysis");
+		Supervisor temp = (Supervisor) this.user;
+		System.out.println("Would you like to \n1) access billing analysis" + "\n2) access occupancy analysis");
 		char analysisType = in.nextLine().toUpperCase().charAt(0);
-		if(analysisType == '1') {
+		if (analysisType == '1') {
 			LocalDate[] dates = this.getDatesForDataAnalysis();
 			System.out.println("Would you like to choose days over the period to only include?(Yes/No)");
 			String choice = in.nextLine().toUpperCase();
@@ -315,7 +351,7 @@ public class TextUI {
 			} else {
 				System.out.println("Input not recognised, analysis not saved to file");
 			}
-		} else if(analysisType == '2') {
+		} else if (analysisType == '2') {
 			LocalDate[] dates = this.getDatesForDataAnalysis();
 			System.out.println("Would you like to choose days over the period to only include?(Yes/No)");
 			String choice = in.nextLine().toUpperCase();
@@ -323,7 +359,7 @@ public class TextUI {
 			boolean numbers = true;
 			TreeMap<Room, Integer> hotelRooms = null;
 			char choice1 = in.nextLine().toUpperCase().charAt(0);
-			if (choice1 == 'A') {	
+			if (choice1 == 'A') {
 				numbers = true;
 				hotelRooms = null;
 			} else if (choice1 == 'B') {
@@ -344,7 +380,7 @@ public class TextUI {
 			}
 		}
 	}
-	
+
 	/*
 	 * Provides the interface visible to the customer
 	 */
@@ -354,7 +390,8 @@ public class TextUI {
 		this.user = new Customer(in.nextLine(), this.hotelName, system);
 		while (loggedIn) {
 			System.out.println("\nHotel: " + this.hotelName);
-			System.out.println("\nWould you like to M)ake a reservation, C(ancel a reservation, V)iew a reservation or L)ogout?");
+			System.out.println(
+					"\nWould you like to M)ake a reservation, C(ancel a reservation, V)iew a reservation or L)ogout?");
 			char command = in.nextLine().toUpperCase().charAt(0);
 			if (command == 'M') {
 				makeReservation();
@@ -367,56 +404,57 @@ public class TextUI {
 			}
 		}
 	}
-	
+
 	/*
 	 * Provides the interface visible to the desk clerk
 	 */
 	private void runAsDeskClerk() {
 		String Password = "deskAdmin";
 		System.out.println("Enter Password: ");
-        boolean run = true;
-        while (run) {
-        	boolean loggedIn = false;
-        	String input = in.nextLine();
-        	if (input.equals(Password)) {
-        		System.out.println("Correct Password! Welcome!");
-        		loggedIn = true;
-        		run = false;
-        	} else if (input.equals("C") || input.equals("c")) {
-        		run = false;
-        	} else {
-        		System.out.println("Incorrect Password. Please Try Again or Cancel (C)");       
-        	}
-        	this.user = new DeskClerk(hotelName, system);
-        	while (loggedIn) {
-        		System.out.println("\nHotel: " + this.hotelName);
-        		System.out.println("\nWould you like to access R)eservations, C)heck-in/out or L)ogout?");
-        		char command = in.nextLine().toUpperCase().charAt(0);
-        		if (command == 'R') {
-        			System.out.println("Would you like to M)ake a reservation, C(ancel a reservation or V)iew a reservation?");
-        			command = in.nextLine().toUpperCase().charAt(0);
-        			if (command == 'M') {
-        				System.out.println("Please enter the customer name: ");
-        				this.user.name = in.nextLine();
-        				makeReservation();
-        			} else if (command == 'C') {
-        				System.out.println("Please enter the customer name: ");
-        				this.user.name = in.nextLine();
-        				cancelReservation();
-        			} else if (command == 'V') {
-        				System.out.println("Please enter the customer name: ");
-        				this.user.name = in.nextLine();
-        				viewReservation();
-        			}	
-        		} else if (command == 'C') {
-        			this.checkinServices();
-        		} else if (command == 'L') {
-        			loggedIn = false;
-        		}
-        	}
-        }
+		boolean run = true;
+		while (run) {
+			boolean loggedIn = false;
+			String input = in.nextLine();
+			if (input.equals(Password)) {
+				System.out.println("Correct Password! Welcome!");
+				loggedIn = true;
+				run = false;
+			} else if (input.equals("C") || input.equals("c")) {
+				run = false;
+			} else {
+				System.out.println("Incorrect Password. Please Try Again or Cancel (C)");
+			}
+			this.user = new DeskClerk(hotelName, system);
+			while (loggedIn) {
+				System.out.println("\nHotel: " + this.hotelName);
+				System.out.println("\nWould you like to access R)eservations, C)heck-in/out or L)ogout?");
+				char command = in.nextLine().toUpperCase().charAt(0);
+				if (command == 'R') {
+					System.out.println(
+							"Would you like to M)ake a reservation, C(ancel a reservation or V)iew a reservation?");
+					command = in.nextLine().toUpperCase().charAt(0);
+					if (command == 'M') {
+						System.out.println("Please enter the customer name: ");
+						this.user.name = in.nextLine();
+						makeReservation();
+					} else if (command == 'C') {
+						System.out.println("Please enter the customer name: ");
+						this.user.name = in.nextLine();
+						cancelReservation();
+					} else if (command == 'V') {
+						System.out.println("Please enter the customer name: ");
+						this.user.name = in.nextLine();
+						viewReservation();
+					}
+				} else if (command == 'C') {
+					this.checkinServices();
+				} else if (command == 'L') {
+					loggedIn = false;
+				}
+			}
+		}
 	}
-	
+
 	/*
 	 * Provides the interface visible to the supervisor
 	 */
@@ -440,11 +478,12 @@ public class TextUI {
 		this.user = new Supervisor(this.hotelName, system);
 		while (loggedIn) {
 			System.out.println("\nHotel: " + this.hotelName);
-			
-			System.out.println("\nWould you like to access \n1)reservations \n2)check-in/out \n3)apply discounts \n4)data analytics or \n5)Logout");
+
+			System.out.println(
+					"\nWould you like to access \n1)reservations \n2)check-in/out \n3)apply discounts \n4)data analytics or \n5)Logout");
 			char command = in.nextLine().toUpperCase().charAt(0);
 			if (command == '1') {
-				
+
 				System.out.println("Would you like to M)ake a reservation or C(ancel a reservation? ");
 				command = in.nextLine().toUpperCase().charAt(0);
 				System.out.println("Please enter the customer name: ");
@@ -454,21 +493,22 @@ public class TextUI {
 				} else if (command == 'C') {
 					cancelReservation();
 				}
-		
-			} else if (command == '2') {  
+
+			} else if (command == '2') {
 				this.checkinServices();
 			} else if (command == '3') {
 				this.applyDiscountToReservation();
-			}else if (command == '4') {
+			} else if (command == '4') {
 				this.dataAnalyticsServices();
 			} else if (command == '5') {
 				loggedIn = false;
 			}
 		}
 	}
-	
+
 	/**
-	 * The only publicly accessible method after created the object, i.e. the only starting point to the program
+	 * The only publicly accessible method after created the object, i.e. the only
+	 * starting point to the program
 	 */
 	public void run() {
 		boolean run = true;
@@ -478,16 +518,16 @@ public class TextUI {
 		int i = 0;
 		for (String n : hotels) {
 			hotelNames[i++] = n;
-		}	
+		}
 		System.out.println("Please choose a hotel: ");
-		this.hotelName = (String)getChoice(hotelNames);
+		this.hotelName = (String) getChoice(hotelNames);
 		while (run) {
 			System.out.println("\nWould you like to L)ogin or C)hange hotel or Q)uit?");
 			char ch = in.nextLine().toUpperCase().charAt(0);
 			if (ch == 'L') {
 				System.out.println("Please choose which user to login as: ");
-				String[] users = {"Customer", "Desk Clerk", "Supervisor"};
-				choice = (String)getChoice(users);	
+				String[] users = { "Customer", "Desk Clerk", "Supervisor" };
+				choice = (String) getChoice(users);
 				if (choice.equals("Customer")) {
 					runAsCustomer();
 				} else if (choice.equals("Desk Clerk")) {
@@ -497,16 +537,19 @@ public class TextUI {
 				}
 			} else if (ch == 'C') {
 				System.out.println("Please choose a hotel: ");
-				this.hotelName = (String)getChoice(hotelNames);
+				this.hotelName = (String) getChoice(hotelNames);
 			} else if (ch == 'Q') {
 				run = false;
 			}
-		} 
+		}
 	}
-	
+
 	/*
-	 * Allows the user choose a single object from the objs array and returns that object
+	 * Allows the user choose a single object from the objs array and returns that
+	 * object
+	 * 
 	 * @param objs an array of objects to choose from
+	 * 
 	 * @return the chosen object
 	 */
 	private Object getChoice(Object[] objs) {
@@ -516,7 +559,7 @@ public class TextUI {
 				System.out.println(ch + ")" + o.toString());
 				ch++;
 			}
-			
+
 			char input = in.nextLine().toUpperCase().charAt(0);
 			int index = input - 'A';
 			if (index >= 0 && index < objs.length) {
@@ -524,11 +567,15 @@ public class TextUI {
 			}
 		}
 	}
-	
+
 	/*
-	 * Allow a user to choose days in the range between start and end(including) and returns them in a list
+	 * Allow a user to choose days in the range between start and end(including) and
+	 * returns them in a list
+	 * 
 	 * @param start the start date of the period
+	 * 
 	 * @param end the end date of the period
+	 * 
 	 * @return an array list of chosen dates
 	 */
 	private ArrayList<LocalDate> getDaysChoice(LocalDate start, LocalDate end) {
