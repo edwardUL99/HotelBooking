@@ -346,22 +346,6 @@ public class DataAnalysis {
 		return counts;
 	}
 
-	public TreeMap<LocalDate, ArrayList<Double>> getFinancialInfo(LocalDate start, LocalDate end) {
-
-		TreeMap<LocalDate, ArrayList<Double>> dateBalance = new TreeMap<LocalDate, ArrayList<Double>>();
-		for (HotelStay stay : stays) {
-			Reservation r = stay.getReservation();
-			if (isReservationInDateRange(r, start, end)) {
-				LocalDate checkin = r.getCheckinDate();
-				if (!dateBalance.containsKey(checkin)) {
-					dateBalance.put(r.getCheckinDate(), new ArrayList<Double>());
-				}
-				dateBalance.get(r.getCheckinDate()).add(r.getTotalCost().getAmountDue());
-			}
-		}
-		return dateBalance;
-	}
-
 	/*
 	 * Checks if a reservation is made in the date period specified by the start and
 	 * end dates. i.e. If the whole reservation is in the date period, it is
