@@ -117,7 +117,15 @@ public class DataAnalysis {
 		}
 		return sum;
 	}
-
+	
+	/*
+	 * Takes a TreeMap of total occupants mapped to to rooms and returns it as one
+	 * summed up total
+	 * 
+	 * @param totals the TreeMap containing all the totals
+	 * 
+	 * @return the totals summed up
+	 */
 	private int sumUpTotalOccupants(TreeMap<Room, Integer> totals) {
 		int sum = 0;
 		for (Entry<Room, Integer> e : totals.entrySet()) {
@@ -245,6 +253,25 @@ public class DataAnalysis {
 
 	}
 
+	/*
+	 *
+	 * 
+	 * @param start the start date of the date period
+	 * 
+	 * @param end the end date of the date period
+	 * 
+	 * @param dailyTotals the total number of occupants or rooms per day
+	 * 
+	 * @param averages the average numbers per room
+	 * 
+	 * @param averages the average numbers per room per day
+	 * 
+	 * @param totals the total numbers per room
+	 * 
+	 * @param days the days to include in the analysis
+	 * 
+	 * @return the filename the info was written to
+	 */
 	private String writeOccupancyRoomNumbersToFile(LocalDate start, LocalDate end,
 			TreeMap<Room, ArrayList<Integer>> dailyCounts, TreeMap<Room, Integer> totals, ArrayList<LocalDate> days,
 			TreeMap<Room, Integer> hotelRooms) {
@@ -294,7 +321,15 @@ public class DataAnalysis {
 		this.writeDataToFile(filePath, data);
 		return fileName;
 	}
-
+	
+	
+	/*
+	 * Gets the daily total occupants for a Room
+	 * @param start the start date of the date period 
+	 * @param end the end date of the date period
+	 * @param days the days to include in the analysis
+	 * @return ArrayList of Room mapped to the daily total occupants for that room
+	 */
 	private TreeMap<Room, ArrayList<Integer>> getDailyRoomCount(LocalDate start, LocalDate end, ArrayList<LocalDate> days) {
 		TreeMap<Room, ArrayList<Integer>> dailyTotals = new TreeMap<Room, ArrayList<Integer>>();
 		if (start.equals(end)) {
@@ -349,7 +384,14 @@ public class DataAnalysis {
 		}
 		return totals;
 	}
-
+	
+	/*
+	 * 
+	 * @param start the start date of the date period 
+	 * @param end the end date of the date period
+	 * @param days the days to include in the analysis
+	 * @return
+	 */
 	private TreeMap<Room, Integer> getTotalRoomCountPerPeriod(LocalDate start, LocalDate end, ArrayList<LocalDate> days) {
 		TreeMap<Room, Integer> counts = new TreeMap<Room, Integer>();
 		for (Room r : this.getAllTotalRoomCount(start, end, days).keySet()) {
@@ -572,7 +614,14 @@ public class DataAnalysis {
 		}
 		return totals;
 	}
-
+	
+	/*
+	 * 
+	 * @param start the start date of the date period 
+	 * @param end the end date of the date period
+	 * @param days the days to include in the analysis
+	 * @return TreeMap of Rooms mapped to ArrayList of total occupants for those Rooms.
+	 */
 	private TreeMap<Room, ArrayList<Integer>> getAllOccupantsPerRoom(LocalDate start, LocalDate end, ArrayList<LocalDate> days) {
 		TreeMap<Room, ArrayList<Integer>> allOccupantTotals = new TreeMap<Room, ArrayList<Integer>>();
 		for (HotelStay stay : this.stays) {
@@ -605,7 +654,15 @@ public class DataAnalysis {
 		}
 		return allOccupantTotals;
 	}
-
+	
+	
+	/*
+	 * Gets the average occupants per room of the same type between two dates.
+	 * @param start the start date of the date period 
+	 * @param end the end date of the date period
+	 * @param days the days to include in the analysis
+	 * @return TreeMap of Room mapped to a double representing average occupants per room of that type.
+	 */
 	private TreeMap<Room, Double> getAverageOccupantsPerRoom(LocalDate start, LocalDate end, ArrayList<LocalDate> days) {
 		TreeMap<Room, Double> averages = new TreeMap<Room, Double>();
 		for (Entry<Room, ArrayList<Integer>> e : this.getAllOccupantsPerRoom(start, end, days).entrySet()) {
@@ -619,6 +676,13 @@ public class DataAnalysis {
 		return averages;
 	}
 	
+	/*
+	 * Gets the average occupants per room per day of the same type between two dates.
+	 * @param start the start date of the date period 
+	 * @param end the end date of the date period
+	 * @param days the days to include in the analysis
+	 * @return TreeMap of Room mapped to a double representing average occupants per per day of that type.
+	 */
 	private TreeMap<Room, Double> getAverageOccupantsPerRoomPerDay(LocalDate start, LocalDate end, ArrayList<LocalDate> days) {
 		TreeMap<Room, Double> averages = new TreeMap<Room, Double>();
 		for (Entry<Room, ArrayList<Integer>> e : this.getAllOccupantsPerRoom(start, end, days).entrySet()) {
