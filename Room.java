@@ -15,7 +15,7 @@ public class Room implements Comparable<Room> {
 	}
 	
 	/**
-	 * 
+	 * Constructor which creates a room object with given type occupancy and rates.
 	 * @param type The room type e.g. Deluxe Double
 	 * @param occupancy the occupancy in the form occupancy[0] = adult minimum, occupancy[1] = child minimum, occupancy[2] = adult maximum, occupancy[3] = child maximum
 	 * @param rates the rates with index 0 representing monday rates, index 1 representing tuesday and so on
@@ -27,7 +27,7 @@ public class Room implements Comparable<Room> {
 	}
 	
 	/**
-	 * 
+	 * gets the type of the room
 	 * @return the room type
 	 */
 	public String getType() {
@@ -35,7 +35,7 @@ public class Room implements Comparable<Room> {
 	}
 	
 	/**
-	 * 
+	 * sets the type of the room
 	 * @param type the type of the room
 	 */
 	public void setType(String type) {
