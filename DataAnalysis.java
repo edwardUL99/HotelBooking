@@ -67,7 +67,7 @@ public class DataAnalysis {
 			lastIndex = 1;
 			data[row][lastIndex++] = e.getKey().getType();
 			for (int i = 0; i < numDays; i++) {
-				data[row][lastIndex++] = "€" + e.getValue().get(i);
+				data[row][lastIndex++] = "\u20ac" + e.getValue().get(i);
 			}
 			row++;
 		}
@@ -75,14 +75,14 @@ public class DataAnalysis {
 		for (Map.Entry<Room, Double> e : averages.entrySet()) {
 			data[row][0] = "";
 			data[row][lastIndex] = this.getNumberOfRooms(e.getKey(), start, end, days);
-			data[row][lastIndex + 1] = String.format("€%.02f", e.getValue());
+			data[row][lastIndex + 1] = String.format("\u20ac%.02f", e.getValue());
 			row++;
 		}
 
 		row = 1;
 		lastIndex += 2;
 		for (Map.Entry<Room, Double> e : totals.entrySet()) {
-			data[row][lastIndex] = String.format("€%.02f", e.getValue());
+			data[row][lastIndex] = String.format("\u20ac%.02f", e.getValue());
 			if (!recordedTotals.containsKey(e.getKey())) {
 				recordedTotals.put(e.getKey(), e.getValue());
 			}
@@ -95,8 +95,8 @@ public class DataAnalysis {
 			data[row][i] = "";
 		}
 		double total = this.sumUpTotalIncomes(recordedTotals);
-		data[row][lastIndex] = "Total: €" + String.format("%.02f", total);
-		data[row][lastIndex + 1] = "Total Average: €" + String.format("%.02f", total / (double) recordedTotals.size());
+		data[row][lastIndex] = "Total: \u20ac" + String.format("%.02f", total);
+		data[row][lastIndex + 1] = "Total Average: \u20ac" + String.format("%.02f", total / (double) recordedTotals.size());
 		data[1][0] = this.hotelName;
 		writeDataToFile(filePath, data);
 		return fileName;

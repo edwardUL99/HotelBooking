@@ -691,7 +691,7 @@ public class BookingSystem implements CsvTools {
 							data[row][lastIndex++] = "";
 						}
 					}
-					data[row][lastIndex++] = String.format("€%.02f", reservation.getTotalCost().getAmountDue()); // look
+					data[row][lastIndex++] = String.format("\u20ac%.02f", reservation.getTotalCost().getAmountDue()); // look
 																													// at
 																													// this
 																													// after
@@ -701,7 +701,7 @@ public class BookingSystem implements CsvTools {
 																													// in
 																													// and
 																													// checkout
-					data[row][lastIndex++] = String.format("€%.02f", reservation.getDeposit().getAmountDue());
+					data[row][lastIndex++] = String.format("\u20ac%.02f", reservation.getDeposit().getAmountDue());
 					if (hotelStay) {
 						HotelStay stay = getHotelStay(e.getKey(), reservation);
 						if (stay != null) {

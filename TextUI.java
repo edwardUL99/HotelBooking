@@ -209,7 +209,7 @@ public class TextUI {
 							+ "\nNumber of People: " + numberOfPeople
 							+ "\nNumber of Rooms: " + numberOfRooms
 							+ "\nRooms: " + roomsAsString(rooms)
-							+ "\nTotal Cost (incl. deposit): " + String.format("€%.02f", this.totalCost(rooms, numberOfPeople, checkinDate, checkinDate.plusDays(numberOfNights))));
+							+ "\nTotal Cost (incl. deposit): " + String.format("\u20ac%.02f", this.totalCost(rooms, numberOfPeople, checkinDate, checkinDate.plusDays(numberOfNights))));
 		while (true) {
 			System.out.println("Would you like to create your reservation or cancel it? (Create/Cancel)");
 			String choice = in.nextLine().toUpperCase();
