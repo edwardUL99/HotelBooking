@@ -106,7 +106,7 @@ public class HotelStay {
 	 */
 	@Override
 	public String toString() {
-		return String.format("%s Checked In: %b, Total Income: €%.02f, Stay from %s to %s", this.reservation.toString(), this.checkedIn, this.totalIncome.getAmountDue(), this.stayStart.toString(), this.stayEnd.toString());
+		return String.format("%s Checked In: %b, Total Income: \u20ac%.02f, Stay from %s to %s", this.reservation.toString(), this.checkedIn, this.totalIncome.getAmountDue(), this.stayStart.toString(), this.stayEnd.toString());
 	}
 
 	/**
