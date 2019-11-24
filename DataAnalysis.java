@@ -254,7 +254,7 @@ public class DataAnalysis {
 	}
 
 	/*
-	 *
+	 * Writes occupancy info for the specified date period to a file
 	 * 
 	 * @param start the start date of the date period
 	 * 
@@ -324,11 +324,15 @@ public class DataAnalysis {
 	
 	
 	/*
-	 * Gets the daily total occupants for a Room
+	 * Counts the 
+	 *
 	 * @param start the start date of the date period 
+	 * 
 	 * @param end the end date of the date period
+	 * 
 	 * @param days the days to include in the analysis
-	 * @return ArrayList of Room mapped to the daily total occupants for that room
+	 * 
+	 * @return TreeMap of Room mapped to an ArrayList of the daily total occupants for that room
 	 */
 	private TreeMap<Room, ArrayList<Integer>> getDailyRoomCount(LocalDate start, LocalDate end, ArrayList<LocalDate> days) {
 		TreeMap<Room, ArrayList<Integer>> dailyTotals = new TreeMap<Room, ArrayList<Integer>>();
@@ -388,8 +392,11 @@ public class DataAnalysis {
 	/*
 	 * 
 	 * @param start the start date of the date period 
+	 * 
 	 * @param end the end date of the date period
+	 * 
 	 * @param days the days to include in the analysis
+	 * 
 	 * @return
 	 */
 	private TreeMap<Room, Integer> getTotalRoomCountPerPeriod(LocalDate start, LocalDate end, ArrayList<LocalDate> days) {
