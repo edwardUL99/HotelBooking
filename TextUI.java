@@ -493,24 +493,6 @@ public class TextUI {
 			} else if (command == '5') {
 				loggedIn = false;
 			}
-			/*
-			} else if (command == '3') {
-				//enter reservation discount applies to and size of discount
-			} else if (command == '4') {
-				//choose data analytic method
-				System.out.println("would you like to \n1)get all room purchases between dates. \n2)get average earnings across all rooms over chosen period \n3)get Total earnings over chosen period");
-				command = in.nextLine().toUpperCase().charAt(0);
-				if (command == '1') {
-			
-				} else if (command1 == '2') {
-			
-				} else if (command1 == '3') {
-			
-				}
-			
-			}
-		 	
-			 */
 		}
 	}
 	

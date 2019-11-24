@@ -1,4 +1,5 @@
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.TreeMap;
 
 /**
@@ -37,12 +38,9 @@ public class Supervisor extends DeskClerk {
 		return false;
 	}
 	
-	/*
-	//methods requesting data Analysis
-	//gets data analysis of financial information between two dates
-	public void getFinancialDataAnalysis(LocalDate start, LocalDate end, String filePath) {
-		analyzer.getFinancialInfo(start, end, this.system.readDataFromFile(filePath));
-	}*/
+	public TreeMap<LocalDate, ArrayList<Double>> getFinancialDataAnalysis(LocalDate start, LocalDate end, String filePath) {
+		return analyzer.getFinancialInfo(start, end);
+	}
 	
 	/**
 	 * Returns the TreeMap of average income per room between the specified date period
@@ -86,8 +84,8 @@ public class Supervisor extends DeskClerk {
 	}
 	
 	//gets data analysis of what rooms are occupied between two dates
-	public void getOccupancyInfo(LocalDate start, LocalDate end) {
-		
+	public TreeMap<Room, Integer> getOccupancyInfo(LocalDate start, LocalDate end) {
+		return analyzer.getOccupancyInfo(start, end);
 	}
 	
 	/**
@@ -100,6 +98,16 @@ public class Supervisor extends DeskClerk {
 		return analyzer.getAverageOccupantsPerRoom(start, end);
 	}
 	
+	/**
+	 * 
+	 * @param start
+	 * @param end
+	 * @return
+	 */
+	
+	public TreeMap<Room, Double> getAverageOccupantsPerRoomPerDay(LocalDate start, LocalDate end) {
+		return analyzer.getAverageOccupantsPerRoomPerDay(start, end);
+	}
 	/**
 	 * Returns the TreeMap of total occupants per room between the specified date period
 	 * @param start the start date of the period
