@@ -128,6 +128,10 @@ public class Room implements Comparable<Room> {
 		return this.type.compareTo(other.type);
 	}
 	
+	/**
+	 * Returns a string representation of this room object
+	 * @return string representation
+	 */
 	@Override
 	public String toString() {
 		return this.type;

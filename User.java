@@ -11,9 +11,10 @@ public class User  {
 	
 	/**
 	 * Constructs a user object
+	 * @param hotelName the name of the hotel this user will work on
 	 * @param system the system for which this user is working on
 	 */
-	public User(String hotelName ,BookingSystem system) {
+	public User(String hotelName, BookingSystem system) {
 		this.system = system;
 		this.hotelName = hotelName;
 	}
@@ -25,10 +26,10 @@ public class User  {
 	 * @param type the type of reservation (S/AP)
 	 * @param checkinDate the check in date
 	 * @param numberOfNights the number of nights staying in the hotel
+	 * @param numberOfPeople the number of people for this reservation
 	 * @param numberOfRooms the number of rooms to reserve
 	 * @param rooms the list of rooms booked
 	 */
-	//Here maybe have it boolean to return if booking was successful or not
 	public void createReservation(String hotelName, String name, String type, LocalDate checkinDate, int numberOfNights, int numberOfPeople, int numberOfRooms, ArrayList<RoomBooking> rooms) {
 		this.system.addReservation(hotelName, new Reservation(name, type, checkinDate, numberOfNights, numberOfPeople, numberOfRooms, rooms));
 	}
