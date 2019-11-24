@@ -21,51 +21,97 @@ public class HotelStay {
 		this.stayEnd = this.reservation.getCheckoutDate();
 	}
 	
+	/**
+	 * Gets the reservation of this hotel stay
+	 * @return the reservation of this hotel stay.
+	 */
 	public Reservation getReservation() {
 		return this.reservation;
 	}
 	
+	/**
+	 * checks if the guests have checked in
+	 * @return True if the guests have checked in
+	 */
 	public boolean isCheckedIn() {
 		return this.checkedIn;
 	}
 	
+	/**
+	 * checks if the guests have checked out/not checked in
+	 * @return True if gets are checked out
+	 */
 	public boolean isCheckedOut() {
 		return !this.checkedIn;
 	}
 	
+	/**
+	 * Sets guests to checked In or not
+	 * @param checkedIn boolean decides if guest is checked in or not
+	 */
 	public void setCheckedIn(boolean checkedIn) {
 		this.checkedIn = checkedIn;
 	}
 	
+	/**
+	 * Gets the Bill for total income
+	 * @return Bill for total income from hotel stay
+	 */
 	public Bill getTotalIncome() {
 		return this.totalIncome;
 	}
 	
+	/**
+	 * Sets income from hotel stay
+	 * @param income double amount of income from hotel stay
+	 */
 	public void setTotalIncome(double income) {
 		this.totalIncome.setAmountDue(income);
 	}
 	
+	/**
+	 * gets start date of hotel stay
+	 * @return LocalDate Start date of hotel stay
+	 */
 	public LocalDate getStayStart() {
 		return this.stayStart;
 	}
 	
+	/**
+	 * gets end date of hotel stay
+	 * @return LocalDate End date of hotel stay
+	 */
 	public LocalDate getStayEnd() {
 		return this.stayEnd;
 	}
 	
+	/**
+	 * sets start date of hotel stay
+	 * @param stayStart LocalDate hotel stay start date
+	 */
 	public void setStayStart(LocalDate stayStart) {
 		this.stayStart = stayStart;
 	}
 	
+	/**
+	 * sets end date of hotel stay
+	 * @param stayEnd LoccalDate hotel stay end date
+	 */
 	public void setStayEnd(LocalDate stayEnd) {
 		this.stayEnd = stayEnd;
 	}
-	
+
+	/**
+	 * Gets hotel stay in string form
+	 */
 	@Override
 	public String toString() {
 		return String.format("%s Checked In: %b, Total Income: €%.02f, Stay from %s to %s", this.reservation.toString(), this.checkedIn, this.totalIncome.getAmountDue(), this.stayStart.toString(), this.stayEnd.toString());
 	}
-	
+
+	/**
+	 * checks if two hotel stays are the same
+	 */
 	@Override
 	public boolean equals(Object obj) {
 		if (!(obj instanceof HotelStay)) {
