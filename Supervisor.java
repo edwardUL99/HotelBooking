@@ -122,20 +122,24 @@ public class Supervisor extends DeskClerk {
 	 * Requests all room Occupancy information (i.e. billing) for all the dates in the date range and stores it in a file
 	 * @param start the start date of the period
 	 * @param end the end date of the period
+	 * @param hotelRooms rooms of the hotel, leave nul if occupantNumbers is true
+	 * @param occupantNumbers true if you want to retrieve occupant numbers, false if you want to retrieve room numbers
 	 * @return the filename at which the analysis was stored
 	 */
-	public String requestRoomOccupantsInformation(LocalDate start, LocalDate end) {
-		return analyzer.requestOccupantInformation(start, end);
+	public String requestRoomOccupantsInformation(LocalDate start, LocalDate end, TreeMap<Room, Integer> hotelRooms, boolean occupantNumbers) {
+		return analyzer.requestOccupantInformation(start, end, hotelRooms, occupantNumbers);
 	}
 	
 	/**
 	 * Requests all room Occupancy information (i.e. billing) for the days specified between the date range and stores it in a file
 	 * @param start the start date of the period
 	 * @param end the end date of the period
+	 * @param hotelRooms rooms of the hotel, leave null if occupantNumbers is true
+	 * @param occupantNumbers true if you want to retrieve occupant numbers, false if you want to retrieve room numbers
 	 * @param days the days of the date range to show 
 	 * @return the filename at which the analysis was stored
 	 */
-	public String requestRoomOccupantsInformation(LocalDate start, LocalDate end, java.util.ArrayList<LocalDate> days) {
-		return analyzer.requestOccupantInformation(start, end, days);
+	public String requestRoomOccupantsInformation(LocalDate start, LocalDate end,  TreeMap<Room, Integer> hotelRooms, boolean occupantNumbers, java.util.ArrayList<LocalDate> days) {
+		return analyzer.requestOccupantInformation(start, end, days, hotelRooms, occupantNumbers);
 	}
 }

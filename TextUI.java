@@ -300,76 +300,47 @@ public class TextUI {
 							+ "\n2) access occupancy analysis");
 		char analysisType = in.nextLine().toUpperCase().charAt(0);
 		if(analysisType == '1') {
-			//choose data analytic method
-			System.out.println("would you like to \n1)view all room purchases between dates"
-					+ "\n2)view average earnings for each room over chosen period"
-					+ "\n3)view Total earnings for each room over chosen period"
-					+ "\n4)request all income information for rooms over chosen period? (writes to file)?");
-			
-			char command = in.nextLine().toUpperCase().charAt(0);
-			if (command == '1') {
-				LocalDate start = LocalDate.of(2020, 8, 20); //hard coded for testing purposes
-				LocalDate end = LocalDate.of(2020, 8, 20);
-			} else if (command == '2') {
-				LocalDate start = LocalDate.of(2020, 8, 20); //hard coded for testing purposes
-				LocalDate end = LocalDate.of(2020, 8, 20);
-				System.out.println(temp.getAverageIncomePerRoom(start, end));
-			} else if (command == '3') {
-				LocalDate start = LocalDate.of(2020, 8, 20); //hard coded for testing purposes
-				LocalDate end = LocalDate.of(2020, 8, 20);
-				System.out.println(temp.getTotalIncomePerRoom(start, end));
-			} else if (command == '4') {
-				LocalDate[] dates = this.getDatesForDataAnalysis();
-				System.out.println("Would you like to choose days over the period to only include?(Yes/No)");
-				String choice = in.nextLine().toUpperCase();
-				String fileName;
-				if (choice.equals("YES")) {
-					System.out.println("Please choose from the list of days: ");
-					ArrayList<LocalDate> days = this.getDaysChoice(dates[0], dates[1]);
-					fileName = temp.requestRoomIncomeInformation(dates[0], dates[1], days);
-					System.out.println("Information saved to: " + fileName);
-				} else if (choice.equals("NO")) {
-					fileName = temp.requestRoomIncomeInformation(dates[0], dates[1]);
-					System.out.println("Information saved to: " + fileName);
-				} else {
-					System.out.println("Input not recognised, analysis not saved to file");
-				}
+			LocalDate[] dates = this.getDatesForDataAnalysis();
+			System.out.println("Would you like to choose days over the period to only include?(Yes/No)");
+			String choice = in.nextLine().toUpperCase();
+			String fileName;
+			if (choice.equals("YES")) {
+				System.out.println("Please choose from the list of days: ");
+				ArrayList<LocalDate> days = this.getDaysChoice(dates[0], dates[1]);
+				fileName = temp.requestRoomIncomeInformation(dates[0], dates[1], days);
+				System.out.println("Information saved to: " + fileName);
+			} else if (choice.equals("NO")) {
+				fileName = temp.requestRoomIncomeInformation(dates[0], dates[1]);
+				System.out.println("Information saved to: " + fileName);
+			} else {
+				System.out.println("Input not recognised, analysis not saved to file");
 			}
 		} else if(analysisType == '2') {
-			System.out.println("would you like to \n1)view all room occupancies between dates"
-					+ "\n2)view average occupancies for each room over chosen period"
-					+ "\n3)view Total occupancies for each room over chosen period"
-					+ "\n4)request all occupancy information for rooms over chosen period? (writes to file)?");
-			
-			char command = in.nextLine().toUpperCase().charAt(0);
-			
-			if (command == '1') {
-				LocalDate start = LocalDate.of(2020, 8, 20); //hard coded for testing purposes
-				LocalDate end = LocalDate.of(2020, 8, 20);
-			} else if (command == '2') {
-				LocalDate start = LocalDate.of(2020, 8, 20); //hard coded for testing purposes
-				LocalDate end = LocalDate.of(2020, 8, 20);
-				System.out.println(temp.getAverageOccupantsPerRoom(start, end));
-			} else if (command == '3') {
-				LocalDate start = LocalDate.of(2020, 8, 20); //hard coded for testing purposes
-				LocalDate end = LocalDate.of(2020, 8, 20);
-				System.out.println(temp.getTotalOccupantsPerRoom(start, end));
-			} else if (command == '4') {
-				LocalDate[] dates = this.getDatesForDataAnalysis();
-				System.out.println("Would you like to choose days over the period to only include?(Yes/No)");
-				String choice = in.nextLine().toUpperCase();
-				String fileName;
-				if (choice.equals("YES")) {
-					System.out.println("Please choose from the list of days: ");
-					ArrayList<LocalDate> days = this.getDaysChoice(dates[0], dates[1]);
-					fileName = temp.requestRoomOccupantsInformation(dates[0], dates[1], days);
-					System.out.println("Information saved to: " + fileName);
-				} else if (choice.equals("NO")) {
-					fileName = temp.requestRoomOccupantsInformation(dates[0], dates[1]);
-					System.out.println("Information saved to: " + fileName);
-				} else {
-					System.out.println("Input not recognised, analysis not saved to file");
-				}
+			LocalDate[] dates = this.getDatesForDataAnalysis();
+			System.out.println("Would you like to choose days over the period to only include?(Yes/No)");
+			String choice = in.nextLine().toUpperCase();
+			System.out.println("Would you like A)occupant numbers information or B)room count information?");
+			boolean numbers = true;
+			TreeMap<Room, Integer> hotelRooms = null;
+			char choice1 = in.nextLine().toUpperCase().charAt(0);
+			if (choice1 == 'A') {	
+				numbers = true;
+				hotelRooms = null;
+			} else if (choice1 == 'B') {
+				numbers = false;
+				hotelRooms = this.system.getAllRooms().get(this.hotelName);
+			}
+			String fileName;
+			if (choice.equals("YES")) {
+				System.out.println("Please choose from the list of days: ");
+				ArrayList<LocalDate> days = this.getDaysChoice(dates[0], dates[1]);
+				fileName = temp.requestRoomOccupantsInformation(dates[0], dates[1], hotelRooms, numbers, days);
+				System.out.println("Information saved to: " + fileName);
+			} else if (choice.equals("NO")) {
+				fileName = temp.requestRoomOccupantsInformation(dates[0], dates[1], hotelRooms, numbers);
+				System.out.println("Information saved to: " + fileName);
+			} else {
+				System.out.println("Input not recognised, analysis not saved to file");
 			}
 		}
 	}
