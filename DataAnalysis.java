@@ -705,7 +705,7 @@ public class DataAnalysis {
 	}
 
 	/*
-	 * Returns a TreeMap of total occupants per room per day in the days lis in the
+	 * Returns a TreeMap of total occupants per room per day in the days listed in the
 	 * range of start and end
 	 * 
 	 * @param start the start date of the period
