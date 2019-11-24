@@ -29,7 +29,7 @@ public class User  {
 	 * @param numberOfPeople the number of people for this reservation
 	 * @param numberOfRooms the number of rooms to reserve
 	 * @param rooms the list of rooms booked
-	 * @returns true if the booking was successful
+	 * @return true if the booking was successful
 	 */
 	public boolean createReservation(String hotelName, String name, String type, LocalDate checkinDate, int numberOfNights, int numberOfPeople, int numberOfRooms, ArrayList<RoomBooking> rooms) {
 		return this.system.addReservation(hotelName, new Reservation(name, type, checkinDate, numberOfNights, numberOfPeople, numberOfRooms, rooms));
