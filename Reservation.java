@@ -202,8 +202,8 @@ public class Reservation {
 		double breakfastCost = 14.00;
 		double calculated = 0.00;
 		
-		for (int i = 0; i < this.numberOfNights; i++) {
-			for (RoomBooking rb : this.rooms) {
+		for (RoomBooking rb : this.rooms) {
+			for (int i = 0; i < this.numberOfNights; i++) {
 				if (rb.isBreakfastIncluded()) {
 					calculated += breakfastCost * this.numberOfPeople;
 				}

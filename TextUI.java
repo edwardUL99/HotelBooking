@@ -179,6 +179,59 @@ public class TextUI {
 		}
 		return rooms;
 	}
+	
+	//Calculates the total cost of the proposed reservation
+	private double totalCost(ArrayList<RoomBooking> rooms, int numberOfPeople, LocalDate checkin, LocalDate checkout) {
+		double totalCost = 0;
+		double breakfastCost = 14.00;
+		double calculatedBreakfast = 0;
+		for (RoomBooking rb : rooms) {
+			Room r = rb.getRoom();
+			for (LocalDate date = checkin; !date.equals(checkout); date = date.plusDays(1)) {
+				if (rb.isBreakfastIncluded()) {
+					calculatedBreakfast += breakfastCost * numberOfPeople;
+				}
+				int dayOfWeek = date.getDayOfWeek().getValue() - 1;
+				totalCost += r.getRate(dayOfWeek);
+			}
+		}
+		totalCost += calculatedBreakfast;
+		return totalCost + 75.00;
+	}
+	
+	private boolean confirmBooking(String hotelName, String name, String type, LocalDate checkinDate, int numberOfNights, int numberOfPeople, int numberOfRooms, ArrayList<RoomBooking> rooms) {
+		type = type.equals("S") ? "Standard Booking":"Advanced Purchase";
+		System.out.println("Please confirm your reservation below: ");
+		System.out.println("Hotel: " + hotelName 
+							+ "\nName: " + name
+							+ "\nType: " + type
+							+ "\nCheck-in Date: " + checkinDate.toString()
+							+ "\nNumber of Nights: " + numberOfNights
+							+ "\nNumber of People: " + numberOfPeople
+							+ "\nNumber of Rooms: " + numberOfRooms
+							+ "\nRooms: " + roomsAsString(rooms)
+							+ "\nTotal Cost (incl. deposit): " + String.format("€%.02f", this.totalCost(rooms, numberOfPeople, checkinDate, checkinDate.plusDays(numberOfNights))));
+		while (true) {
+			System.out.println("Would you like to create your reservation or cancel it? (Create/Cancel)");
+			String choice = in.nextLine().toUpperCase();
+			if (choice.equals("CREATE")) {
+				return true;
+			} else if (choice.equals("CANCEL")) {
+				return false;
+			} else {
+				System.out.println("Input not recognised, please try again");
+			}
+		}
+	}
+	
+	private String roomsAsString(ArrayList<RoomBooking> rooms) {
+		String rm = "\n";
+		for (RoomBooking rb : rooms) {
+			String breakIncluded = rb.isBreakfastIncluded() ? " Breakfast Included":" Breakfast Not Included";
+			rm += rb.getRoom().toString() + breakIncluded + "\n";
+		}
+		return rm;
+	}
 
 	/*
 	 * Provides the user with the interface to create a reservation and all users
@@ -205,8 +258,16 @@ public class TextUI {
 		int numRooms = Integer.parseInt(in.nextLine()); // Prevents line not found errors as nextInt() does not skip to
 														// nextLine
 		ArrayList<RoomBooking> rooms = chooseRooms(numRooms, checkin, checkin.plusDays(numNights));
-		this.user.createReservation(this.hotelName, this.user.name, type, checkin, numNights, numPeople, numRooms,
-				rooms);
+		if (this.confirmBooking(this.hotelName, this.user.name, type, checkin, numNights, numPeople, numRooms, rooms)) {
+			boolean created = this.user.createReservation(this.hotelName, this.user.name, type, checkin, numNights, numPeople, numRooms, rooms);
+			if (created) {
+				System.out.println("Reservation created successfully");
+			} else {
+				System.out.println("The reservation was unsuccessful");
+			}
+		} else {
+			System.out.println("Reservation cancelled");
+		}
 	}
 
 	/*

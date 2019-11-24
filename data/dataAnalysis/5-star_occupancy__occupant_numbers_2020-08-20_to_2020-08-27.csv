@@ -1,5 +1,5 @@
 Hotel Name,Rooms,2020-08-20,2020-08-21,2020-08-22,2020-08-23,2020-08-24,2020-08-25,2020-08-26,Number of Rooms Booked in Period,Average Occupants Per Room,Average Occupants Per Room Per Day,Total Occupants Per Room
-5-star,Deluxe Family,3,3,3,3,3,0,0,1,15.00,2.14,15
-,Deluxe Single,3,3,3,3,3,1,1,4,4.25,0.61,17
-,Penthouse,5,5,5,5,5,5,5,1,35.00,5.00,35
-,,,,,,,,,,,Total: 67,Total Average: 22.33
+5-star,Deluxe Double,2,2,2,2,2,0,0,1,10.00,1.43,10
+,Deluxe Single,0,0,0,0,0,0,0,5,0.00,0.00,0
+,Deluxe Twin,10,10,10,10,10,10,10,5,14.00,2.00,70
+,,,,,,,,,,,Total: 80,Total Average: 26.67
