@@ -217,7 +217,7 @@ public class TextUI {
 			int numberOfNights, int numberOfPeople, int numberOfRooms, ArrayList<RoomBooking> rooms) {
 		type = type.equals("S") ? "Standard Booking" : "Advanced Purchase";
 		System.out.println("Please confirm your reservation below: ");
-		System.out.println("Hotel: " + hotelName + "\nName: " + name + "\nType: " + type + "\nCheck-in Date: "
+		System.out.println("Hotel: L4-Hotels " + hotelName + "\nName: " + name + "\nType: " + type + "\nCheck-in Date: "
 				+ checkinDate.toString() + "\nNumber of Nights: " + numberOfNights + "\nNumber of People: "
 				+ numberOfPeople + "\nNumber of Rooms: " + numberOfRooms + "\nRooms: " + roomsAsString(rooms)
 				+ "\nTotal Cost (incl. deposit): " + String.format("\u20ac%.02f",
@@ -349,6 +349,7 @@ public class TextUI {
 		if (reservation == null) {
 			System.out.println("The reservation could not be found");
 		} else {
+			System.out.println("Hotel: " + "L4-Hotels " + this.hotelName);
 			System.out.println(reservation.format());
 		}
 	}
