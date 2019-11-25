@@ -20,7 +20,7 @@ public class Reservation {
 	private Bill deposit;
 	
 	/**
-	 * 
+	 * Creates a Reservation object
 	 * @param name the reservation name
 	 * @param type the type of booking S/AP
 	 * @param checkinDate the date of check-in
