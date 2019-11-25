@@ -290,9 +290,9 @@ public class TextUI {
 			int numRooms = Integer.parseInt(input);
 			ArrayList<RoomBooking> rooms = chooseRooms(numRooms, checkin, checkin.plusDays(numNights));
 			if (this.confirmBooking(this.hotelName, this.user.name, type, checkin, numNights, numPeople, numRooms,rooms)) {
-				boolean created = this.user.createReservation(this.hotelName, this.user.name, type, checkin, numNights,numPeople, numRooms, rooms);
-				if (created) {
-					System.out.println("Reservation created successfully");
+				Reservation created = this.user.createReservation(this.hotelName, this.user.name, type, checkin, numNights,numPeople, numRooms, rooms);
+				if (created != null) {
+					System.out.println("Reservation #" + created.getNumber() + " created successfully(Please take note of the number for future reference)");
 				} else {
 					System.out.println("The reservation was unsuccessful");
 				}

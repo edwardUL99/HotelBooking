@@ -499,18 +499,18 @@ public class BookingSystem implements CsvTools {
 	 * 
 	 * @param hotelName   the name of the hotel owned by the chain e.g 5-star
 	 * @param reservation the reservation to be added
-	 * @return true if the reservation was successfully added
+	 * @return the reservation created if the reservation was successfully added or null if not
 	 */
-	public boolean addReservation(String hotelName, Reservation reservation) {
+	public Reservation addReservation(String hotelName, Reservation reservation) {
 		if (hasEnoughRoomsFree(hotelName, reservation)) { 
 			if (!this.reservations.containsKey(hotelName)) {
 				this.reservations.put(hotelName, new ArrayList<Reservation>());
 			}
 			this.reservations.get(hotelName).add(reservation);
 			this.updateFiles("Reservations");
-			return true;
+			return reservation;
 		}
-		return false;
+		return null;
 	}
 
 	/*
