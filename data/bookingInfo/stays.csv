@@ -1,3 +1,2 @@
 Hotel,Number,Name,Type,Check-in Date,Number of Nights,Number of People,Number Of Rooms,Rooms(Breakfast Included_Adult Occupancy_Child Occupancy),Total Cost,Deposit,Checked In,Stay Start,Stay End
 5-star,1000,Eddy Lynch,S,2020-08-20,5,2,1,Deluxe Twin(true_2_0),€625.00,€75.00,true,2020-08-20,2020-08-25
-,1001,Eddy Lynch,S,2020-12-15,5,1,1,Deluxe Single(false_1_0),€450.00,€75.00,true,2020-12-15,2020-12-20

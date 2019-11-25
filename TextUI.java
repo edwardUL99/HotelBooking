@@ -142,8 +142,7 @@ public class TextUI {
 				System.out.println("You cannot choose this room, as it is booked out. Please choose another.");
 			} else {
 				int n = input.toUpperCase().charAt(0) - 'A';
-				System.out.println(
-						"Please enter how many adults and children are staying per room (number of Adults,number of Children): ");
+				System.out.println("Please enter how many adults and children are staying per room (number of Adults,number of Children): ");
 				input = in.nextLine();
 				while (input.equals("") || input.equals(" ") || input.split(",").length != 2) {
 					System.out.println("Please enter your choice: ");
@@ -151,8 +150,7 @@ public class TextUI {
 				}
 				String[] occupancy = input.split(",");
 				if (occupancy.length < 2) {
-					System.out
-							.println("Please enter occupancy as: number of adults,number of children (with the comma)");
+					System.out.println("Please enter occupancy as: number of adults,number of children (with the comma)");
 				} else {
 					try {
 						int adults = Integer.parseInt(occupancy[0]);
@@ -195,7 +193,7 @@ public class TextUI {
 	}
 
 	// Calculates the total cost of the proposed reservation
-	private double totalCost(ArrayList<RoomBooking> rooms, int numberOfPeople, LocalDate checkin, LocalDate checkout) {
+	private double totalCost(ArrayList<RoomBooking> rooms, LocalDate checkin, LocalDate checkout) {
 		double totalCost = 0;
 		double breakfastCost = 14.00;
 		double calculatedBreakfast = 0;
@@ -203,7 +201,7 @@ public class TextUI {
 			Room r = rb.getRoom();
 			for (LocalDate date = checkin; !date.equals(checkout); date = date.plusDays(1)) {
 				if (rb.isBreakfastIncluded()) {
-					calculatedBreakfast += breakfastCost * numberOfPeople;
+					calculatedBreakfast += breakfastCost * (rb.getOccupancy()[0] + rb.getOccupancy()[1]);
 				}
 				int dayOfWeek = date.getDayOfWeek().getValue() - 1;
 				totalCost += r.getRate(dayOfWeek);
@@ -220,8 +218,8 @@ public class TextUI {
 		System.out.println("Hotel: L4-Hotels " + hotelName + "\nName: " + name + "\nType: " + type + "\nCheck-in Date: "
 				+ checkinDate.toString() + "\nNumber of Nights: " + numberOfNights + "\nNumber of People: "
 				+ numberOfPeople + "\nNumber of Rooms: " + numberOfRooms + "\nRooms: " + roomsAsString(rooms)
-				+ "\nTotal Cost (incl. deposit): " + String.format("\u20ac%.02f",
-						this.totalCost(rooms, numberOfPeople, checkinDate, checkinDate.plusDays(numberOfNights))));
+				+ "\nTotal Cost (incl. deposit): " + String.format("$%.02f",
+						this.totalCost(rooms, checkinDate, checkinDate.plusDays(numberOfNights))));
 		while (true) {
 			System.out.println("Would you like to create your reservation or cancel it? (Create/Cancel)");
 			String choice = in.nextLine().toUpperCase();
@@ -363,23 +361,19 @@ public class TextUI {
 	 */
 	private void checkInUser() {
 		// call getTotalCostCalculated() for a reservation either here or at checkout
-		System.out.println("Please enter the customer name: ");
-		String name = in.nextLine();
 		System.out.println("Please enter the check-in date(dd/mm/yyyy): "); //leave as LocalDate.now()??
 		LocalDate checkin = getDate(true);
-		System.out.println("Please enter the booking number: ");
-		try {
-			int number = Integer.parseInt(in.nextLine());
+		System.out.println("Please choose a reservation to check in: ");
+		Reservation r = (Reservation)this.getChoice(this.system.reservationsOnDate(this.hotelName, checkin, true));
+		if (r != null) {
 			if (this.user instanceof DeskClerk) {
 				DeskClerk clerk = (DeskClerk) this.user;
-				if (clerk.checkIn(name, checkin, number)) {
-					System.out.println("Booking #" + number + " checked in successfully");
-				} else {
-					System.out.println("Booking #" + number + " was not checked in successfully");
-				}
+				if (clerk.checkIn(r)) {
+					System.out.println("Booking #" + r.getNumber() + " checked in successfully");
+					} else {
+					System.out.println("Booking #" + r.getNumber() + " was not checked in successfully");
+					}
 			}
-		} catch (NumberFormatException e) {
-			System.out.println("The booking number provided was not a number, customer not checked in");
 		}
 	}
 
@@ -387,29 +381,20 @@ public class TextUI {
 	 * Provides the interface for checking out a user
 	 */
 	private void checkOutUser() {
-		System.out.println("Please enter the customer name: ");
-		String name = in.nextLine();
-		System.out.println("Please enter the check-in date(dd/mm/yyyy): ");
-		LocalDate checkin = getDate(true);
-		System.out.println("Please enter the check-out date(dd/mm/yyyy): "); // may replace with LocalDate.now() as if
-																				// this was a checkout it would be
-																				// current time. Same with checkin and
-																				// check is it the right date for the
-																				// checkin to occur
+     // may replace with LocalDate.now() as if this was a checkout it would be current time. Same with checkin and check is it the right date for the checkout to occur
+		System.out.println("Please enter check-out date(dd/mm/yyyy): ");
 		LocalDate checkout = getDate(true);
-		System.out.println("Please enter the booking number: ");
-		try {
-			int number = Integer.parseInt(in.nextLine());
+		System.out.println("Please choose a reservation to check out: ");
+		Reservation r = (Reservation)this.getChoice(this.system.reservationsOnDate(this.hotelName, checkout, false));
+		if (r != null) {
 			if (this.user instanceof DeskClerk) {
 				DeskClerk clerk = (DeskClerk) this.user;
-				if (clerk.checkOut(name, checkin, checkout, number)) {
-					System.out.println("Booking #" + number + " checked out");
+				if (clerk.checkOut(r)) {
+					System.out.println("Booking #" + r.getNumber() + " checked out");
 				} else {
-					System.out.println("Booking #" + number + " could not be checked out");
+					System.out.println("Booking #" + r.getNumber() + " could not be checked out");
 				}
 			}
-		} catch (NumberFormatException e) {
-			System.out.println("The booking number provided was not a number, user not checked out");
 		}
 	}
 
@@ -733,6 +718,12 @@ public class TextUI {
 	 */
 	private Object getChoice(Object[] objs) {
 		while (true) {
+			if (objs == null) {
+				return null;
+			} else if (objs.length == 0) {
+				System.out.println("No reservations at this date");
+				return null;
+			}
 			char ch = 'A';
 			for (Object o : objs) {
 				System.out.println(ch + ")" + o.toString());

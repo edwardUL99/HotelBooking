@@ -198,7 +198,7 @@ public class Reservation {
 		for (RoomBooking rb : this.rooms) {
 			for (int i = 0; i < this.numberOfNights; i++) {
 				if (rb.isBreakfastIncluded()) {
-					calculated += breakfastCost * this.numberOfPeople;
+					calculated += breakfastCost * (rb.getOccupancy()[0] + rb.getOccupancy()[1]);
 				}
 			}
 		}
@@ -291,4 +291,14 @@ public class Reservation {
 		return String.format("Reservation name: %s\nReservation type: %s\nResrvation number: %d\nCheck-in Date: %s\nNumber of nights: %d\nNumber of rooms: %d\nRooms Booked:\n%sTotal Cost (incl. deposit): \u20ac%.02f\nDeposit: \u20ac%.02f", this.name, this.type, this.number, this.checkinDate.toString(), this.numberOfNights, this.numberOfRooms, roomsBookedAsString(), this.getTotalCost().getAmountDue(), this.deposit.getAmountDue());
 	}
 	
+	/**
+	 * A summarised version of the string returned by format()
+	 */
+	public String toString() {
+		String rooms = "";
+		for (RoomBooking rb : this.rooms) {
+			rooms += rb.getRoom().getType() + " ";
+		}
+		return String.format("Reservation number: %d, Name: %s, Type: %s, Check-in date: %s, Number of nights: %s, Number of people: %s, Rooms: %s", this.number, this.name, this.type, this.checkinDate.toString(), this.numberOfNights, this.numberOfPeople, rooms);
+	}
 }

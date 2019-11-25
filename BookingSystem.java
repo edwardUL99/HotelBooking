@@ -459,7 +459,37 @@ public class BookingSystem implements CsvTools {
 		}
 		return false;
 	}
-
+	
+	/**
+	 * Returns an array of reservations that are on this check in date for the desk clerk to choose
+	 * @param hotelName the name of the hotel
+	 * @param date check in date if checkin is true, check-out if checkin is false
+	 * @param checkin true if you want to get reservations for checkin, false for checkout
+	 * @return an object array of the reservations
+	 */
+	public Object[] reservationsOnDate(String hotelName, LocalDate date, boolean checkin) {
+		ArrayList<Reservation> rList = this.reservations.get(hotelName);
+		if (rList != null) {
+			Object[] reservations = new Object[rList.size()];
+			int i = 0;
+			for (Reservation r : rList) {
+				LocalDate dateToCheck = checkin ? r.getCheckinDate():r.getCheckoutDate();
+				if (dateToCheck.equals(date)) {
+					if (!checkin) {
+						HotelStay stay = this.getHotelStay(hotelName, r); 
+						if (stay != null && stay.isCheckedIn()) {
+							reservations[i++] = r; //if checkout make sure its checked in first
+						}
+					} else {
+						reservations[i++] = r;
+					}
+				}
+			}
+			
+			return java.util.Arrays.copyOf(reservations, i);
+		}
+		return null;
+	}
 	/**
 	 * Adds a new reservation to the list of reservations for the particular hotel
 	 * 
@@ -527,6 +557,7 @@ public class BookingSystem implements CsvTools {
 			this.stays.get(hotelName).add(stay);
 			this.updateFiles("Reservations");
 			this.updateFiles("Stays");
+			return true;
 		}
 		return false;
 	}
@@ -698,9 +729,8 @@ public class BookingSystem implements CsvTools {
 							data[row][lastIndex++] = "";
 						}
 					}
-					data[row][lastIndex++] = String.format("\u20ac%.02f", reservation.getTotalCost().getAmountDue());
-															//unicode for euro symbol														// checkout
-					data[row][lastIndex++] = String.format("\u20ac%.02f", reservation.getDeposit().getAmountDue());
+					data[row][lastIndex++] = String.format("$%.02f", reservation.getTotalCost().getAmountDue());														// checkout
+					data[row][lastIndex++] = String.format("$%.02f", reservation.getDeposit().getAmountDue());
 					if (hotelStay) {
 						HotelStay stay = getHotelStay(e.getKey(), reservation);
 						if (stay != null) {

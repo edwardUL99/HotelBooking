@@ -54,6 +54,14 @@ public class Bill {
 	}
 	
 	/**
+	 * Sets the biled date
+	 * @param billedDate the new date
+	 */
+	public void setBilledDate(LocalDate billedDate) {
+		this.billedDate = billedDate;
+	}
+	
+	/**
 	 * Gets the amount that this bill is billed for
 	 * @return the amount due of this bill
 	 */
@@ -75,7 +83,7 @@ public class Bill {
 	 */
 	@Override
 	public String toString() {
-		return "Name: " + billName + "\n" + "Date: " + billedDate + "\n" + "Total amount due: "  + String.format("€%.02f", amountDue);
+		return "Name: " + billName + "\n" + "Date: " + billedDate + "\n" + "Total amount due: "  + String.format("$%.02f", amountDue);
 	}
 
 }
