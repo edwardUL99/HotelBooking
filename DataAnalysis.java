@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.TreeMap;
@@ -74,7 +75,7 @@ public class DataAnalysis {
 		row = 1;
 		for (Map.Entry<Room, Double> e : averages.entrySet()) {
 			data[row][0] = "";
-			data[row][lastIndex] = this.getNumberOfRooms(e.getKey(), start, end, days);
+			data[row][lastIndex] = this.getNumberOfRoom(e.getKey(), start, end, days);
 			data[row][lastIndex + 1] = String.format("\u20ac%.02f", e.getValue());
 			row++;
 		}
@@ -128,7 +129,7 @@ public class DataAnalysis {
 	 */
 	private int sumUpTotalOccupants(TreeMap<Room, Integer> totals) {
 		int sum = 0;
-		for (Entry<Room, Integer> e : totals.entrySet()) {
+		for (Map.Entry<Room, Integer> e : totals.entrySet()) {
 			sum += e.getValue();
 		}
 		return sum;
@@ -218,7 +219,7 @@ public class DataAnalysis {
 		row = 1;
 		for (Entry<Room, Double> e : averages.entrySet()) {
 			data[row][0] = "";
-			data[row][lastIndex] = this.getNumberOfRooms(e.getKey(), start, end, days);
+			data[row][lastIndex] = this.getNumberOfRoom(e.getKey(), start, end, days);
 			data[row][lastIndex+1] = String.format("%.02f", e.getValue());
 			row++;
 		}
@@ -326,7 +327,7 @@ public class DataAnalysis {
 	
 	
 	/*
-	 * Counts the 
+	 * Counts the daily room count
 	 *
 	 * @param start the start date of the date period 
 	 * 
@@ -363,7 +364,7 @@ public class DataAnalysis {
 		TreeMap<Room, Integer> totals = new TreeMap<Room, Integer>();
 		for (HotelStay stay : this.stays) {
 			Reservation r = stay.getReservation();
-			ArrayList<LocalDate> reservationDates = this.dateRangesForReservation(r);
+			ArrayList<LocalDate> reservationDates = r.dateRangeForReservation();
 			ArrayList<RoomBooking> roomBookings = r.getRooms();
 			for (RoomBooking rb : roomBookings) {
 				Room rm = rb.getRoom();
@@ -404,25 +405,9 @@ public class DataAnalysis {
 	private TreeMap<Room, Integer> getTotalRoomCountPerPeriod(LocalDate start, LocalDate end, ArrayList<LocalDate> days) {
 		TreeMap<Room, Integer> counts = new TreeMap<Room, Integer>();
 		for (Room r : this.getAllTotalRoomCount(start, end, days).keySet()) {
-			counts.put(r, this.getNumberOfRooms(r, start, end, days));
+			counts.put(r, this.getNumberOfRoom(r, start, end, days));
 		}
 		return counts;
-	}
-
-	/*
-	 * Returns a list of dates over which this reservation spans from check in date
-	 * up to but not including, the checkout date
-	 * 
-	 * @param r the reservation to get the dates spanned
-	 * 
-	 * @return an ArrayList of the range of dates the reservation spans over
-	 */
-	private ArrayList<LocalDate> dateRangesForReservation(Reservation r) {
-		ArrayList<LocalDate> range = new ArrayList<LocalDate>();
-		for (LocalDate date = r.getCheckinDate(); !date.equals(r.getCheckoutDate()); date = date.plusDays(1)) {
-			range.add(date);
-		}
-		return range;
 	}
 
 	/*
@@ -495,7 +480,7 @@ public class DataAnalysis {
 		TreeMap<Room, ArrayList<Double>> allTotals = new TreeMap<Room, ArrayList<Double>>();
 		for (HotelStay stay : this.stays) {
 			Reservation r = stay.getReservation();
-			ArrayList<LocalDate> reservationDates = this.dateRangesForReservation(r);
+			ArrayList<LocalDate> reservationDates = r.dateRangeForReservation();
 			ArrayList<RoomBooking> roomBookings = r.getRooms();
 			for (RoomBooking rb : roomBookings) {
 				double totalRate = 0;
@@ -546,6 +531,7 @@ public class DataAnalysis {
 	 * @return the file name of where the analysis was saved to
 	 */
 	public String requestIncomeInformation(LocalDate start, LocalDate end, ArrayList<LocalDate> days) {
+		Collections.sort(days); // ensure days are in order
 		TreeMap<Room, Double> averages = getAverageIncomePerRoom(start, end, days);
 		TreeMap<Room, Double> totals = getTotalIncomePerRoom(start, end, days);
 		TreeMap<Room, ArrayList<Double>> allTotals = this.totalsPerRoomPerDay(start, end, days);
@@ -568,7 +554,7 @@ public class DataAnalysis {
 	 * 
 	 * @return the count of the room booked during the date period
 	 */
-	private int getNumberOfRooms(Room rm, LocalDate start, LocalDate end, ArrayList<LocalDate> days) {
+	private int getNumberOfRoom(Room rm, LocalDate start, LocalDate end, ArrayList<LocalDate> days) {
 		TreeMap<Room, ArrayList<Double>> totals = this.getAllTotalsPerRoom(start, end, days);
 		for (Map.Entry<Room, ArrayList<Double>> e : totals.entrySet()) {
 			if (e.getKey().equals(rm)) {
@@ -628,7 +614,7 @@ public class DataAnalysis {
 	 * Checks if the given reservation has any days in the start end range
 	 */
 	private boolean isReservationInRange(Reservation r, LocalDate start, LocalDate end) {
-		ArrayList<LocalDate> dates = this.dateRangesForReservation(r);
+		ArrayList<LocalDate> dates = r.dateRangeForReservation();
 		if (start.equals(end)) {
 			return dates.contains(start);
 		} else {
@@ -652,7 +638,7 @@ public class DataAnalysis {
 		TreeMap<Room, ArrayList<Integer>> allOccupantTotals = new TreeMap<Room, ArrayList<Integer>>();
 		for (HotelStay stay : this.stays) {
 			Reservation r = stay.getReservation();
-			ArrayList<LocalDate> reservationDates = this.dateRangesForReservation(r);
+			ArrayList<LocalDate> reservationDates = r.dateRangeForReservation();
 			ArrayList<RoomBooking> roomBookings = r.getRooms();
 			for (RoomBooking rb : roomBookings) {
 				int totalOccupants = 0;
@@ -787,6 +773,7 @@ public class DataAnalysis {
 	 * @return the name of the file the information was stored to
 	 */
 	public String requestOccupantInformation(LocalDate start, LocalDate end, ArrayList<LocalDate> days, TreeMap<Room, Integer> hotelRooms, boolean numberOfOccupants) {
+		Collections.sort(days); //Ensure days are in order
 		if (numberOfOccupants) {
 			TreeMap<Room, Double> averages = getAverageOccupantsPerRoom(start, end, days);
 			TreeMap<Room, Double> averagesPerDay = getAverageOccupantsPerRoomPerDay(start, end, days);

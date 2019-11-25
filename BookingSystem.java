@@ -31,7 +31,7 @@ public class BookingSystem implements CsvTools {
 		this.reinitialise(true, true); // reinitialises stays
 	}
 
-	/**
+	/*
 	 * Reads hotel info from a hotel information CSV file and returns the Rooms and
 	 * Room count for each hotel. Example: If you had a file with 3 hotels, 5-star:
 	 * Deluxe Single 45 Deluxe Double 10 4-star: Executive Single 40 Executive
@@ -42,7 +42,7 @@ public class BookingSystem implements CsvTools {
 	 * @return the non-null TreeMap containing hotel names and the room and number
 	 *         of rooms that hotel has
 	 */
-	public TreeMap<String, TreeMap<Room, Integer>> getRoomsFromFile() {
+	private TreeMap<String, TreeMap<Room, Integer>> getRoomsFromFile() {
 		this.allRooms = new TreeMap<String, TreeMap<Room, Integer>>();
 		File f = new File(System.getProperty("user.dir") + "/data/hotels/l4Hotels.csv");
 		try (Scanner in = new Scanner(f)) {
@@ -197,13 +197,13 @@ public class BookingSystem implements CsvTools {
 	 * 
 	 * @param hotelName returns the name of the Hotel
 	 * 
-	 * @param room specifys the type of room
+	 * @param room specifies the type of room
 	 * 
 	 * @param from the date the period begins
 	 * 
 	 * @param to the date the period ends
 	 * 
-	 * @return the list of rooms in that time period that are booked
+	 * @return the number of rooms in that time period that are booked
 	 */
 	private int numberOfTimesRoomIsBookedAtDate(String hotelName, Room room, LocalDate from, LocalDate to) {
 		ArrayList<Reservation> bookings = bookingsInTimePeriod(hotelName, from, to);
@@ -463,7 +463,7 @@ public class BookingSystem implements CsvTools {
 
 	/*
 	 * After each check in, this method scans for if any reservation was a no show
-	 * and cancels it with np refund
+	 * and cancels it with no refund
 	 * 
 	 * @param hotelName the name of the hotel to check for no shows in
 	 */
@@ -677,15 +677,7 @@ public class BookingSystem implements CsvTools {
 							data[row][lastIndex++] = "";
 						}
 					}
-					data[row][lastIndex++] = String.format("\u20ac%.02f", reservation.getTotalCost().getAmountDue()); // look
-																													// at
-																													// this
-																													// after
-																													// figuring
-																													// out
-																													// check
-																													// in
-																													// and
+					data[row][lastIndex++] = String.format("\u20ac%.02f", reservation.getTotalCost().getAmountDue());
 															//unicode for euro symbol														// checkout
 					data[row][lastIndex++] = String.format("\u20ac%.02f", reservation.getDeposit().getAmountDue());
 					if (hotelStay) {

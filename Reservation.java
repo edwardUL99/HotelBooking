@@ -90,16 +90,17 @@ public class Reservation {
 		return lastBookingNumber;
 	}
 	
-	/**
+	/*
 	 * Sets the new reservation number, particularly useful for when reading in a new reservation from data in a file
 	 * @param number the reservation number
 	 */
-	public void setNumber(int number) {
+	private void setNumber(int number) {
 		this.number = number;
 		lastBookingNumber++;
 	}
 	
 	/**
+	 * Gets the name on the reservation
 	 * @return the reservation name
 	 */
 	public String getName() {
@@ -107,19 +108,11 @@ public class Reservation {
 	}
 	
 	/**
-	 * 
+	 * Gets the type of the reservation
 	 * @return the reservation type (S/AP)
 	 */
 	public String getType() {
 		return type;
-	}
-	
-	/**
-	 * Sets the number of people for this reservation
-	 * @param numberOfPeople the number of people
-	 */
-	public void setNumberOfPeople(int numberOfPeople) {
-		this.numberOfPeople = numberOfPeople;
 	}
 	
 	/**
@@ -131,7 +124,7 @@ public class Reservation {
 	}
 	
 	/**
-	 * 
+	 * Gets the check-in date for the reservation
 	 * @return the check-in date for this reservation
 	 */
 	public LocalDate getCheckinDate() {
@@ -139,7 +132,7 @@ public class Reservation {
 	}
 	
 	/**
-	 * 
+	 * Gets the number of nights this reservation is booked for
 	 * @return the number of nights for the reservation
 	 */
 	public int getNumberOfNights() {
@@ -147,7 +140,7 @@ public class Reservation {
 	}
 
 	/**
-	 * 
+	 * Gets the number of rooms booked 
 	 * @return the number of rooms booked 
 	 */
 	public int getNumberOfRooms() {
@@ -194,11 +187,11 @@ public class Reservation {
 		return this.totalCost;
 	}
 	
-	/**
+	/*
 	 * Calculates the cost of breakfast for this reservation
 	 * @return the cost of breakfast calculated per night per person
 	 */
-	public double calculateBreakfastCost() {
+	private double calculateBreakfastCost() {
 		double breakfastCost = 14.00;
 		double calculated = 0.00;
 		
@@ -244,6 +237,18 @@ public class Reservation {
 	 */
 	public Bill getDeposit() {
 		return this.deposit;
+	}
+	
+	/**
+	 * Gets the list of all the dates this reservation spans over
+	 * @return the ArrayList of the date range of the reservation
+	 */
+	public ArrayList<LocalDate> dateRangeForReservation() {
+		ArrayList<LocalDate> range = new ArrayList<LocalDate>();
+		for (LocalDate date = this.getCheckinDate(); !date.equals(this.getCheckoutDate()); date = date.plusDays(1)) {
+			range.add(date);
+		}
+		return range;
 	}
 	
 	/**

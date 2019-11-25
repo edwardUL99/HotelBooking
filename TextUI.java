@@ -683,7 +683,7 @@ public class TextUI {
 	public void run() {
 		boolean run = true;
 		String choice;
-		java.util.Set<String> hotels = system.getRoomsFromFile().keySet();
+		java.util.Set<String> hotels = system.getAllRooms().keySet();
 		String[] hotelNames = new String[hotels.size()];
 		int i = 0;
 		for (String n : hotels) {
@@ -785,6 +785,8 @@ public class TextUI {
 				LocalDate choice = allDays.get(index);
 				if (!days.contains(choice)) {
 					days.add(choice);
+				} else {
+					System.out.println("You already chose " + choice);
 				}
 			}
 		}

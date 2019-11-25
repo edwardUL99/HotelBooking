@@ -1,3 +1,3 @@
-Hotel Name,Rooms,2020-08-20,2020-08-21,2020-08-23,2020-08-26,Number of Rooms Booked in Period,Average Occupants Per Room,Average Occupants Per Room Per Day,Total Occupants Per Room
-5-star,Deluxe Twin,2,2,2,0,1,6.00,1.50,6
-,,,,,,,,Total: 6,Total Average: 6.00
+Hotel Name,Rooms,2020-08-20,2020-08-21,2020-08-22,2020-08-24,2020-08-26,Number of Rooms Booked in Period,Average Occupants Per Room,Average Occupants Per Room Per Day,Total Occupants Per Room
+5-star,Deluxe Twin,2,2,2,2,0,1,8.00,1.60,8
+,,,,,,,,,Total: 8,Total Average: 8.00
