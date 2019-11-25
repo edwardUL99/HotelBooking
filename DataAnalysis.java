@@ -43,11 +43,11 @@ public class DataAnalysis {
 	 * @param returns the filename
 	 */
 	private String writeBillingInfoToFile(LocalDate start, LocalDate end, TreeMap<Room, ArrayList<Double>> dailyTotals,
-			TreeMap<Room, Double> averages, TreeMap<Room, Double> totals, ArrayList<LocalDate> days) {
+			TreeMap<Room, Double> averages,TreeMap<Room, Double> averagesPerDay, TreeMap<Room, Double> totals, ArrayList<LocalDate> days) {
 		String fileName = String.format("/data/dataAnalysis/%s_billing_%s_to_%s.csv", this.hotelName, start.toString(),
 				end.toString());
 		String filePath = System.getProperty("user.dir") + fileName;
-		String[] attributes = { "Hotel Name", "Rooms", "Number of Rooms Booked in Period", "Average Income Per Room",
+		String[] attributes = { "Hotel Name", "Rooms", "Number of Rooms Booked in Period", "Average Income Per Room","Average Income Per Room Per day",
 				"Total Income Per Room" };
 		int numDays = days.size();
 		Object[][] data = new Object[averages.size() + 2][attributes.length + numDays];
@@ -76,6 +76,14 @@ public class DataAnalysis {
 		for (Map.Entry<Room, Double> e : averages.entrySet()) {
 			data[row][0] = "";
 			data[row][lastIndex] = this.getNumberOfRoom(e.getKey(), start, end, days);
+			data[row][lastIndex + 1] = String.format("\u20ac%.02f", e.getValue());
+			row++;
+		}
+		
+		row = 1;
+		lastIndex += 1;
+		for (Map.Entry<Room, Double> e : averagesPerDay.entrySet()) {
+			data[row][0] = "";
 			data[row][lastIndex + 1] = String.format("\u20ac%.02f", e.getValue());
 			row++;
 		}
@@ -533,9 +541,10 @@ public class DataAnalysis {
 	public String requestIncomeInformation(LocalDate start, LocalDate end, ArrayList<LocalDate> days) {
 		Collections.sort(days); // ensure days are in order
 		TreeMap<Room, Double> averages = getAverageIncomePerRoom(start, end, days);
+		TreeMap<Room, Double> averagesPerDay = getAverageIncomePerRoomPerDay(start, end, days);
 		TreeMap<Room, Double> totals = getTotalIncomePerRoom(start, end, days);
 		TreeMap<Room, ArrayList<Double>> allTotals = this.totalsPerRoomPerDay(start, end, days);
-		String fileName = this.writeBillingInfoToFile(start, end, allTotals, averages, totals, days);
+		String fileName = this.writeBillingInfoToFile(start, end, allTotals, averages, averagesPerDay, totals, days);
 		return fileName.split("/")[fileName.split("/").length - 1];
 	}
 
@@ -582,6 +591,30 @@ public class DataAnalysis {
 				average += d;
 			}
 			average /= e.getValue().size();
+			averages.put(e.getKey(), average);
+		}
+		return averages;
+	}
+	
+	/*
+	 * Returns for each room the average income that room generated on the days
+	 * specified during the date period
+	 * 
+	 * @param start the start date of the time period
+	 * @param end   the end date of the time period
+	 * @param days  the days to calculate the average for
+	 * @return a TreeMap with the average income generated mapped to that room
+	 *         during the date period
+	 */
+	private TreeMap<Room, Double> getAverageIncomePerRoomPerDay(LocalDate start, LocalDate end, ArrayList<LocalDate> days) {
+		TreeMap<Room, Double> averages = new TreeMap<Room, Double>();
+		for (Map.Entry<Room, ArrayList<Double>> e : this.getAllTotalsPerRoom(start, end, days).entrySet()) {
+			double average = 0;
+			for (double d : e.getValue()) {
+				average += d;
+			}
+			average /= e.getValue().size();
+			average /= days.size();
 			averages.put(e.getKey(), average);
 		}
 		return averages;
