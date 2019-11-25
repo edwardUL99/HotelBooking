@@ -430,13 +430,17 @@ public class BookingSystem implements CsvTools {
 							//didn't check in yet so charge them
 							reservation.getTotalCostCalculated();
 							reservation.setDeposit(75);
+							System.out.println("You have been charged:\n" + reservation.getTotalCost());
 						}
 					}
 				} else {
 					if (reservation.getTotalCost().getAmountDue() == 0) {
 						//didn't check in yet so charge them
 						reservation.getTotalCostCalculated();
+						reservation.getTotalCost().setBilledDate(LocalDate.now()); //billed for the date it was cancelled
 						reservation.setDeposit(75);
+						reservation.getDeposit().setBilledDate(LocalDate.now());
+						System.out.println("You have been charged:\n" + reservation.getTotalCost());
 					}
 				}
 				this.cancellations.get(hotelName).add(reservation);
@@ -498,10 +502,7 @@ public class BookingSystem implements CsvTools {
 	 * @return true if the reservation was successfully added
 	 */
 	public boolean addReservation(String hotelName, Reservation reservation) {
-		// Will have to have a way to check if the reservation can be made
-		if (hasEnoughRoomsFree(hotelName, reservation)) { // May have this changed so when user is choosing a room
-															// they're only shown options that are avlable to book, i.e.
-															// if theres enough rooms of that type to book
+		if (hasEnoughRoomsFree(hotelName, reservation)) { 
 			if (!this.reservations.containsKey(hotelName)) {
 				this.reservations.put(hotelName, new ArrayList<Reservation>());
 			}

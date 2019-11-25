@@ -129,8 +129,7 @@ public class TextUI {
 					System.out.println(ch + ")" + r.getType() + " is booked out for these dates");
 				}
 				ch++;
-			} // This is not how it will be implemented, just until the other methods are
-				// developed
+			} 
 			String input = in.nextLine();
 			while (input.equals("") || input.equals(" ")) {
 				System.out.println("Please enter your choice: ");
@@ -420,16 +419,12 @@ public class TextUI {
 	 * Provides the interface for a supervisor to apply a discount to a reservation
 	 */
 	private void applyDiscountToReservation() {
-		System.out.println("Please enter the customer name: ");
-		String input = in.nextLine();
-		while (input.equals("") || input.equals(" ")) {
-			System.out.println("Please enter your a name: ");
-			input = in.nextLine();
-		}
-		this.user.name = input;
-		Reservation reservation = this.getReservation();
+		System.out.println("Please enter the checkin date of the reservation you want to apply the discount to: ");
+		LocalDate date = getDate(true);
+		System.out.println("Please choose the reservation: ");
+		Reservation reservation = (Reservation)this.getChoice(this.system.reservationsOnDate(hotelName, date, true));
 		if (reservation == null) {
-			System.out.println("The reservation could not be found and a discount cannot applied");
+			System.out.println("The reservation could not be found or there is no reservation on this date and a discount cannot applied");
 		} else {
 			try {
 				System.out.println("Please enter the percentage discount (0-100): ");
@@ -633,8 +628,7 @@ public class TextUI {
 		while (loggedIn) {
 			System.out.println("\nHotel: " + this.hotelName);
 
-			System.out.println(
-					"\nWould you like to access \n1)reservations \n2)check-in/out \n3)apply discounts \n4)data analytics or \n5)Logout");
+			System.out.println("\nWould you like to access \n1)reservations \n2)check-in/out \n3)apply discounts \n4)data analytics or \n5)Logout");
 			String input = in.nextLine();
 			while (input.equals("") || input.equals(" ")) {
 				System.out.println("Please enter your choice: ");
