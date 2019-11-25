@@ -273,31 +273,7 @@ public class BookingSystem implements CsvTools {
 	}
 
 	/**
-	 * Returns a single reservation specified by the name and the checkIn date
-	 * 
-	 * @param hotelName the name of the hotel
-	 * @param name      the name of the customer who owns the reservation
-	 * @param checkIn   the check in date
-	 * @return a list of reservations matching the name and checkout date, null if
-	 *         the hotel doesn't exist
-	 */
-	public ArrayList<Reservation> getReservations(String hotelName, String name, LocalDate checkIn) {
-		ArrayList<Reservation> reservations = this.reservations.get(hotelName);
-		if (reservations != null) {
-			ArrayList<Reservation> matches = new ArrayList<Reservation>();
-			for (Reservation r : reservations) {
-				if (r.getName().equals(name) && r.getCheckinDate().isEqual(checkIn)) {
-					matches.add(r);
-				}
-			}
-			return matches;
-		}
-		return null;
-	}
-
-	/**
-	 * Returns a single reservation specified by the name and the checkIn date
-	 * 
+	 * Returns a single reservation specified by the name and the checkIn date 
 	 * @param hotelName the name of the hotel
 	 * @param name      the name of the customer who owns the reservation
 	 * @param checkIn   the check in date
@@ -307,11 +283,21 @@ public class BookingSystem implements CsvTools {
 	 */
 	public Reservation getReservation(String hotelName, String name, LocalDate checkIn, int number) {
 		for (Reservation r : this.reservations.get(hotelName)) {
-			if (r.getName().equals(name) && r.getCheckinDate().equals(checkIn) && r.getNumber() == number) {
+			if ((r.getName().equals(name) && r.getCheckinDate().equals(checkIn)) || r.getNumber() == number) {
 				return r;
 			}
 		}
 		return null;
+	}
+	
+	/**
+	 * Returns a reservation based on the reservation number in that hotel
+	 * @param hotelName the hotel name
+	 * @param number the reservation number
+	 * @return the reservation matching the number
+	 */
+	public Reservation getReservation(String hotelName, int number) {
+		return this.getReservation(hotelName, "", LocalDate.now(), number); //have local date as a placeholder
 	}
 
 	/*

@@ -75,7 +75,7 @@ public class Bill {
 	 */
 	@Override
 	public String toString() {
-		return "Name: " + billName + "\n" + "Date: " + billedDate + "\n" + "Total amount due: "  + amountDue;
+		return "Name: " + billName + "\n" + "Date: " + billedDate + "\n" + "Total amount due: "  + String.format("€%.02f", amountDue);
 	}
 
 }

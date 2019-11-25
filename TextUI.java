@@ -14,7 +14,7 @@ public class TextUI {
 	private String hotelName;
 
 	/**
-	 * Initialises the Text UI by creating a new instance of scanner and starting
+	 * Initializes the Text UI by creating a new instance of scanner and starting
 	 * the Booking System
 	 */
 	public TextUI() {
@@ -432,12 +432,12 @@ public class TextUI {
 	 */
 	private void applyDiscountToReservation() {
 		System.out.println("Please enter the customer name: ");
-		this.user.name = in.nextLine();
 		String input = in.nextLine();
 		while (input.equals("") || input.equals(" ")) {
 			System.out.println("Please enter your a name: ");
 			input = in.nextLine();
 		}
+		this.user.name = input;
 		Reservation reservation = this.getReservation();
 		if (reservation == null) {
 			System.out.println("The reservation could not be found and a discount cannot applied");

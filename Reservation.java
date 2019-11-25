@@ -286,13 +286,4 @@ public class Reservation {
 		return String.format("Reservation name: %s\nReservation type: %s\nResrvation number: %d\nCheck-in Date: %s\nNumber of nights: %d\nNumber of rooms: %d\nRooms Booked:\n%sTotal Cost (incl. deposit): \u20ac%.02f\nDeposit: \u20ac%.02f", this.name, this.type, this.number, this.checkinDate.toString(), this.numberOfNights, this.numberOfRooms, roomsBookedAsString(), this.getTotalCost().getAmountDue(), this.deposit.getAmountDue());
 	}
 	
-	/**
-	 * Returns a string representation of this reservation object
-	 * @return string representation
-	 */
-	@Override
-	public String toString() {
-		return String.format("Reservation name: %s, Type: %s, Number: %d, Checkin Date: %s, Number of nights: %d, Number of rooms: %d", this.name, this.type, this.number, this.checkinDate.toString(), this.numberOfNights, this.numberOfRooms);
-	}
-	
 }

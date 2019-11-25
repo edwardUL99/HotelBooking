@@ -28,22 +28,15 @@ public class Supervisor extends DeskClerk {
 	 */
 	public boolean applyDiscount(double discount, int reservationNumber) {
 		discount = discount > 1 ? discount / 100 : discount;
-		for (int i = 0; i < this.system.getReservations().get(hotelName).size(); i++) {
-			Reservation r = this.system.getReservations().get(hotelName).get(i);
-			if (r.getNumber() == reservationNumber && r.getTotalCost().getAmountDue() != 0.00) { // discounts can only
-																									// be applied on
-																									// checkin so if
-																									// it's not 0 they
-																									// have checked in
-																									// and the desk
-																									// clerk has
-																									// calculated their
-																									// bill
-				r.getTotalCost().setAmountDue(r.getTotalCost().getAmountDue() * (1 - discount));
-				this.system.updateFiles("Reservations");
-				this.system.updateFiles("Stays");
-				return true;
-			}
+		Reservation r = this.system.getReservation(hotelName, reservationNumber);
+		if (r == null) {
+			return false;
+		}
+		if (r.getTotalCost().getAmountDue() != 0.00) { // discounts can only be applied on checkin so if it's not 0 they have checked in and the desk clerk has calculated their bill
+			r.getTotalCost().setAmountDue(r.getTotalCost().getAmountDue() * (1 - discount));
+			this.system.updateFiles("Reservations");
+			this.system.updateFiles("Stays");
+			return true;
 		}
 		return false;
 	}

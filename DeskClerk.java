@@ -19,7 +19,7 @@ public class DeskClerk extends User {
 	 * @param customerName the name of the customer who made the reservation
 	 * @param checkIn the check in date
 	 * @param number  the booking number
-	 * @return whether the check in was succesfull, false if the reservation doesn't exist
+	 * @return whether the check in was succesful, false if the reservation doesn't exist
 	 */
 	public boolean checkIn(String customerName, LocalDate checkIn, int number) {
 		//LocalDate checkIn = null;
@@ -30,9 +30,12 @@ public class DeskClerk extends User {
 			return false;
 		} else {
 			if (!this.system.isStayed(this.hotelName, r)) { //if reservation is already a stay no point checking in
-				r.getTotalCostCalculated(); //Updates their bill with total cost
 				HotelStay stay = new HotelStay(r); //will be added to an arraylist in BookingSystem 
 				this.system.addHotelStay(this.hotelName, stay);
+				r.getTotalCostCalculated(); //Updates their bill with total cost
+				System.out.println("Your deposit payable is:\n" + r.getDeposit());
+				this.system.updateFiles("Reservation"); 
+				this.system.updateFiles("Stays");
 				return true;
 			}
 			//possibly write to file here
@@ -58,10 +61,16 @@ public class DeskClerk extends User {
 		if (stay == null) {
 			return false;
 		} else {
+			r.getTotalCostCalculated(); //Updates their bill with total cost
+			System.out.println("Your bill(incl. deposit) is:\n" + r.getTotalCost());
+			Bill totalExclDeposit = r.getTotalCost();
+			totalExclDeposit.setAmountDue(r.getTotalCost().getAmountDue() - 75);
+			System.out.println("Your bill(excl. deposit) is:\n" + totalExclDeposit);
 			stay.setCheckedIn(false);
 			stay.setStayStart(checkIn); //possibly check here if these are valid dates
 			stay.setStayEnd(checkOut);
-			this.system.writeReservationsToFile(true, true); //write to the stays file
+			this.system.updateFiles("Reservation"); 
+			this.system.updateFiles("Stays");
 			return true;
 		}
 	}
