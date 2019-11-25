@@ -39,13 +39,10 @@ public class User  {
 	 * Notifies the booking system that the reservation was cancelled and to remove it from the system
 	 * @param hotelName the name of the hotel
 	 * @param reservation the reservation to remove
+	 * @return true if the cancellation was returned with a refund, false if not
 	 */
-	public void cancelReservation(String hotelName, Reservation reservation) {
-		if (!reservation.getCheckinDate().equals(LocalDate.now().minusDays((long)1)) && reservation.getType().equals("S")) {
-			reservation.setTotalCost(0.00);
-			reservation.setDeposit(0.00); //assume this is what's meant by refund? i.e. total paid
-		}
-		this.system.removeReservation(hotelName, reservation, true);
+	public boolean cancelReservation(String hotelName, Reservation reservation) {
+		return this.system.removeReservation(hotelName, reservation, true);
 	}
 		
 }

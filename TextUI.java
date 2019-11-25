@@ -317,7 +317,11 @@ public class TextUI {
 		if (reservation == null) {
 			System.out.println("The reservation could not be found");
 		} else {
-			this.user.cancelReservation(hotelName, reservation);
+			if (this.user.cancelReservation(hotelName, reservation)) {
+				System.out.println("The booking was cancelled and the booking cost was refunded");
+			} else {
+				System.out.println("The booking was cancelled but the booking cost was not refunded as it was either cancelled in less than 24 hours before, or it was an Advance Purchase Reservation");
+			}
 		}
 	}
 

@@ -419,10 +419,31 @@ public class BookingSystem implements CsvTools {
 				if (!this.cancellations.containsKey(hotelName)) {
 					this.cancellations.put(hotelName, new ArrayList<Reservation>());
 				}
+				boolean refunded = false;
+				if (!reservation.getCheckinDate().equals(LocalDate.now().minusDays((long)1))) {
+					if (reservation.getType().equals("S")) {
+						reservation.setTotalCost(0.00);
+						reservation.setDeposit(0.00); //refunded money
+						refunded = true;
+					} else if (reservation.getType().equals("AP")) {
+						if (reservation.getTotalCost().getAmountDue() == 0) {
+							//didn't check in yet so charge them
+							reservation.getTotalCostCalculated();
+							reservation.setDeposit(75);
+						}
+					}
+				} else {
+					if (reservation.getTotalCost().getAmountDue() == 0) {
+						//didn't check in yet so charge them
+						reservation.getTotalCostCalculated();
+						reservation.setDeposit(75);
+					}
+				}
 				this.cancellations.get(hotelName).add(reservation);
 				this.reservations.get(hotelName).remove(reservation);
 				this.updateFiles("Reservations");
 				this.updateFiles("Cancellations");
+				return refunded;
 			} else {
 				if (LocalDate.now().isAfter(reservation.getCheckoutDate().plusDays(30))
 						&& (this.cancellations.get(hotelName).contains(reservation) || // if cancelled or is a hotel
