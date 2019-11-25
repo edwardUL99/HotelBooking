@@ -80,9 +80,9 @@ public class TextUI {
 	 */
 	private LocalDate[] getDatesForDataAnalysis() {
 		LocalDate[] dates = new LocalDate[2];
-		System.out.println("Please enter the start date(dd/mm/yy): ");
+		System.out.println("Please enter the start date(dd/mm/yyyy): ");
 		LocalDate d1 = getDate(false); // allow previous dates also as may want to do analysis on historical data
-		System.out.println("Please enter the end date(dd/mm/yy): ");
+		System.out.println("Please enter the end date(dd/mm/yyyy): ");
 		LocalDate d2 = getDate(false);
 
 		if (d1.isAfter(d2)) {
