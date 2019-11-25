@@ -121,7 +121,9 @@ public class TextUI {
 			for (int i = 0; i < allRooms.size(); i++) {
 				Room r = allRooms.get(i);
 				if (map.get(r) > 0) {
-					System.out.println(ch + ")" + r.getType() + " " + map.get(r) + " available. Maximum adult occupancy: " + r.occupancy(true, false)+ ". Maximum children occupancy: " + r.occupancy(false, false) + ".");
+					System.out.println(ch + ")" + r.getType() + " " + map.get(r)
+							+ " available. Maximum adult occupancy: " + r.occupancy(true, false)
+							+ ". Maximum children occupancy: " + r.occupancy(false, false) + ".");
 				} else {
 					notAvailable.add(ch);
 					System.out.println(ch + ")" + r.getType() + " is booked out for these dates");
@@ -130,56 +132,69 @@ public class TextUI {
 			} // This is not how it will be implemented, just until the other methods are
 				// developed
 			String input = in.nextLine();
+			while (input.equals("") || input.equals(" ")) {
+				System.out.println("Please enter your choice: ");
+				input = in.nextLine();
+			}
 			if (notAvailable.contains(input.toUpperCase().charAt(0))) { // If notAvailable contains the choice, the user
 																		// tried to choose a room that has been booked
 																		// out
 				System.out.println("You cannot choose this room, as it is booked out. Please choose another.");
 			} else {
 				int n = input.toUpperCase().charAt(0) - 'A';
-				System.out.println("Please enter how many adults and children are staying per room (number of Adults,number of Children): ");
-				String[] occupancy = in.nextLine().split(",");
+				System.out.println(
+						"Please enter how many adults and children are staying per room (number of Adults,number of Children): ");
+				input = in.nextLine();
+				while (input.equals("") || input.equals(" ") || input.split(",").length != 2) {
+					System.out.println("Please enter your choice: ");
+					input = in.nextLine();
+				}
+				String[] occupancy = input.split(",");
 				if (occupancy.length < 2) {
 					System.out
 							.println("Please enter occupancy as: number of adults,number of children (with the comma)");
 				} else {
-					int adults = Integer.parseInt(occupancy[0]);
-					int children = Integer.parseInt(occupancy[1]);
-					if (n >= 0 && n < allRooms.size()) {
-						Room choice = allRooms.get(n);
-						map.put(choice, map.get(choice) - 1); //decrement as this room was chosen
-						if ((adults >= choice.occupancy(true, true) && adults <= choice.occupancy(true, false))
-								&& (children >= choice.occupancy(false, true)
-										&& children <= choice.occupancy(false, false))) {
-							boolean run = true;
-							while (run) {
-								System.out.println("Would you like breakfast included with the room? (Yes/No)");
-								String option = in.nextLine();
-								option = option.substring(0, 1).toUpperCase() + option.substring(1).toLowerCase();
-								RoomBooking booking = new RoomBooking(choice, adults, children);
-								if (option.equals("Yes")) {
-									booking.setBreakfastIncluded(true);
-									rooms.add(booking);
-									run = false;
-								} else if (option.equals("No")) {
-									booking.setBreakfastIncluded(false);
-									rooms.add(booking);
-									run = false;
-								} else {
-									System.out.println("Please choose yes/no");
+					try {
+						int adults = Integer.parseInt(occupancy[0]);
+						int children = Integer.parseInt(occupancy[1]);
+						if (n >= 0 && n < allRooms.size()) {
+							Room choice = allRooms.get(n);
+							map.put(choice, map.get(choice) - 1); // decrement as this room was chosen
+							if ((adults >= choice.occupancy(true, true) && adults <= choice.occupancy(true, false))
+									&& (children >= choice.occupancy(false, true)
+											&& children <= choice.occupancy(false, false))) {
+								boolean run = true;
+								while (run) {
+									System.out.println("Would you like breakfast included with the room? (Yes/No)");
+									String option = in.nextLine();
+									option = option.substring(0, 1).toUpperCase() + option.substring(1).toLowerCase();
+									RoomBooking booking = new RoomBooking(choice, adults, children);
+									if (option.equals("Yes")) {
+										booking.setBreakfastIncluded(true);
+										rooms.add(booking);
+										run = false;
+									} else if (option.equals("No")) {
+										booking.setBreakfastIncluded(false);
+										rooms.add(booking);
+										run = false;
+									} else {
+										System.out.println("Please choose yes/no");
+									}
 								}
 							}
+						} else {
+							System.out.println("The room chosen is not suitable for the number of adults or children you entered, please try again");
 						}
-					} else {
-						System.out.println(
-								"The room chosen is not suitable for the number of adults or children you entered, please try again");
+					} catch (NumberFormatException e) {
+						System.out.println("You can only enter a number for the number of adults or number of children");
 					}
 				}
 			}
 		}
 		return rooms;
 	}
-	
-	//Calculates the total cost of the proposed reservation
+
+	// Calculates the total cost of the proposed reservation
 	private double totalCost(ArrayList<RoomBooking> rooms, int numberOfPeople, LocalDate checkin, LocalDate checkout) {
 		double totalCost = 0;
 		double breakfastCost = 14.00;
@@ -197,22 +212,23 @@ public class TextUI {
 		totalCost += calculatedBreakfast;
 		return totalCost + 75.00;
 	}
-	
-	private boolean confirmBooking(String hotelName, String name, String type, LocalDate checkinDate, int numberOfNights, int numberOfPeople, int numberOfRooms, ArrayList<RoomBooking> rooms) {
-		type = type.equals("S") ? "Standard Booking":"Advanced Purchase";
+
+	private boolean confirmBooking(String hotelName, String name, String type, LocalDate checkinDate,
+			int numberOfNights, int numberOfPeople, int numberOfRooms, ArrayList<RoomBooking> rooms) {
+		type = type.equals("S") ? "Standard Booking" : "Advanced Purchase";
 		System.out.println("Please confirm your reservation below: ");
-		System.out.println("Hotel: " + hotelName 
-							+ "\nName: " + name
-							+ "\nType: " + type
-							+ "\nCheck-in Date: " + checkinDate.toString()
-							+ "\nNumber of Nights: " + numberOfNights
-							+ "\nNumber of People: " + numberOfPeople
-							+ "\nNumber of Rooms: " + numberOfRooms
-							+ "\nRooms: " + roomsAsString(rooms)
-							+ "\nTotal Cost (incl. deposit): " + String.format("\u20ac%.02f", this.totalCost(rooms, numberOfPeople, checkinDate, checkinDate.plusDays(numberOfNights))));
+		System.out.println("Hotel: " + hotelName + "\nName: " + name + "\nType: " + type + "\nCheck-in Date: "
+				+ checkinDate.toString() + "\nNumber of Nights: " + numberOfNights + "\nNumber of People: "
+				+ numberOfPeople + "\nNumber of Rooms: " + numberOfRooms + "\nRooms: " + roomsAsString(rooms)
+				+ "\nTotal Cost (incl. deposit): " + String.format("\u20ac%.02f",
+						this.totalCost(rooms, numberOfPeople, checkinDate, checkinDate.plusDays(numberOfNights))));
 		while (true) {
 			System.out.println("Would you like to create your reservation or cancel it? (Create/Cancel)");
 			String choice = in.nextLine().toUpperCase();
+			while (choice.equals("") || choice.equals(" ")) {
+				System.out.println("Please enter your choice: ");
+				choice = in.nextLine();
+			}
 			if (choice.equals("CREATE")) {
 				return true;
 			} else if (choice.equals("CANCEL")) {
@@ -222,11 +238,11 @@ public class TextUI {
 			}
 		}
 	}
-	
+
 	private String roomsAsString(ArrayList<RoomBooking> rooms) {
 		String rm = "\n";
 		for (RoomBooking rb : rooms) {
-			String breakIncluded = rb.isBreakfastIncluded() ? " Breakfast Included":" Breakfast Not Included";
+			String breakIncluded = rb.isBreakfastIncluded() ? " Breakfast Included" : " Breakfast Not Included";
 			rm += rb.getRoom().toString() + breakIncluded + "\n";
 		}
 		return rm;
@@ -238,7 +254,12 @@ public class TextUI {
 	 */
 	private void makeReservation() {
 		System.out.println("Do you want to make a S)tandard booking or A)dvanced Purchase?");
-		char choice = in.nextLine().toUpperCase().charAt(0);
+		String input = in.nextLine();
+		while (input.equals("") || input.equals(" ")) {
+			System.out.println("Please enter your choice: ");
+			input = in.nextLine();
+		}
+		char choice = input.toUpperCase().charAt(0);
 		String type;
 		if (choice == 'S') {
 			type = "S";
@@ -249,23 +270,41 @@ public class TextUI {
 		System.out.println("Please enter your check-in date(dd/mm/yyyy): ");
 		checkin = getDate(true);
 		System.out.println("Please enter the number of nights you wish to stay: ");
-		int numNights = Integer.parseInt(in.nextLine()); // Prevents line not found errors as nextInt() does not skip to
-															// nextLine
-		System.out.println("Please enter the number of people staying: ");
-		int numPeople = Integer.parseInt(in.nextLine());
-		System.out.println("Please enter the number of rooms you wish to book: ");
-		int numRooms = Integer.parseInt(in.nextLine()); // Prevents line not found errors as nextInt() does not skip to
-														// nextLine
-		ArrayList<RoomBooking> rooms = chooseRooms(numRooms, checkin, checkin.plusDays(numNights));
-		if (this.confirmBooking(this.hotelName, this.user.name, type, checkin, numNights, numPeople, numRooms, rooms)) {
-			boolean created = this.user.createReservation(this.hotelName, this.user.name, type, checkin, numNights, numPeople, numRooms, rooms);
-			if (created) {
-				System.out.println("Reservation created successfully");
-			} else {
-				System.out.println("The reservation was unsuccessful");
+		try {
+			input = in.nextLine();
+			while (input.equals("") || input.equals(" ")) {
+				System.out.println("Please enter the number of nights: ");
+				input = in.nextLine();
 			}
-		} else {
-			System.out.println("Reservation cancelled");
+			int numNights = Integer.parseInt(input);
+			System.out.println("Please enter the number of people staying: ");
+			input = in.nextLine();
+			while (input.equals("") || input.equals(" ")) {
+				System.out.println("Please enter the number of people staying: ");
+				input = in.nextLine();
+			}
+			int numPeople = Integer.parseInt(input);
+			System.out.println("Please enter the number of rooms you wish to book: ");
+			input = in.nextLine();
+			while (input.equals("") || input.equals(" ")) {
+				System.out.println("Please enter the number of rooms: ");
+				input = in.nextLine();
+			}
+			int numRooms = Integer.parseInt(input);
+			ArrayList<RoomBooking> rooms = chooseRooms(numRooms, checkin, checkin.plusDays(numNights));
+			if (this.confirmBooking(this.hotelName, this.user.name, type, checkin, numNights, numPeople, numRooms,rooms)) {
+				boolean created = this.user.createReservation(this.hotelName, this.user.name, type, checkin, numNights,numPeople, numRooms, rooms);
+				if (created) {
+					System.out.println("Reservation created successfully");
+				} else {
+					System.out.println("The reservation was unsuccessful");
+				}
+			} else {
+				System.out.println("Reservation cancelled");
+			}
+		} catch (NumberFormatException e) {
+			System.out.println("You can only enter numbers for number of people or number of rooms");
+			makeReservation();
 		}
 	}
 
@@ -292,8 +331,13 @@ public class TextUI {
 		System.out.println("Please enter the checkIn date(dd/mm/yyyy): ");
 		LocalDate checkIn = getDate(true);
 		System.out.println("Please enter the booking number: ");
-		int number = Integer.parseInt(in.nextLine()); // using in.nextInt() cause no next line errors
-		return this.system.getReservation(this.hotelName, this.user.name, checkIn, number);
+		try {
+			int number = Integer.parseInt(in.nextLine()); // using in.nextInt() cause no next line errors
+			return this.system.getReservation(this.hotelName, this.user.name, checkIn, number);
+		} catch (NumberFormatException e) {
+			System.out.println("The booking number provided was not a number");
+		}
+		return null;
 	}
 
 	/*
@@ -319,14 +363,18 @@ public class TextUI {
 		System.out.println("Please enter the check-in date(dd/mm/yyyy): ");
 		LocalDate checkin = getDate(true);
 		System.out.println("Please enter the booking number: ");
-		int number = Integer.parseInt(in.nextLine());
-		if (this.user instanceof DeskClerk) {
-			DeskClerk clerk = (DeskClerk) this.user;
-			if (clerk.checkIn(name, checkin, number)) {
-				System.out.println("Booking #" + number + " checked in successfully");
-			} else {
-				System.out.println("Booking #" + number + " was not checked in successfully");
+		try {
+			int number = Integer.parseInt(in.nextLine());
+			if (this.user instanceof DeskClerk) {
+				DeskClerk clerk = (DeskClerk) this.user;
+				if (clerk.checkIn(name, checkin, number)) {
+					System.out.println("Booking #" + number + " checked in successfully");
+				} else {
+					System.out.println("Booking #" + number + " was not checked in successfully");
+				}
 			}
+		} catch (NumberFormatException e) {
+			System.out.println("The booking number provided was not a number, customer not checked in");
 		}
 	}
 
@@ -345,14 +393,18 @@ public class TextUI {
 																				// checkin to occur
 		LocalDate checkout = getDate(true);
 		System.out.println("Please enter the booking number: ");
-		int number = Integer.parseInt(in.nextLine());
-		if (this.user instanceof DeskClerk) {
-			DeskClerk clerk = (DeskClerk) this.user;
-			if (clerk.checkOut(name, checkin, checkout, number)) {
-				System.out.println("Booking #" + number + " checked out");
-			} else {
-				System.out.println("Booking #" + number + " could not be checked out");
+		try {
+			int number = Integer.parseInt(in.nextLine());
+			if (this.user instanceof DeskClerk) {
+				DeskClerk clerk = (DeskClerk) this.user;
+				if (clerk.checkOut(name, checkin, checkout, number)) {
+					System.out.println("Booking #" + number + " checked out");
+				} else {
+					System.out.println("Booking #" + number + " could not be checked out");
+				}
 			}
+		} catch (NumberFormatException e) {
+			System.out.println("The booking number provided was not a number, user not checked out");
 		}
 	}
 
@@ -361,7 +413,12 @@ public class TextUI {
 	 */
 	private void checkinServices() {
 		System.out.println("Would you like to A)Check In or B)Check Out?");
-		char choice = in.nextLine().toUpperCase().charAt(0);
+		String input = in.nextLine();
+		while (input.equals("") || input.equals(" ")) {
+			System.out.println("Please enter your choice: ");
+			input = in.nextLine();
+		}
+		char choice = input.toUpperCase().charAt(0);
 		if (choice == 'A') {
 			checkInUser();
 		} else if (choice == 'B') {
@@ -375,15 +432,24 @@ public class TextUI {
 	private void applyDiscountToReservation() {
 		System.out.println("Please enter the customer name: ");
 		this.user.name = in.nextLine();
+		String input = in.nextLine();
+		while (input.equals("") || input.equals(" ")) {
+			System.out.println("Please enter your a name: ");
+			input = in.nextLine();
+		}
 		Reservation reservation = this.getReservation();
 		if (reservation == null) {
 			System.out.println("The reservation could not be found and a discount cannot applied");
 		} else {
-			System.out.println("Please enter the percentage discount (0-100): ");
-			double percentageDiscount = Double.parseDouble(in.nextLine());
-			Supervisor temp = (Supervisor) this.user;
-			if (temp.applyDiscount(percentageDiscount, reservation.getNumber())) {
-				System.out.println("The discount was applied successfully");
+			try {
+				System.out.println("Please enter the percentage discount (0-100): ");
+				double percentageDiscount = Double.parseDouble(in.nextLine());
+				Supervisor temp = (Supervisor) this.user;
+				if (temp.applyDiscount(percentageDiscount, reservation.getNumber())) {
+					System.out.println("The discount was applied successfully");
+				}
+			} catch (NumberFormatException e) {
+				System.out.println("The percentage provided was not a number, discount was not applied");
 			}
 		}
 	}
@@ -394,7 +460,12 @@ public class TextUI {
 	private void dataAnalyticsServices() {
 		Supervisor temp = (Supervisor) this.user;
 		System.out.println("Would you like to \n1) access billing analysis" + "\n2) access occupancy analysis");
-		char analysisType = in.nextLine().toUpperCase().charAt(0);
+		String input = in.nextLine();
+		while (input.equals("") || input.equals(" ")) {
+			System.out.println("Please enter your choice: ");
+			input = in.nextLine();
+		}
+		char analysisType = input.toUpperCase().charAt(0);
 		if (analysisType == '1') {
 			LocalDate[] dates = this.getDatesForDataAnalysis();
 			System.out.println("Would you like to choose days over the period to only include?(Yes/No)");
@@ -414,11 +485,21 @@ public class TextUI {
 		} else if (analysisType == '2') {
 			LocalDate[] dates = this.getDatesForDataAnalysis();
 			System.out.println("Would you like to choose days over the period to only include?(Yes/No)");
-			String choice = in.nextLine().toUpperCase();
+			input = in.nextLine();
+			while (input.equals("") || input.equals(" ")) {
+				System.out.println("Please enter your choice: ");
+				input = in.nextLine();
+			}
+			String choice = input.toUpperCase();
 			System.out.println("Would you like A)occupant numbers information or B)room count information?");
 			boolean numbers = true;
 			TreeMap<Room, Integer> hotelRooms = null;
-			char choice1 = in.nextLine().toUpperCase().charAt(0);
+			input = in.nextLine();
+			while (input.equals("") || input.equals(" ")) {
+				System.out.println("Please enter your choice: ");
+				input = in.nextLine();
+			}
+			char choice1 = input.toUpperCase().charAt(0);
 			if (choice1 == 'A') {
 				numbers = true;
 				hotelRooms = null;
@@ -447,12 +528,22 @@ public class TextUI {
 	private void runAsCustomer() {
 		boolean loggedIn = true;
 		System.out.println("Please enter your name: ");
-		this.user = new Customer(in.nextLine(), this.hotelName, system);
+		String name = in.nextLine();
+		while (name.equals("") || name.equals(" ")) {
+			System.out.println("Please enter your name: ");
+			name = in.nextLine();
+		}
+		this.user = new Customer(name, this.hotelName, system);
 		while (loggedIn) {
 			System.out.println("\nHotel: " + this.hotelName);
 			System.out.println(
 					"\nWould you like to M)ake a reservation, C(ancel a reservation, V)iew a reservation or L)ogout?");
-			char command = in.nextLine().toUpperCase().charAt(0);
+			String input = in.nextLine();
+			while (input.equals("") || input.equals(" ")) {
+				System.out.println("Please enter your choice: ");
+				input = in.nextLine();
+			}
+			char command = input.toUpperCase().charAt(0);
 			if (command == 'M') {
 				makeReservation();
 			} else if (command == 'C') {
@@ -469,13 +560,17 @@ public class TextUI {
 	 * Provides the interface visible to the desk clerk
 	 */
 	private void runAsDeskClerk() {
-		String Password = "deskAdmin";
+		String password = "deskAdmin";
 		System.out.println("Enter Password: ");
 		boolean run = true;
 		while (run) {
 			boolean loggedIn = false;
 			String input = in.nextLine();
-			if (input.equals(Password)) {
+			while (input.equals("")) {
+				System.out.println("Please enter a password: ");
+				password = in.nextLine();
+			}
+			if (input.equals(password)) {
 				System.out.println("Correct Password! Welcome!");
 				loggedIn = true;
 				run = false;
@@ -488,7 +583,12 @@ public class TextUI {
 			while (loggedIn) {
 				System.out.println("\nHotel: " + this.hotelName);
 				System.out.println("\nWould you like to access R)eservations, C)heck-in/out or L)ogout?");
-				char command = in.nextLine().toUpperCase().charAt(0);
+				input = in.nextLine();
+				while (input.equals("") || input.equals(" ")) {
+					System.out.println("Please enter your choice: ");
+					input = in.nextLine();
+				}
+				char command = input.toUpperCase().charAt(0);
 				if (command == 'R') {
 					System.out.println(
 							"Would you like to M)ake a reservation, C(ancel a reservation or V)iew a reservation?");
@@ -525,7 +625,11 @@ public class TextUI {
 		while (run) {
 			System.out.println("Please enter your password: ");
 			String input = in.nextLine();
-			if (password.equals(password)) {
+			while (input.equals("")) {
+				System.out.println("Please enter a password: ");
+				input = in.nextLine();
+			}
+			if (password.equals(input)) {
 				System.out.println("You have been logged in!");
 				loggedIn = true;
 				run = false;
@@ -541,7 +645,12 @@ public class TextUI {
 
 			System.out.println(
 					"\nWould you like to access \n1)reservations \n2)check-in/out \n3)apply discounts \n4)data analytics or \n5)Logout");
-			char command = in.nextLine().toUpperCase().charAt(0);
+			String input = in.nextLine();
+			while (input.equals("") || input.equals(" ")) {
+				System.out.println("Please enter your choice: ");
+				input = in.nextLine();
+			}
+			char command = input.toUpperCase().charAt(0);
 			if (command == '1') {
 
 				System.out.println("Would you like to M)ake a reservation or C(ancel a reservation? ");
@@ -583,7 +692,12 @@ public class TextUI {
 		this.hotelName = (String) getChoice(hotelNames);
 		while (run) {
 			System.out.println("\nWould you like to L)ogin or C)hange hotel or Q)uit?");
-			char ch = in.nextLine().toUpperCase().charAt(0);
+			String input = in.nextLine();
+			while (input.equals("") || input.equals(" ")) {
+				System.out.println("Please enter your choice: ");
+				input = in.nextLine();
+			}
+			char ch = input.toUpperCase().charAt(0);
 			if (ch == 'L') {
 				System.out.println("Please choose which user to login as: ");
 				String[] users = { "Customer", "Desk Clerk", "Supervisor" };
@@ -620,7 +734,12 @@ public class TextUI {
 				ch++;
 			}
 
-			char input = in.nextLine().toUpperCase().charAt(0);
+			String line = in.nextLine();
+			while (line.equals("")) {
+				System.out.println("Please enter your choice: ");
+				line = in.nextLine();
+			}
+			char input = line.toUpperCase().charAt(0);
 			int index = input - 'A';
 			if (index >= 0 && index < objs.length) {
 				return objs[index];
@@ -651,7 +770,12 @@ public class TextUI {
 				ch++;
 			}
 			System.out.println("Q)uit selection");
-			char input = in.nextLine().toUpperCase().charAt(0);
+			String line = in.nextLine();
+			while (line.equals("")) {
+				System.out.println("Please enter your choice");
+				line = in.nextLine();
+			}
+			char input = line.toUpperCase().charAt(0);
 			if (input == 'Q' || days.size() == allDays.size()) {
 				return days;
 			}

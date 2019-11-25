@@ -143,7 +143,7 @@ public class DataAnalysis {
 	 */
 	private void writeDataToFile(String filePath, Object[][] data) {
 		File file = new File(filePath);
-		try (PrintWriter writer = new PrintWriter(file)) {
+		try (PrintWriter writer = new PrintWriter(file, "UTF-8")) {
 			if (!file.exists()) {
 				file.createNewFile();
 			}

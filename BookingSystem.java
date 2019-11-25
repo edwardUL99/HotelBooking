@@ -735,7 +735,7 @@ public class BookingSystem implements CsvTools {
 	@Override
 	public void writeDataToFile(String filePath, Object[][] data) {
 		File file = new File(filePath);
-		try (PrintWriter writer = new PrintWriter(file)) {
+		try (PrintWriter writer = new PrintWriter(file, "UTF-8")) {
 			if (!file.exists()) {
 				file.createNewFile();
 			}
