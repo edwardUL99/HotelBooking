@@ -365,7 +365,7 @@ public class TextUI {
 		// call getTotalCostCalculated() for a reservation either here or at checkout
 		System.out.println("Please enter the customer name: ");
 		String name = in.nextLine();
-		System.out.println("Please enter the check-in date(dd/mm/yyyy): ");
+		System.out.println("Please enter the check-in date(dd/mm/yyyy): "); //leave as LocalDate.now()??
 		LocalDate checkin = getDate(true);
 		System.out.println("Please enter the booking number: ");
 		try {
