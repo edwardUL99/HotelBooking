@@ -1,1 +1,7 @@
+NOTE: You need passwords for the DeskClerk and Supervisor (to prevent a customer from checking themselves in or applying
+discounts. The passwords are :
+
+DESKCLERK: deskAdmin
+SUPERVISOR: admin
+
 See README.md

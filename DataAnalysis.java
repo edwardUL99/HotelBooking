@@ -6,7 +6,6 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.TreeMap;
 
 public class DataAnalysis {
@@ -211,7 +210,7 @@ public class DataAnalysis {
 		int row = 1;
 		row = 1;
 		int lastIndex = 1;
-		for (Entry<Room, ArrayList<Integer>> e : dailyTotals.entrySet()) {
+		for (Map.Entry<Room, ArrayList<Integer>> e : dailyTotals.entrySet()) {
 			lastIndex = 1;
 			data[row][lastIndex++] = e.getKey().getType();
 			for (int i = 0; i < numDays; i++) {
@@ -225,7 +224,7 @@ public class DataAnalysis {
 		}
 		
 		row = 1;
-		for (Entry<Room, Double> e : averages.entrySet()) {
+		for (Map.Entry<Room, Double> e : averages.entrySet()) {
 			data[row][0] = "";
 			data[row][lastIndex] = this.getNumberOfRoom(e.getKey(), start, end, days);
 			data[row][lastIndex+1] = String.format("%.02f", e.getValue());
@@ -234,7 +233,7 @@ public class DataAnalysis {
 		
 		row = 1;
 		lastIndex += 1;
-		for (Entry<Room, Double> e : averagesPerDay.entrySet()) {
+		for (Map.Entry<Room, Double> e : averagesPerDay.entrySet()) {
 			data[row][0] = "";
 			data[row][lastIndex + 1] = String.format("%.02f", e.getValue());
 			row++;
@@ -630,7 +629,6 @@ public class DataAnalysis {
 	 * @return a TreeMap of each room mapped to the total income generated for that
 	 *         room in the date period
 	 */
-	// 11
 	private TreeMap<Room, Double> getTotalIncomePerRoom(LocalDate start, LocalDate end, ArrayList<LocalDate> days) {
 		TreeMap<Room, Double> totals = new TreeMap<Room, Double>();
 		for (Map.Entry<Room, ArrayList<Double>> e : this.getAllTotalsPerRoom(start, end, days).entrySet()) {
@@ -661,7 +659,7 @@ public class DataAnalysis {
 	}
 	
 	/*
-	 * 
+	 * Gets all the occupant counts per room in the time period without averaging or totalling, i.e. if there are 7 of the same rooms booked, you will have 7 occupant counts in the arraylist for that room
 	 * @param start the start date of the date period 
 	 * @param end the end date of the date period
 	 * @param days the days to include in the analysis
@@ -712,7 +710,7 @@ public class DataAnalysis {
 	 */
 	private TreeMap<Room, Double> getAverageOccupantsPerRoom(LocalDate start, LocalDate end, ArrayList<LocalDate> days) {
 		TreeMap<Room, Double> averages = new TreeMap<Room, Double>();
-		for (Entry<Room, ArrayList<Integer>> e : this.getAllOccupantsPerRoom(start, end, days).entrySet()) {
+		for (Map.Entry<Room, ArrayList<Integer>> e : this.getAllOccupantsPerRoom(start, end, days).entrySet()) {
 			double average = 0;
 			for (int d : e.getValue()) {
 				average += (double) d;
@@ -732,14 +730,14 @@ public class DataAnalysis {
 	 */
 	private TreeMap<Room, Double> getAverageOccupantsPerRoomPerDay(LocalDate start, LocalDate end, ArrayList<LocalDate> days) {
 		TreeMap<Room, Double> averages = new TreeMap<Room, Double>();
-		for (Entry<Room, ArrayList<Integer>> e : this.getAllOccupantsPerRoom(start, end, days).entrySet()) {
+		for (Map.Entry<Room, ArrayList<Integer>> e : this.getAllOccupantsPerRoom(start, end, days).entrySet()) {
 			double average = 0;
 			for (int d : e.getValue()) {
 				average += (double) d;
 			}
-			average /= (double) (e.getValue()).size();
-			average /= days.size();
-			averages.put(e.getKey(), (double) average);
+			average /= (double) (e.getValue()).size(); //first get the average of ALL the occupants per room type
+			average /= (double)days.size(); //then get the average per day 
+			averages.put(e.getKey(), average);
 		}
 		return averages;
 	}
@@ -835,7 +833,6 @@ public class DataAnalysis {
 	 * @return a TreeMap of each room mapped to the total income generated for that
 	 *         room in the date period
 	 */
-	// 11
 	private TreeMap<Room, Integer> getTotalOccupantsPerRoom(LocalDate start, LocalDate end, ArrayList<LocalDate> days) {
 		TreeMap<Room, Integer> totals = new TreeMap<Room, Integer>();
 		for (Map.Entry<Room, ArrayList<Integer>> e : this.getAllOccupantsPerRoom(start, end, days).entrySet()) {

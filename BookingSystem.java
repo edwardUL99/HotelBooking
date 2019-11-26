@@ -65,7 +65,7 @@ public class BookingSystem implements CsvTools {
 					String roomType = values[1];
 					int numberOfRooms = Integer.parseInt(values[2]);
 					int[] occupancy = new int[4];
-					String[] occ = values[3].split("\\+");
+					String[] occ = values[3].split("\\+"); //+ is a special character in regex, so need to escape it
 					occupancy[0] = Integer.parseInt(occ[0]);
 					occupancy[1] = Integer.parseInt(occ[1]);
 					occ = values[4].split("\\+");
@@ -233,25 +233,16 @@ public class BookingSystem implements CsvTools {
 	 *         available in the hotel during this period
 	 */
 	public TreeMap<Room, Integer> getCurrentRooms(String hotelName, LocalDate from, LocalDate to) {
-		TreeMap<Room, Integer> hotelRooms = this.getRoomsFromFile().get(hotelName);
-		if (hotelRooms != null) {
-			TreeMap<Room, Integer> availableRooms = new TreeMap<Room, Integer>(hotelRooms); // Initialise it with
-																							// allRooms i.e the total
-																							// number of rooms in the
-																							// hotel regardless of if
-																							// booked or not
-			for (Room r : hotelRooms.keySet()) {
-				int numberTimesBooked = this.numberOfTimesRoomIsBookedAtDate(hotelName, r, from, to);
-				if (numberTimesBooked != -1) {
-					availableRooms.put(r, availableRooms.get(r) - numberTimesBooked);
-				}
-			}
-			return availableRooms;
+		TreeMap<Room, Integer> hotelRooms = new TreeMap<Room, Integer>(this.getAllRooms().get(hotelName)); //deepCopy to prevent the method from altering the rooms in the hotel
+		if (this.reservations.get(hotelName) == null) { //no reservations made so all rooms are available
+			return hotelRooms;
 		}
-		// N.B. At the moment this code doesn't take into account rooms booked during
-		// the date period that overflow as such the period with the number of nights
-		// staying. will have to fix this in the methods used by this method
-		return null;
+		TreeMap<Room, Integer> availableRooms = new TreeMap<Room, Integer>(hotelRooms); // Initialise it with allRooms i.e the total number of rooms in the hotel regardless of if booked or not
+		for (Room r : hotelRooms.keySet()) {
+			int numberTimesBooked = this.numberOfTimesRoomIsBookedAtDate(hotelName, r, from, to);
+			availableRooms.put(r, availableRooms.get(r) - numberTimesBooked);
+		}
+		return availableRooms;
 	}
 
 	/**
@@ -282,9 +273,12 @@ public class BookingSystem implements CsvTools {
 	 *         null if not
 	 */
 	public Reservation getReservation(String hotelName, String name, LocalDate checkIn, int number) {
-		for (Reservation r : this.reservations.get(hotelName)) {
-			if ((r.getName().equals(name) && r.getCheckinDate().equals(checkIn)) || r.getNumber() == number) {
-				return r;
+		ArrayList<Reservation> reservations = this.reservations.get(hotelName);
+		if (reservations != null) {
+			for (Reservation r : this.reservations.get(hotelName)) {
+				if ((r.getName().equals(name) && r.getCheckinDate().equals(checkIn)) || r.getNumber() == number) {
+					return r;
+				}
 			}
 		}
 		return null;

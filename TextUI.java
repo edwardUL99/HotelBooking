@@ -109,19 +109,17 @@ public class TextUI {
 	 * @return an ArrayList of room bookings for the rooms selected
 	 */
 	private ArrayList<RoomBooking> chooseRooms(int numberOfRooms, LocalDate from, LocalDate to) {
-		TreeMap<Room, Integer> map = new TreeMap<Room, Integer>(this.system.getCurrentRooms(this.hotelName, from, to));
-		ArrayList<Room> allRooms = new ArrayList<Room>(map.keySet());
+		TreeMap<Room, Integer> availableRooms = this.system.getCurrentRooms(this.hotelName, from, to);
+		ArrayList<Room> allRooms = new ArrayList<Room>(availableRooms.keySet());
 		ArrayList<RoomBooking> rooms = new ArrayList<RoomBooking>(numberOfRooms);
 		System.out.println("Room type");
 		while (rooms.size() != numberOfRooms) {
 			char ch = 'A';
-			ArrayList<Character> notAvailable = new ArrayList<Character>(5); // Keeps track of rooms that are not
-																				// available i.e. their rooms available
-																				// count is 0
+			ArrayList<Character> notAvailable = new ArrayList<Character>(5); // Keeps track of rooms that are not available i.e. their rooms available count is 0
 			for (int i = 0; i < allRooms.size(); i++) {
 				Room r = allRooms.get(i);
-				if (map.get(r) > 0) {
-					System.out.println(ch + ")" + r.getType() + " " + map.get(r)
+				if (availableRooms.get(r) > 0) {
+					System.out.println(ch + ")" + r.getType() + " " + availableRooms.get(r)
 							+ " available. Maximum adult occupancy: " + r.occupancy(true, false)
 							+ ". Maximum children occupancy: " + r.occupancy(false, false) + ".");
 				} else {
@@ -135,9 +133,7 @@ public class TextUI {
 				System.out.println("Please enter your choice: ");
 				input = in.nextLine();
 			}
-			if (notAvailable.contains(input.toUpperCase().charAt(0))) { // If notAvailable contains the choice, the user
-																		// tried to choose a room that has been booked
-																		// out
+			if (notAvailable.contains(input.toUpperCase().charAt(0))) { // If notAvailable contains the choice, the user tried to choose a room that has been booked out
 				System.out.println("You cannot choose this room, as it is booked out. Please choose another.");
 			} else {
 				int n = input.toUpperCase().charAt(0) - 'A';
@@ -156,10 +152,10 @@ public class TextUI {
 						int children = Integer.parseInt(occupancy[1]);
 						if (n >= 0 && n < allRooms.size()) {
 							Room choice = allRooms.get(n);
-							map.put(choice, map.get(choice) - 1); // decrement as this room was chosen
 							if ((adults >= choice.occupancy(true, true) && adults <= choice.occupancy(true, false))
 									&& (children >= choice.occupancy(false, true)
 											&& children <= choice.occupancy(false, false))) {
+								availableRooms.put(choice, availableRooms.get(choice) - 1); // decrement as this room was chosen
 								boolean run = true;
 								while (run) {
 									System.out.println("Would you like breakfast included with the room? (Yes/No)");
@@ -178,9 +174,9 @@ public class TextUI {
 										System.out.println("Please choose yes/no");
 									}
 								}
-							}
-						} else {
+							} else {
 							System.out.println("The room chosen is not suitable for the number of adults or children you entered, please try again");
+							}
 						}
 					} catch (NumberFormatException e) {
 						System.out.println("You can only enter a number for the number of adults or number of children");
@@ -292,12 +288,13 @@ public class TextUI {
 			if (this.confirmBooking(this.hotelName, this.user.name, type, checkin, numNights, numPeople, numRooms,rooms)) {
 				Reservation created = this.user.createReservation(this.hotelName, this.user.name, type, checkin, numNights,numPeople, numRooms, rooms);
 				if (created != null) {
+					created.getTotalCostCalculated();
 					System.out.println("Reservation #" + created.getNumber() + " created successfully(Please take note of the number for future reference)");
 				} else {
 					System.out.println("The reservation was unsuccessful");
 				}
 			} else {
-				System.out.println("Reservation cancelled");
+				System.out.println("Transaction cancelled");
 			}
 		} catch (NumberFormatException e) {
 			System.out.println("You can only enter numbers for number of people or number of rooms");

@@ -22,8 +22,7 @@ public class DeskClerk extends User {
 			return false;
 		} else {
 			if (!this.system.isStayed(this.hotelName, reservation)) { //if reservation is already a stay no point checking in
-				HotelStay stay = new HotelStay(reservation); 
-				reservation.getTotalCostCalculated(); //Updates their bill with total cost
+				HotelStay stay = new HotelStay(reservation);
 				reservation.getDeposit().setBilledDate(reservation.getCheckinDate()); //billed on arrival
 				this.system.addHotelStay(this.hotelName, stay);
 				System.out.println("Your deposit payable is:\n" + reservation.getDeposit());
