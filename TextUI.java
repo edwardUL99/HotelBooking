@@ -288,7 +288,6 @@ public class TextUI {
 			if (this.confirmBooking(this.hotelName, this.user.name, type, checkin, numNights, numPeople, numRooms,rooms)) {
 				Reservation created = this.user.createReservation(this.hotelName, this.user.name, type, checkin, numNights,numPeople, numRooms, rooms);
 				if (created != null) {
-					created.getTotalCostCalculated();
 					System.out.println("Reservation #" + created.getNumber() + " created successfully(Please take note of the number for future reference)");
 				} else {
 					System.out.println("The reservation was unsuccessful");
@@ -441,7 +440,7 @@ public class TextUI {
 	 */
 	private void dataAnalyticsServices() {
 		Supervisor temp = (Supervisor) this.user;
-		System.out.println("Would you like to \n1) access billing analysis" + "\n2) access occupancy analysis");
+		System.out.println("Would you like to \n1)access billing analysis" + "\n2)access occupancy analysis");
 		String input = in.nextLine();
 		while (input.equals("") || input.equals(" ")) {
 			System.out.println("Please enter your choice: ");
@@ -518,8 +517,7 @@ public class TextUI {
 		this.user = new Customer(name, this.hotelName, system);
 		while (loggedIn) {
 			System.out.println("\nHotel: " + this.hotelName);
-			System.out.println(
-					"\nWould you like to M)ake a reservation, C(ancel a reservation, V)iew a reservation or L)ogout?");
+			System.out.println("\nWould you like to M)ake a reservation, C(ancel a reservation, V)iew a reservation or L)ogout?");
 			String input = in.nextLine();
 			while (input.equals("") || input.equals(" ")) {
 				System.out.println("Please enter your choice: ");
@@ -626,15 +624,14 @@ public class TextUI {
 		while (loggedIn) {
 			System.out.println("\nHotel: " + this.hotelName);
 
-			System.out.println("\nWould you like to access \n1)reservations \n2)check-in/out \n3)apply discounts \n4)data analytics or \n5)Logout");
+			System.out.println("\nWould you like to access \nR)eservations \nC)heck-in/out \nA)pply discounts \nD)ata analytics or \nL)ogout");
 			String input = in.nextLine();
 			while (input.equals("") || input.equals(" ")) {
 				System.out.println("Please enter your choice: ");
 				input = in.nextLine();
 			}
 			char command = input.toUpperCase().charAt(0);
-			if (command == '1') {
-
+			if (command == 'R') {
 				System.out.println("Would you like to M)ake a reservation or C(ancel a reservation? ");
 				command = in.nextLine().toUpperCase().charAt(0);
 				System.out.println("Please enter the customer name: ");
@@ -645,13 +642,13 @@ public class TextUI {
 					cancelReservation();
 				}
 
-			} else if (command == '2') {
+			} else if (command == 'C') {
 				this.checkinServices();
-			} else if (command == '3') {
+			} else if (command == 'A') {
 				this.applyDiscountToReservation();
-			} else if (command == '4') {
+			} else if (command == 'D') {
 				this.dataAnalyticsServices();
-			} else if (command == '5') {
+			} else if (command == 'L') {
 				loggedIn = false;
 			}
 		}

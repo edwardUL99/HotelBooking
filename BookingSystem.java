@@ -501,6 +501,7 @@ public class BookingSystem implements CsvTools {
 				this.reservations.put(hotelName, new ArrayList<Reservation>());
 			}
 			this.reservations.get(hotelName).add(reservation);
+			reservation.getTotalCostCalculated();
 			this.updateFiles("Reservations");
 			return reservation;
 		}
