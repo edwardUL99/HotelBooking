@@ -84,7 +84,7 @@ public class DataAnalysis {
 		lastIndex += 1;
 		for (Map.Entry<Room, Double> e : averagesPerDay.entrySet()) {
 			data[row][0] = "";
-			data[row][lastIndex + 1] = String.format("\u20ac%.02f", e.getValue());
+			data[row][lastIndex + 1] = String.format("$%.02f", e.getValue());
 			row++;
 		}
 
