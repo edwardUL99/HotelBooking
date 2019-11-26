@@ -551,7 +551,6 @@ public class BookingSystem implements CsvTools {
 				return false; // already checkedin
 			}
 			this.stays.get(hotelName).add(stay);
-			this.updateFiles("Reservations");
 			this.updateFiles("Stays");
 			return true;
 		}
