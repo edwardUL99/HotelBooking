@@ -543,7 +543,7 @@ public class TextUI {
 	 */
 	private void runAsDeskClerk() {
 		String password = "deskAdmin";
-		System.out.println("Enter Password: ");
+		System.out.println("Enter Password (or Cancel(C)): ");
 		boolean run = true;
 		while (run) {
 			boolean loggedIn = false;
@@ -559,7 +559,8 @@ public class TextUI {
 			} else if (input.equals("C") || input.equals("c")) {
 				run = false;
 			} else {
-				System.out.println("Incorrect Password. Please Try Again or Cancel (C)");
+				System.out.println("Incorrect Password");
+				run = false;
 			}
 			this.user = new DeskClerk(hotelName, system);
 			while (loggedIn) {
@@ -572,8 +573,7 @@ public class TextUI {
 				}
 				char command = input.toUpperCase().charAt(0);
 				if (command == 'R') {
-					System.out.println(
-							"Would you like to M)ake a reservation, C(ancel a reservation or V)iew a reservation?");
+					System.out.println("Would you like to M)ake a reservation, C(ancel a reservation or V)iew a reservation?");
 					command = in.nextLine().toUpperCase().charAt(0);
 					if (command == 'M') {
 						System.out.println("Please enter the customer name: ");
@@ -605,7 +605,7 @@ public class TextUI {
 		String password = "admin";
 		boolean run = true;
 		while (run) {
-			System.out.println("Please enter your password: ");
+			System.out.println("Enter password (or cancel(C)): ");
 			String input = in.nextLine();
 			while (input.equals("")) {
 				System.out.println("Please enter a password: ");
@@ -618,7 +618,8 @@ public class TextUI {
 			} else if (input.equals("C") || input.equals("c")) {
 				run = false;
 			} else {
-				System.out.println("Password incorrect. Please try again or cancel(C)");
+				System.out.println("Password incorrect");
+				run = false;
 			}
 		}
 		this.user = new Supervisor(this.hotelName, system);
